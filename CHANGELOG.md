@@ -1,12 +1,17 @@
 # Changelog
 
+## 0.3.1
+
+- Removed seed data — new users start with empty library
+- Header logo shown on all pages (removed library-page hide)
+- Consistent header spacing across all views
+
 ## 0.3.0
 
 - Client-only architecture: removed Hono server, all logic runs in browser
 - localStorage persistence (no server, no cloud, no tracking)
 - Client-side ISBN lookup (Open Library + Google Books, direct CORS)
 - Client-side export generation (JSON, CSV, Goodreads, LibraryThing) via Blob download
-- Seed data migration: existing book collection auto-loaded into localStorage on first visit
 - Custom SVG splash screen artwork with dithered noise gradient background
 - Custom SVG favicon (BF monogram)
 - Header logo: "BOOK FREEDOM" line logo (stroke-only text with echo effect)
