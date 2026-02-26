@@ -1,11 +1,13 @@
 {
-  "name": "Sokola",
-  "short_name": "Sokola",
-  "description": "Scan ISBN barcodes and manage your book collection",
+  "name": "Books Freedom",
+  "short_name": "Books Freedom",
+  "description": "Scan ISBN barcodes and manage your book collection. No account, no cloud, no tracking.",
+  "id": "/",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0f0f1a",
-  "theme_color": "#1a1a2e",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
   "orientation": "portrait",
   "icons": [
     {

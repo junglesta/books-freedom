@@ -21,11 +21,25 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <link rel="apple-touch-icon" href="/icon-192.png" />
   <link rel="manifest" href="/manifest.json" />
+  <link rel="canonical" href="https://laser.junglestar.org/" />
+  <meta name="description" content="Scan ISBN barcodes and manage your book collection. No account, no cloud, no tracking." />
   <title>Books Freedom</title>
   <link rel="icon" type="image/png" href="/icon-192.png" />
   <link rel="stylesheet" href="./assets/styles.css" />
 </head>
 <body>
+  <svg style="position:absolute;width:0;height:0" aria-hidden="true">
+    <filter id="dither" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" result="noise"/>
+      <feColorMatrix in="noise" type="saturate" values="0" result="gray"/>
+      <feBlend in="SourceGraphic" in2="gray" mode="overlay" result="mixed"/>
+      <feComponentTransfer in="mixed">
+        <feFuncR type="discrete" tableValues="0 0.831"/>
+        <feFuncG type="discrete" tableValues="0 1"/>
+        <feFuncB type="discrete" tableValues="0 0"/>
+      </feComponentTransfer>
+    </filter>
+  </svg>
   <div id="app"></div>
   <script type="module" src="./main.ts"></script>
   <script>

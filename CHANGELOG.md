@@ -13,6 +13,8 @@
 - Export page: split subtitle and heading into separate elements
 - Netlify deploy config (netlify.toml)
 - README.md and LICENSE (CC BY-SA 4.0)
+- PWA updated: manifest, service worker, canonical URL (laser.junglestar.org)
+- Dithered noise background on desktop (SVG feTurbulence filter)
 
 ## 0.1.0
 

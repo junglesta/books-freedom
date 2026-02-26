@@ -1263,14 +1263,25 @@ h1 .count {
     display: flex;
     align-items: center;
     justify-content: center;
+    background: transparent;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, #0a0a0a 0%, #0a0a0a 25%, #d4ff00 100%);
+    filter: url(#dither);
   }
 
   #app {
-    max-width: 1235px;
+    max-width: 640px;
     width: 100%;
     max-height: 95vh;
     overflow-y: auto;
     scrollbar-width: none;
+    background: var(--bg);
     border: 2px solid limegreen;
     border-radius: 16px;
   }
