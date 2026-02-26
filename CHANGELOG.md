@@ -12,6 +12,7 @@
 - Package name updated to books-freedom
 - Export page: split subtitle and heading into separate elements
 - Netlify deploy config (netlify.toml)
+- README.md and LICENSE (CC BY-SA 4.0)
 
 ## 0.1.0
 

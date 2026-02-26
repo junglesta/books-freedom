@@ -38,4 +38,6 @@ docker compose up
 
 ## license
 
-do whatever you want with it.
+CC BY-SA 4.0 — share it, remix it, just keep it open.
+
+want to use our SDK or build something commercial? hit us up at **info@junglestar.org**
