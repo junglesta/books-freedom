@@ -8,8 +8,10 @@
 - Desktop frame: limegreen border with rounded corners at 1235px+, centered x/y
 - Desktop scroll contained inside frame with hidden scrollbar
 - Sticky nav inside desktop frame (no longer escapes container)
-- GitHub repo renamed from bukuku to sokola
+- GitHub repo renamed from bukuku to books-freedom
+- Package name updated to books-freedom
 - Export page: split subtitle and heading into separate elements
+- Netlify deploy config (netlify.toml)
 
 ## 0.1.0
 
