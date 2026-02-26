@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bukuku-v1';
+const CACHE_NAME = 'sokola-v1';
 const PRECACHE = [
   '/',
   '/manifest.json',

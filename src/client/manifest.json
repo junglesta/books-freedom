@@ -1,6 +1,6 @@
 {
-  "name": "Bukuku",
-  "short_name": "Bukuku",
+  "name": "Sokola",
+  "short_name": "Sokola",
   "description": "Scan ISBN barcodes and manage your book collection",
   "start_url": "/",
   "display": "standalone",

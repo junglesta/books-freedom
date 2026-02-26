@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.0
+
+- Rebrand app name from "sokola" to "BOOKS FREEDOM"
+- New open book icon (replaces crosshair/book combo)
+- Brand layout: BOOKS [icon] FREEDOM in one row (stacked on splash)
+- Desktop frame: limegreen border with rounded corners at 1235px+, centered x/y
+- Desktop scroll contained inside frame with hidden scrollbar
+- Sticky nav inside desktop frame (no longer escapes container)
+- GitHub repo renamed from bukuku to sokola
+- Export page: split subtitle and heading into separate elements
+
 ## 0.1.0
 
 Initial release.

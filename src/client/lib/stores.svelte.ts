@@ -12,7 +12,7 @@ let toastVisible = $state(false);
 let toastTimeout: ReturnType<typeof setTimeout> | null = null;
 
 // Library name state
-let libraryName = $state(localStorage.getItem('bukuku_library_name') || 'Library');
+let libraryName = $state(localStorage.getItem('sokola_library_name') || 'Library');
 
 export function getLibraryName() {
   return libraryName;
@@ -20,7 +20,7 @@ export function getLibraryName() {
 
 export function setLibraryName(name: string) {
   libraryName = name;
-  localStorage.setItem('bukuku_library_name', name);
+  localStorage.setItem('sokola_library_name', name);
 }
 
 // Current route

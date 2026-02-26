@@ -2,7 +2,7 @@
   import { getBooks, showToast, getLibraryName } from '../lib/stores.svelte.ts';
   import { exportGoogleSheets } from '../lib/api';
 
-  let webhookUrl = $state(localStorage.getItem('bukuku_sheets_url') || '');
+  let webhookUrl = $state(localStorage.getItem('sokola_sheets_url') || '');
   let exporting = $state(false);
   let openHelp = $state<string | null>(null);
 
@@ -76,7 +76,7 @@
       return;
     }
 
-    localStorage.setItem('bukuku_sheets_url', webhookUrl);
+    localStorage.setItem('sokola_sheets_url', webhookUrl);
     exporting = true;
 
     try {
@@ -91,7 +91,8 @@
 </script>
 
 <div class="export-page">
-  <p class="export-subtitle">{getBooks().length} Books in <span class="export-library-name">{getLibraryName()}</span> | Pick Export format:</p>
+  <p class="export-subtitle">{getBooks().length} Books in <span class="export-library-name">{getLibraryName()}</span></p>
+  <h2 class="export-heading">Pick Export format:</h2>
 
   {#each formats as fmt}
     <div class="export-section">
