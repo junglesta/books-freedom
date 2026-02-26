@@ -1,24 +1,22 @@
 <p align="center">
-  <img src="logo.svg" alt="Books Freedom" width="96">
+  <img src="logo.svg" alt="Book Freedom" width="480">
 </p>
 
-# BOOKS FREEDOM
+> no account, no cloud, no tracking.
 
 scan it. shelve it. own your data.
 
 ## why
 
-because your reading list shouldn't live on some corpo platform that sells your habits, goes down randomly, or gets acqui-hired into oblivion. 
+because your reading list shouldn't live on some corpo platform that sells your habits, goes down randomly, or gets acqui-hired into oblivion.
 
 your books, your device, your rules.
 
 ## what
 
-a dead-simple book library app. point your camera at a barcode, get the book info, done. 
+a dead-simple book library app. point your camera at a barcode, get the book info, done.
 
-no account, no cloud, no tracking. 
-
-everything stays on your device.
+everything stays on your device in localStorage. nothing leaves the browser.
 
 ## how
 
@@ -31,19 +29,13 @@ everything stays on your device.
 
 ## stack
 
-svelte 5 + vite + hono + bun. dark mode only. runs in docker or bare metal.
+svelte 5 + vite. pure static SPA. dark mode only. deploy anywhere.
 
 ## run it
 
 ```bash
 pnpm install
 pnpm dev
-```
-
-or docker:
-
-```bash
-docker compose up
 ```
 
 ## license

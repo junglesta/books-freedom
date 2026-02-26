@@ -17,6 +17,7 @@
 - Fixed splash popover animation override
 - Removed server dependencies (hono, uuid, concurrently)
 - a11y: keyboard event handlers on all interactive elements
+- README updated: new logo, "no account, no cloud, no tracking" quote, removed docker/server refs
 
 ## 0.2.1
 
