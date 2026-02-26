@@ -1,14 +1,24 @@
+<p align="center">
+  <img src="logo.svg" alt="Books Freedom" width="96">
+</p>
+
 # BOOKS FREEDOM
 
 scan it. shelve it. own your data.
 
 ## why
 
-because your reading list shouldn't live on some corpo platform that sells your habits, goes down randomly, or gets acqui-hired into oblivion. your books, your device, your rules.
+because your reading list shouldn't live on some corpo platform that sells your habits, goes down randomly, or gets acqui-hired into oblivion. 
+
+your books, your device, your rules.
 
 ## what
 
-a dead-simple book library app. point your camera at a barcode, get the book info, done. no account, no cloud, no tracking. everything stays on your device.
+a dead-simple book library app. point your camera at a barcode, get the book info, done. 
+
+no account, no cloud, no tracking. 
+
+everything stays on your device.
 
 ## how
 

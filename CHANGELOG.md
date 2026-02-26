@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0
+## 0.2.1
 
 - Rebrand app name from "sokola" to "BOOKS FREEDOM"
 - New open book icon (replaces crosshair/book combo)
