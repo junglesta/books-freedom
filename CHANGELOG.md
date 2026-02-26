@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.3
+
+- Camera auto-stops after successful barcode scan
+- Fixed Stop Camera button not working on desktop
+- Simplified scanner cleanup (bulletproof stop/clear/innerHTML fallback)
+
 ## 0.3.2
 
 - Fixed barcode scanner: was scanning QR codes instead of EAN-13 barcodes (wrong format enum)

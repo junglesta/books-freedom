@@ -117,6 +117,7 @@
         (decodedText: string) => {
           const cleaned = decodedText.replace(/[^0-9]/g, '');
           if (cleaned.length === 13 || cleaned.length === 10) {
+            stopScanner();
             onScan(cleaned);
           }
         },
@@ -130,15 +131,14 @@
   }
 
   async function stopScanner() {
-    if (scanner) {
-      try {
-        await scanner.stop();
-      } catch {
-        // Ignore stop errors
-      }
-      scanner = null;
-      isScanning = false;
+    const s = scanner;
+    scanner = null;
+    isScanning = false;
+    if (s) {
+      try { await s.stop(); } catch {}
+      try { s.clear(); } catch {}
     }
+    if (scannerRef) scannerRef.innerHTML = '';
   }
 
   function submitIsbn13(e: Event) {
@@ -175,7 +175,7 @@
     {/if}
   </div>
   {#if isScanning}
-    <button class="btn btn-ghost" onclick={stopScanner}>Stop Camera</button>
+    <button class="btn btn-primary" onclick={stopScanner}>Stop Camera</button>
   {/if}
   {#if !isScanning && scannerError}
     <div class="scanner-error">
