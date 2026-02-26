@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.2
+
+- Fixed barcode scanner: was scanning QR codes instead of EAN-13 barcodes (wrong format enum)
+- Added EAN-8 and UPC-A barcode format support
+- Fixed scanner DOM swap destroying camera video feed
+- Added Permissions-Policy camera header to netlify.toml
+- Version number shown on splash screen
+
 ## 0.3.1
 
 - Removed seed data — new users start with empty library

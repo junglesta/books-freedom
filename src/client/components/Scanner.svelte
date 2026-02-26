@@ -100,7 +100,7 @@
     scannerError = '';
 
     try {
-      const { Html5Qrcode } = await import('html5-qrcode');
+      const { Html5Qrcode, Html5QrcodeSupportedFormats } = await import('html5-qrcode');
       scanner = new Html5Qrcode(scannerRef.id);
 
       await scanner.start(
@@ -108,11 +108,15 @@
         {
           fps: 10,
           qrbox: { width: 280, height: 100 },
-          formatsToSupport: [0], // EAN_13
+          formatsToSupport: [
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.EAN_8,
+            Html5QrcodeSupportedFormats.UPC_A,
+          ],
         },
         (decodedText: string) => {
           const cleaned = decodedText.replace(/[^0-9]/g, '');
-          if (cleaned.length === 13) {
+          if (cleaned.length === 13 || cleaned.length === 10) {
             onScan(cleaned);
           }
         },
@@ -163,20 +167,20 @@
 </script>
 
 <div class="scanner-container">
-  {#if isScanning}
-    <div id="scanner-view" bind:this={scannerRef} class="scanner-view"></div>
-    <button class="btn btn-ghost" onclick={stopScanner}>Stop Camera</button>
-  {:else}
-    <div id="scanner-view" bind:this={scannerRef} class="scanner-view-idle">
+  <div id="scanner-view" bind:this={scannerRef} class={isScanning ? 'scanner-view' : 'scanner-view-idle'}>
+    {#if !isScanning}
       <button class="btn btn-primary scanner-start-btn" onclick={startScanner}>
         Open Camera Scanner
       </button>
-    </div>
-    {#if scannerError}
-      <div class="scanner-error">
-        <p>{scannerError}</p>
-      </div>
     {/if}
+  </div>
+  {#if isScanning}
+    <button class="btn btn-ghost" onclick={stopScanner}>Stop Camera</button>
+  {/if}
+  {#if !isScanning && scannerError}
+    <div class="scanner-error">
+      <p>{scannerError}</p>
+    </div>
   {/if}
 
   <div class="manual-section">

@@ -8,6 +8,7 @@
     import { getRoute, loadBooks } from "./lib/stores.svelte";
     import logoUrl from "./assets/logo.svg";
     import headerLogoUrl from "./assets/header-logo.svg";
+    import { version } from "../../package.json";
 
     let splashDone = $state(false);
     let showSplash = $state(false);
@@ -26,6 +27,7 @@
 
 {#if !splashDone}
     <div class="splash">
+        <span class="splash-version">version {version}</span>
         <img class="splash-logo" src={logoUrl} alt="Book's Freedom" />
     </div>
 {:else}
@@ -37,6 +39,7 @@
             role="button"
             tabindex="-1"
         >
+            <span class="splash-version">version {version}</span>
             <img class="splash-logo" src={logoUrl} alt="Book's Freedom" />
         </div>
     {/if}
