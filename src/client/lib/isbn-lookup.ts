@@ -1,4 +1,4 @@
-import type { Book } from '../types';
+import type { Book } from './types';
 
 export async function lookupIsbn(isbn: string): Promise<Book | null> {
   const cleaned = isbn.replace(/[-\s]/g, '');

@@ -9,12 +9,21 @@
 
   let { book, onClose }: Props = $props();
 
-  let status = $state(book.status);
-  let rating = $state(book.rating || 0);
-  let notes = $state(book.notes || '');
-  let tagsInput = $state((book.tags || []).join(', '));
+  let status = $state<Book['status']>('to-read');
+  let rating = $state(0);
+  let language = $state('');
+  let notes = $state('');
+  let tagsInput = $state('');
   let saving = $state(false);
   let statusOpen = $state(false);
+
+  $effect(() => {
+    status = book.status;
+    rating = book.rating || 0;
+    language = book.language || '';
+    notes = book.notes || '';
+    tagsInput = (book.tags || []).join(', ');
+  });
 
   const statusOptions: { value: Book['status']; label: string }[] = [
     { value: 'to-read', label: 'To Read' },
@@ -33,6 +42,7 @@
       await updateBookInCollection(book.id, {
         status,
         rating: rating || undefined,
+        language: language || undefined,
         notes: notes || undefined,
         tags: tagsInput ? tagsInput.split(',').map((t) => t.trim()).filter(Boolean) : undefined,
         dateRead: status === 'read' && !book.dateRead ? new Date().toISOString() : book.dateRead,
@@ -110,6 +120,11 @@
           {/each}
         </div>
       </div>
+
+      <label class="form-group">
+        <span>Language</span>
+        <input type="text" bind:value={language} placeholder="eng, it, fr..." />
+      </label>
 
       <label class="form-group">
         <span>Notes</span>

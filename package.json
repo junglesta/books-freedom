@@ -1,24 +1,15 @@
 {
   "name": "books-freedom",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"bun run dev:server\" \"bun run dev:client\"",
-    "dev:server": "bun --watch src/server/index.ts",
-    "dev:client": "vite",
+    "dev": "vite",
     "build": "vite build",
-    "start": "NODE_ENV=production bun src/server/index.ts",
-    "preview": "bun run build && bun run start"
-  },
-  "dependencies": {
-    "hono": "^4.7.0",
-    "uuid": "^11.1.0"
+    "preview": "vite preview"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
-    "@types/uuid": "^10.0.0",
-    "concurrently": "^9.1.0",
     "html5-qrcode": "^2.3.8",
     "svelte": "^5.0.0",
     "typescript": "^5.7.0",

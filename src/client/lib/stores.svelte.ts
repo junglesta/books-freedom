@@ -1,5 +1,6 @@
-import type { Book } from './types';
-import { fetchBooks, addBook as apiAddBook, updateBook as apiUpdateBook, deleteBook as apiDeleteBook } from './api';
+import type { Book, ScanResult } from './types';
+import { getAllBooks, addBook, updateBook, deleteBook, getBookByIsbn } from './storage';
+import { lookupIsbn } from './isbn-lookup';
 
 // Book collection state
 let books = $state<Book[]>([]);
@@ -51,11 +52,11 @@ export function getError() {
   return error;
 }
 
-export async function loadBooks() {
+export function loadBooks() {
   loading = true;
   error = null;
   try {
-    books = await fetchBooks();
+    books = getAllBooks();
   } catch (e: any) {
     error = e.message;
   } finally {
@@ -63,9 +64,9 @@ export async function loadBooks() {
   }
 }
 
-export async function addBookToCollection(book: Partial<Book>) {
+export function addBookToCollection(book: Partial<Book>) {
   try {
-    const saved = await apiAddBook(book);
+    const saved = addBook(book);
     books = [...books, saved];
     showToast('Book added to library!');
     return saved;
@@ -75,9 +76,9 @@ export async function addBookToCollection(book: Partial<Book>) {
   }
 }
 
-export async function updateBookInCollection(id: string, updates: Partial<Book>) {
+export function updateBookInCollection(id: string, updates: Partial<Book>) {
   try {
-    const updated = await apiUpdateBook(id, updates);
+    const updated = updateBook(id, updates);
     books = books.map((b) => (b.id === id ? updated : b));
     showToast('Book updated!');
     return updated;
@@ -87,15 +88,36 @@ export async function updateBookInCollection(id: string, updates: Partial<Book>)
   }
 }
 
-export async function removeBookFromCollection(id: string) {
+export function removeBookFromCollection(id: string) {
   try {
-    await apiDeleteBook(id);
+    deleteBook(id);
     books = books.filter((b) => b.id !== id);
     showToast('Book removed.');
   } catch (e: any) {
     showToast(e.message);
     throw e;
   }
+}
+
+export async function scanIsbn(isbn: string): Promise<ScanResult> {
+  const cleaned = isbn.replace(/[-\s]/g, '');
+  if (!/^(\d{10}|\d{13})$/.test(cleaned)) {
+    throw new Error('Invalid ISBN format');
+  }
+
+  // Check if already in collection
+  const normalizedIsbn13 = cleaned.length === 13 ? cleaned : normalizeToIsbn13(cleaned);
+  const existing = getBookByIsbn(normalizedIsbn13);
+  if (existing) {
+    return { book: existing, alreadyExists: true };
+  }
+
+  const book = await lookupIsbn(cleaned);
+  if (!book) {
+    throw new Error('Book not found');
+  }
+
+  return { book, alreadyExists: false };
 }
 
 export function showToast(message: string) {
@@ -113,4 +135,14 @@ export function getToastMessage() {
 
 export function isToastVisible() {
   return toastVisible;
+}
+
+function normalizeToIsbn13(isbn: string): string {
+  const prefix = '978' + isbn.slice(0, 9);
+  let sum = 0;
+  for (let i = 0; i < 12; i++) {
+    sum += parseInt(prefix[i]) * (i % 2 === 0 ? 1 : 3);
+  }
+  const check = (10 - (sum % 10)) % 10;
+  return prefix + check;
 }

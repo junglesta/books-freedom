@@ -64,6 +64,7 @@ html, body {
   position: fixed;
   inset: 0;
   background: var(--bg);
+  user-select: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -73,23 +74,20 @@ html, body {
   animation: splash-fade 0.4s ease 1s forwards;
 }
 
-.splash-icon {
-  width: 96px;
-  height: 96px;
-  overflow: visible;
-  color: var(--primary);
-  animation: splash-draw 0.8s ease forwards;
+.splash::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, #0a0a0a 0%, #0a0a0a 25%, #d4ff00 100%);
+  filter: url(#dither);
 }
 
-.splash-title {
-  font-size: 40px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  line-height: 1;
-  text-transform: uppercase;
-  text-align: center;
-  color: var(--primary);
-  animation: splash-draw 0.8s ease 0.2s both;
+.splash-logo {
+  min-width: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  animation: splash-draw 0.8s ease forwards;
 }
 
 @keyframes splash-draw {
@@ -102,7 +100,7 @@ html, body {
 }
 
 .splash-popover {
-  animation: splash-in 0.25s ease forwards;
+  animation: splash-in 0.25s ease forwards !important;
   cursor: pointer;
 }
 
@@ -115,24 +113,18 @@ html, body {
 .brand {
   cursor: pointer;
   display: flex;
+  user-select: none;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 20px 16px 8px;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  line-height: 1;
-  text-transform: uppercase;
-  color: var(--primary);
+  padding: 24px 16px 16px;
   max-width: 600px;
   margin: 0 auto;
   width: 100%;
 }
 
-.brand-icon {
-  width: 40px;
+.brand-logo {
   height: 36px;
+  width: auto;
 }
 
 @media (min-width: 640px) {
@@ -206,20 +198,14 @@ html, body {
   .nav-brand {
     display: flex;
     align-items: center;
-    gap: 6px;
     margin-right: auto;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    line-height: 1;
-    text-transform: uppercase;
-    color: var(--primary);
+    cursor: pointer;
+    user-select: none;
   }
 
-  .nav-brand-icon {
-    width: 30px;
-    height: 27px;
-    color: var(--primary);
+  .nav-brand-logo {
+    height: 24px;
+    width: auto;
   }
 
   .nav-tab {
@@ -626,7 +612,7 @@ h1 .count {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 0 12px;
+  padding: 0 0 12px;
 }
 
 @media (min-width: 640px) {
@@ -1189,6 +1175,24 @@ h1 .count {
 .export-card p {
   font-size: 13px;
   color: var(--text-secondary);
+}
+
+.export-card-feedback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
 .sheets-section {

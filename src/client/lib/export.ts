@@ -1,4 +1,4 @@
-import type { Book } from '../types';
+import type { Book } from './types';
 
 function escapeCsv(val: string): string {
   if (val.includes(',') || val.includes('"') || val.includes('\n')) {
@@ -86,6 +86,16 @@ export function generateLibraryThingTsv(books: Book[]): string {
   ]);
 
   return [headers.join('\t'), ...rows.map((r) => r.join('\t'))].join('\n');
+}
+
+export function downloadBlob(content: string, filename: string, mimeType: string): void {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function formatGoodreadsDate(isoDate: string): string {

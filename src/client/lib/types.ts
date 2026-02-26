@@ -20,6 +20,11 @@ export interface Book {
   source: 'openlibrary' | 'googlebooks' | 'manual';
 }
 
+export interface BookCollection {
+  version: 1;
+  books: Book[];
+}
+
 export interface ScanResult {
   book: Book;
   alreadyExists: boolean;

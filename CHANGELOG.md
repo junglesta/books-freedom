@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.3.0
+
+- Client-only architecture: removed Hono server, all logic runs in browser
+- localStorage persistence (no server, no cloud, no tracking)
+- Client-side ISBN lookup (Open Library + Google Books, direct CORS)
+- Client-side export generation (JSON, CSV, Goodreads, LibraryThing) via Blob download
+- Seed data migration: existing book collection auto-loaded into localStorage on first visit
+- Custom SVG splash screen artwork with dithered noise gradient background
+- Custom SVG favicon (BF monogram)
+- Header logo: "BOOK FREEDOM" line logo (stroke-only text with echo effect)
+- Splash popover restored on both mobile and desktop (nav brand clickable)
+- Manual language field in book detail editor
+- Inline export feedback (spinner + "wait..." on card click)
+- Fixed Svelte 5 `state_referenced_locally` warnings in BookDetail
+- Fixed splash popover animation override
+- Removed server dependencies (hono, uuid, concurrently)
+- a11y: keyboard event handlers on all interactive elements
+
 ## 0.2.1
 
 - Rebrand app name from "sokola" to "BOOKS FREEDOM"
