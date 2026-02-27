@@ -7,6 +7,7 @@
         showToast,
         navigate,
     } from "../lib/stores.svelte";
+    import { getErrorMessage } from "../lib/error";
     import type { ScanResult } from "../lib/types";
 
     let preview = $state<ScanResult | null>(null);
@@ -28,8 +29,8 @@
             if (result.alreadyExists) {
                 showToast("This book is already in your library.");
             }
-        } catch (e: any) {
-            lookupError = e.message || "Book not found";
+        } catch (e: unknown) {
+            lookupError = getErrorMessage(e, "Book not found");
             preview = null;
         } finally {
             scanning = false;

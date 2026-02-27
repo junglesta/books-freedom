@@ -11,6 +11,12 @@
         LEGACY_SHEETS_URL_STORAGE_KEY,
         SHEETS_URL_STORAGE_KEY,
     } from "../lib/storage-keys";
+    import {
+        formatWebhookError,
+        getWebhookHost,
+        validateWebhookUrl,
+    } from "../lib/webhook";
+    import { getErrorMessage } from "../lib/error";
 
     function loadWebhookUrl(): string {
         const current = localStorage.getItem(SHEETS_URL_STORAGE_KEY);
@@ -122,27 +128,36 @@
     }
 
     async function pushToSheets() {
-        if (!webhookUrl.trim()) {
-            showToast("Please enter a webhook URL");
+        const validation = validateWebhookUrl(webhookUrl);
+        if (!validation.ok || !validation.normalizedUrl) {
+            showToast(validation.error || "Webhook URL is not valid");
             return;
         }
 
-        localStorage.setItem(SHEETS_URL_STORAGE_KEY, webhookUrl);
+        const collection = getRawCollection();
+        const confirmed = confirm(
+            `This will send ${collection.books.length} books (including notes/tags) to ${getWebhookHost(validation.normalizedUrl)}. Continue?`,
+        );
+        if (!confirmed) return;
+
+        webhookUrl = validation.normalizedUrl;
+        localStorage.setItem(SHEETS_URL_STORAGE_KEY, validation.normalizedUrl);
         exporting = true;
 
         try {
-            const collection = getRawCollection();
-            const resp = await fetch(webhookUrl, {
+            const resp = await fetch(validation.normalizedUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(collection),
             });
-            if (!resp.ok) throw new Error("Export failed");
+            if (!resp.ok) {
+                throw new Error(await formatWebhookError(resp));
+            }
             showToast(
                 `Exported ${collection.books.length} books to Google Sheets!`,
             );
-        } catch (e: any) {
-            showToast(e.message || "Export failed");
+        } catch (e: unknown) {
+            showToast(getErrorMessage(e, "Export failed"));
         } finally {
             exporting = false;
         }

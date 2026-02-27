@@ -8,7 +8,7 @@ beforeEach(() => {
 });
 
 function mockOpenLibrary(
-  data: Record<string, any> = {},
+  data: Record<string, unknown> = {},
   authorName = "Test Author",
   subjects: string[] = [],
 ) {
@@ -56,7 +56,7 @@ function _mockOpenLibraryFail() {
   });
 }
 
-function mockGoogleBooks(vol: Record<string, any> = {}) {
+function mockGoogleBooks(vol: Record<string, unknown> = {}) {
   return Promise.resolve({
     ok: true,
     json: () =>
@@ -144,7 +144,10 @@ describe("lookupIsbn", () => {
   it("strips hyphens from ISBN input", async () => {
     mockOpenLibrary();
     await lookupIsbn("978-0-14-143951-8");
-    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("9780141439518"));
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining("9780141439518"),
+      expect.objectContaining({ signal: expect.any(Object) }),
+    );
   });
 
   it("fetches Google Books language when OL has none", async () => {

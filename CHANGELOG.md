@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.11
+
+- Added page-level UI tests (Scan, Export, Library) with Testing Library + jsdom setup
+- Replaced runtime `any` error handling with typed/centralized error parsing helper
+- Hardened ISBN lookup network handling with request timeout + safer JSON parsing
+- Fixed Goodreads export date formatting for invalid dates (now blank instead of invalid date tokens)
+
 ## 0.3.10
 
 - Export hardening: neutralize spreadsheet formula-like cells in CSV/TSV exports

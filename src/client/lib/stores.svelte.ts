@@ -1,4 +1,6 @@
+import { getErrorMessage } from "./error";
 import { lookupIsbn } from "./isbn-lookup";
+import { scanIsbnWithDeps } from "./scan";
 import { addBook, deleteBook, getAllBooks, getBookByIsbn, updateBook } from "./storage";
 import { LEGACY_LIBRARY_NAME_STORAGE_KEY, LIBRARY_NAME_STORAGE_KEY } from "./storage-keys";
 import type { Book, ScanResult } from "./types";
@@ -71,8 +73,8 @@ export function loadBooks() {
   error = null;
   try {
     books = getAllBooks();
-  } catch (e: any) {
-    error = e.message;
+  } catch (e: unknown) {
+    error = getErrorMessage(e, "Failed to load books");
   } finally {
     loading = false;
   }
@@ -84,8 +86,8 @@ export function addBookToCollection(book: Partial<Book>) {
     books = [...books, saved];
     showToast("Book added to library!");
     return saved;
-  } catch (e: any) {
-    showToast(e.message);
+  } catch (e: unknown) {
+    showToast(getErrorMessage(e, "Failed to add book"));
     throw e;
   }
 }
@@ -96,8 +98,8 @@ export function updateBookInCollection(id: string, updates: Partial<Book>) {
     books = books.map((b) => (b.id === id ? updated : b));
     showToast("Book updated!");
     return updated;
-  } catch (e: any) {
-    showToast(e.message);
+  } catch (e: unknown) {
+    showToast(getErrorMessage(e, "Failed to update book"));
     throw e;
   }
 }
@@ -107,31 +109,17 @@ export function removeBookFromCollection(id: string) {
     deleteBook(id);
     books = books.filter((b) => b.id !== id);
     showToast("Book removed.");
-  } catch (e: any) {
-    showToast(e.message);
+  } catch (e: unknown) {
+    showToast(getErrorMessage(e, "Failed to remove book"));
     throw e;
   }
 }
 
 export async function scanIsbn(isbn: string): Promise<ScanResult> {
-  const cleaned = isbn.replace(/[-\s]/g, "");
-  if (!/^(\d{10}|\d{13})$/.test(cleaned)) {
-    throw new Error("Invalid ISBN format");
-  }
-
-  // Check if already in collection
-  const normalizedIsbn13 = cleaned.length === 13 ? cleaned : normalizeToIsbn13(cleaned);
-  const existing = getBookByIsbn(normalizedIsbn13);
-  if (existing) {
-    return { book: existing, alreadyExists: true };
-  }
-
-  const book = await lookupIsbn(cleaned);
-  if (!book) {
-    throw new Error("Book not found");
-  }
-
-  return { book, alreadyExists: false };
+  return scanIsbnWithDeps(isbn, {
+    findByIsbn13: getBookByIsbn,
+    lookupByIsbn: lookupIsbn,
+  });
 }
 
 export function showToast(message: string) {
@@ -149,14 +137,4 @@ export function getToastMessage() {
 
 export function isToastVisible() {
   return toastVisible;
-}
-
-function normalizeToIsbn13(isbn: string): string {
-  const prefix = `978${isbn.slice(0, 9)}`;
-  let sum = 0;
-  for (let i = 0; i < 12; i++) {
-    sum += parseInt(prefix[i], 10) * (i % 2 === 0 ? 1 : 3);
-  }
-  const check = (10 - (sum % 10)) % 10;
-  return prefix + check;
 }

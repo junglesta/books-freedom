@@ -67,6 +67,33 @@ describe("loadCollection", () => {
     expect(col.books).toHaveLength(1);
     expect(col.books[0].title).toBe("Pride and Prejudice");
   });
+
+  it("migrates legacy collection without version", () => {
+    store["books-freedom"] = JSON.stringify({ books: [makeBook()] });
+    const col = loadCollection();
+    expect(col.version).toBe(1);
+    expect(col.books).toHaveLength(1);
+    expect(localStorageMock.setItem).toHaveBeenCalled();
+  });
+
+  it("drops malformed books during migration", () => {
+    store["books-freedom"] = JSON.stringify({
+      version: 1,
+      books: [{ bad: "record" }, makeBook()],
+    });
+    const col = loadCollection();
+    expect(col.books).toHaveLength(1);
+    expect(col.books[0].id).toBe("book-1");
+  });
+
+  it("resets unsupported versions to empty collection", () => {
+    store["books-freedom"] = JSON.stringify({
+      version: 999,
+      books: [makeBook()],
+    });
+    const col = loadCollection();
+    expect(col).toEqual({ version: 1, books: [] });
+  });
 });
 
 describe("saveCollection", () => {
@@ -132,6 +159,10 @@ describe("addBook", () => {
     const stored = JSON.parse(store["books-freedom"]);
     expect(stored.books).toHaveLength(1);
   });
+
+  it("throws when required fields are missing", () => {
+    expect(() => addBook({ title: "Incomplete" })).toThrow("isbn13");
+  });
 });
 
 describe("updateBook", () => {
@@ -151,6 +182,13 @@ describe("updateBook", () => {
     seedCollection([makeBook()]);
     const updated = updateBook("book-1", { id: "hacked" } as Partial<Book>);
     expect(updated.id).toBe("book-1");
+  });
+
+  it("throws for invalid status updates", () => {
+    seedCollection([makeBook()]);
+    expect(() => updateBook("book-1", { status: "invalid" as Book["status"] })).toThrow(
+      "Invalid status",
+    );
   });
 });
 

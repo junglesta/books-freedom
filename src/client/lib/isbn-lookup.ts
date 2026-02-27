@@ -1,10 +1,44 @@
+import { cleanIsbn, toIsbn13 } from "./isbn";
 import type { Book } from "./types";
 
+const LOOKUP_TIMEOUT_MS = 8000;
+
+type JsonRecord = Record<string, unknown>;
+
+function asRecord(value: unknown): JsonRecord {
+  return typeof value === "object" && value !== null ? (value as JsonRecord) : {};
+}
+
+function asString(value: unknown): string | undefined {
+  return typeof value === "string" ? value : undefined;
+}
+
+function asStringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+}
+
+async function fetchJson(url: string): Promise<JsonRecord | null> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), LOOKUP_TIMEOUT_MS);
+  try {
+    const resp = await fetch(url, { signal: controller.signal });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    return asRecord(data);
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export async function lookupIsbn(isbn: string): Promise<Book | null> {
-  const cleaned = isbn.replace(/[-\s]/g, "");
+  const cleaned = cleanIsbn(isbn);
+  const normalizedIsbn13 = toIsbn13(cleaned);
+  if (!normalizedIsbn13) return null;
 
   // Try Open Library first
-  const olResult = await tryOpenLibrary(cleaned);
+  const olResult = await tryOpenLibrary(cleaned, normalizedIsbn13);
   if (olResult) {
     // If OpenLibrary didn't provide language, try Google Books for it
     if (!olResult.language) {
@@ -15,150 +49,124 @@ export async function lookupIsbn(isbn: string): Promise<Book | null> {
   }
 
   // Fallback to Google Books
-  const gbResult = await tryGoogleBooks(cleaned);
+  const gbResult = await tryGoogleBooks(cleaned, normalizedIsbn13);
   if (gbResult) return gbResult;
 
   return null;
 }
 
-async function tryOpenLibrary(isbn: string): Promise<Book | null> {
-  try {
-    const resp = await fetch(`https://openlibrary.org/isbn/${isbn}.json`);
-    if (!resp.ok) return null;
+async function tryOpenLibrary(isbn: string, normalizedIsbn13: string): Promise<Book | null> {
+  const data = await fetchJson(`https://openlibrary.org/isbn/${isbn}.json`);
+  if (!data) return null;
 
-    const data = await resp.json();
-
-    // Resolve author names
-    const authors: string[] = [];
-    if (data.authors) {
-      for (const authorRef of data.authors) {
-        const key = authorRef.key;
-        if (key) {
-          try {
-            const authorResp = await fetch(`https://openlibrary.org${key}.json`);
-            if (authorResp.ok) {
-              const authorData = await authorResp.json();
-              authors.push(authorData.name || "Unknown Author");
-            }
-          } catch {
-            // Skip failed author lookups
-          }
-        }
-      }
+  // Resolve author names
+  const authors: string[] = [];
+  const authorRefs = Array.isArray(data.authors) ? data.authors : [];
+  for (const authorRef of authorRefs) {
+    const key = asString(asRecord(authorRef).key);
+    if (!key) continue;
+    const authorData = await fetchJson(`https://openlibrary.org${key}.json`);
+    if (authorData) {
+      authors.push(asString(authorData.name) || "Unknown Author");
     }
-
-    // Extract ISBNs
-    const isbn13 = normalizeToIsbn13(isbn);
-    const isbn10 = isbn.length === 10 ? isbn : data.isbn_10?.[0] || undefined;
-
-    // Extract cover URL
-    const coverId = data.covers?.[0];
-    const coverUrl = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` : undefined;
-
-    // Extract publish year
-    const publishDate = data.publish_date || undefined;
-    const publishYear = publishDate ? extractYear(publishDate) : undefined;
-
-    // Extract subjects from works
-    let subjects: string[] | undefined;
-    if (data.works?.[0]?.key) {
-      try {
-        const worksResp = await fetch(`https://openlibrary.org${data.works[0].key}.json`);
-        if (worksResp.ok) {
-          const worksData = await worksResp.json();
-          subjects = worksData.subjects?.slice(0, 10);
-        }
-      } catch {
-        // Skip
-      }
-    }
-
-    return {
-      id: "",
-      isbn13,
-      isbn10,
-      title: data.title || "Unknown Title",
-      authors,
-      publisher: data.publishers?.[0] || undefined,
-      publishDate,
-      publishYear,
-      pageCount: data.number_of_pages || undefined,
-      language: data.languages?.[0]?.key?.replace("/languages/", "") || undefined,
-      subjects,
-      coverUrl,
-      status: "to-read",
-      dateAdded: "",
-      source: "openlibrary",
-    };
-  } catch {
-    return null;
   }
+
+  // Extract ISBNs
+  const isbn13 = normalizedIsbn13;
+  const isbn10Candidates = asStringArray(data.isbn_10);
+  const isbn10 = isbn.length === 10 ? isbn : isbn10Candidates[0] || undefined;
+
+  // Extract cover URL
+  const covers = Array.isArray(data.covers) ? data.covers : [];
+  const coverId = typeof covers[0] === "number" ? covers[0] : undefined;
+  const coverUrl = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-L.jpg` : undefined;
+
+  // Extract publish year
+  const publishDate = asString(data.publish_date);
+  const publishYear = publishDate ? extractYear(publishDate) : undefined;
+
+  // Extract subjects from works
+  let subjects: string[] | undefined;
+  const works = Array.isArray(data.works) ? data.works : [];
+  const workKey = asString(asRecord(works[0]).key);
+  if (workKey) {
+    const worksData = await fetchJson(`https://openlibrary.org${workKey}.json`);
+    if (worksData) {
+      subjects = asStringArray(worksData.subjects).slice(0, 10);
+    }
+  }
+
+  return {
+    id: "",
+    isbn13,
+    isbn10,
+    title: asString(data.title) || "Unknown Title",
+    authors,
+    publisher: asStringArray(data.publishers)[0] || undefined,
+    publishDate,
+    publishYear,
+    pageCount: typeof data.number_of_pages === "number" ? data.number_of_pages : undefined,
+    language: asString(
+      asRecord(Array.isArray(data.languages) ? data.languages[0] : undefined).key,
+    )?.replace("/languages/", ""),
+    subjects,
+    coverUrl,
+    status: "to-read",
+    dateAdded: "",
+    source: "openlibrary",
+  };
 }
 
-async function tryGoogleBooks(isbn: string): Promise<Book | null> {
-  try {
-    const resp = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
-    if (!resp.ok) return null;
+async function tryGoogleBooks(isbn: string, normalizedIsbn13: string): Promise<Book | null> {
+  const data = await fetchJson(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
+  if (!data) return null;
 
-    const data = await resp.json();
-    if (!data.items || data.items.length === 0) return null;
+  const items = Array.isArray(data.items) ? data.items : [];
+  if (items.length === 0) return null;
 
-    const vol = data.items[0].volumeInfo;
-    const isbn13 = normalizeToIsbn13(isbn);
+  const vol = asRecord(asRecord(items[0]).volumeInfo);
+  const isbn13 = normalizedIsbn13;
 
-    // Find ISBNs from response
-    let isbn10: string | undefined;
-    if (vol.industryIdentifiers) {
-      for (const id of vol.industryIdentifiers) {
-        if (id.type === "ISBN_10") isbn10 = id.identifier;
-      }
+  // Find ISBN-10 from response
+  let isbn10: string | undefined;
+  const identifiers = Array.isArray(vol.industryIdentifiers) ? vol.industryIdentifiers : [];
+  for (const id of identifiers) {
+    const rec = asRecord(id);
+    if (rec.type === "ISBN_10") {
+      isbn10 = asString(rec.identifier);
+      break;
     }
-
-    const publishYear = vol.publishedDate ? extractYear(vol.publishedDate) : undefined;
-
-    return {
-      id: "",
-      isbn13,
-      isbn10,
-      title: vol.title || "Unknown Title",
-      authors: vol.authors || [],
-      publisher: vol.publisher || undefined,
-      publishDate: vol.publishedDate || undefined,
-      publishYear,
-      pageCount: vol.pageCount || undefined,
-      language: vol.language || undefined,
-      subjects: vol.categories?.slice(0, 10),
-      coverUrl: vol.imageLinks?.thumbnail?.replace("http:", "https:") || undefined,
-      status: "to-read",
-      dateAdded: "",
-      source: "googlebooks",
-    };
-  } catch {
-    return null;
   }
+
+  const publishedDate = asString(vol.publishedDate);
+  const publishYear = publishedDate ? extractYear(publishedDate) : undefined;
+
+  const thumb = asString(asRecord(vol.imageLinks).thumbnail);
+  return {
+    id: "",
+    isbn13,
+    isbn10,
+    title: asString(vol.title) || "Unknown Title",
+    authors: asStringArray(vol.authors),
+    publisher: asString(vol.publisher),
+    publishDate: publishedDate,
+    publishYear,
+    pageCount: typeof vol.pageCount === "number" ? vol.pageCount : undefined,
+    language: asString(vol.language),
+    subjects: asStringArray(vol.categories).slice(0, 10),
+    coverUrl: thumb?.replace("http:", "https:"),
+    status: "to-read",
+    dateAdded: "",
+    source: "googlebooks",
+  };
 }
 
 async function tryGoogleBooksLanguage(isbn: string): Promise<string | null> {
-  try {
-    const resp = await fetch(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
-    if (!resp.ok) return null;
-    const data = await resp.json();
-    return data.items?.[0]?.volumeInfo?.language || null;
-  } catch {
-    return null;
-  }
-}
-
-function normalizeToIsbn13(isbn: string): string {
-  const cleaned = isbn.replace(/[-\s]/g, "");
-  if (cleaned.length === 13) return cleaned;
-  const prefix = `978${cleaned.slice(0, 9)}`;
-  let sum = 0;
-  for (let i = 0; i < 12; i++) {
-    sum += parseInt(prefix[i], 10) * (i % 2 === 0 ? 1 : 3);
-  }
-  const check = (10 - (sum % 10)) % 10;
-  return prefix + check;
+  const data = await fetchJson(`https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`);
+  if (!data) return null;
+  const items = Array.isArray(data.items) ? data.items : [];
+  const language = asString(asRecord(asRecord(items[0]).volumeInfo).language);
+  return language || null;
 }
 
 function extractYear(dateStr: string): number | undefined {

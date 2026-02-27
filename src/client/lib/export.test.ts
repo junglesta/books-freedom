@@ -117,6 +117,16 @@ describe("generateGoodreadsCsv", () => {
     const csv = generateGoodreadsCsv([book]);
     expect(csv).toContain("'+SUM(1,1)");
   });
+
+  it("uses blank date cells for invalid date values", () => {
+    const csv = generateGoodreadsCsv([
+      makeBook({ dateAdded: "not-a-date", dateRead: "not-a-date" }),
+    ]);
+    const cols = csv.split("\n")[1].split(",");
+    // Date Read, Date Added
+    expect(cols[7]).toBe("");
+    expect(cols[8]).toBe("");
+  });
 });
 
 describe("generateLibraryThingTsv", () => {

@@ -1,5 +1,7 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
+  import { cleanIsbn, isValidIsbn10, isValidIsbn13 } from '../lib/isbn';
+  import { getErrorMessage } from '../lib/error';
 
   interface Props {
     onScan: (isbn: string) => void;
@@ -8,7 +10,12 @@
   let { onScan }: Props = $props();
 
   let scannerRef: HTMLDivElement | undefined = $state();
-  let scanner: any = null;
+  type ActiveScanner = {
+    stop: () => Promise<void>;
+    clear: () => void;
+  };
+
+  let scanner: ActiveScanner | null = null;
   let scannerError = $state('');
   let isScanning = $state(false);
 
@@ -135,8 +142,8 @@
         },
         () => {}
       );
-    } catch (err: any) {
-      scannerError = err?.message || 'Failed to start camera';
+    } catch (err: unknown) {
+      scannerError = getErrorMessage(err, 'Failed to start camera');
       killVideoTracks();
       isScanning = false;
     }
@@ -164,9 +171,9 @@
   function submitIsbn13(e: Event) {
     e.preventDefault();
     inputError = '';
-    const cleaned = isbn13.replace(/[-\s]/g, '');
-    if (cleaned.length !== 13 || !/^\d{13}$/.test(cleaned)) {
-      inputError = 'ISBN-13 must be exactly 13 digits';
+    const cleaned = cleanIsbn(isbn13);
+    if (!isValidIsbn13(cleaned)) {
+      inputError = 'Invalid ISBN-13 checksum';
       return;
     }
     onScan(cleaned);
@@ -176,9 +183,9 @@
   function submitIsbn10(e: Event) {
     e.preventDefault();
     inputError = '';
-    const cleaned = isbn10.replace(/[-\s]/g, '');
-    if (cleaned.length !== 10 || !/^\d{9}[\dXx]$/.test(cleaned)) {
-      inputError = 'ISBN-10 must be 9 digits + a check digit (0-9 or X)';
+    const cleaned = cleanIsbn(isbn10);
+    if (!isValidIsbn10(cleaned)) {
+      inputError = 'Invalid ISBN-10 checksum';
       return;
     }
     onScan(cleaned);
