@@ -15,6 +15,7 @@
     let lastScannedIsbn = $state("");
     let justAdded = $state(false);
     let lookupError = $state("");
+    let scannerResetKey = $state(0);
 
     async function handleScan(isbn: string) {
         if (isbn === lastScannedIsbn && preview) return;
@@ -57,13 +58,17 @@
         lastScannedIsbn = "";
         justAdded = false;
         lookupError = "";
+        scanning = false;
+        scannerResetKey += 1;
     }
 </script>
 
 <div class="scan-page">
     <h1>Scan ISBN</h1>
 
-    <Scanner onScan={handleScan} />
+    {#key scannerResetKey}
+        <Scanner onScan={handleScan} />
+    {/key}
 
     {#if scanning}
         <div class="scan-loading">

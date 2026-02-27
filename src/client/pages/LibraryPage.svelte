@@ -2,8 +2,20 @@
   import { onMount } from 'svelte';
   import BookList from '../components/BookList.svelte';
   import BookDetail from '../components/BookDetail.svelte';
+  import ConfirmDialog from "../components/ConfirmDialog.svelte";
   import SearchBar from '../components/SearchBar.svelte';
-  import { getBooks, isLoading, loadBooks, getLibraryName, setLibraryName } from '../lib/stores.svelte.ts';
+  import { getErrorMessage } from "../lib/error";
+  import { parseImportedBooks } from "../lib/import";
+  import {
+    clearLibraryCollection,
+    getBooks,
+    getLibraryName,
+    importBooksToCollection,
+    isLoading,
+    loadBooks,
+    setLibraryName,
+    showToast,
+  } from "../lib/stores.svelte.ts";
   import type { Book } from '../lib/types';
 
   onMount(() => { loadBooks(); });
@@ -16,6 +28,8 @@
   let viewMode = $state<'card' | 'list'>('card');
   let languageFilter = $state<string>('all');
   let languageMenuOpen = $state(false);
+  let importInputRef = $state<HTMLInputElement>();
+  let dropConfirmOpen = $state(false);
 
   const statusOptions = [
     { value: 'all', label: 'All' },
@@ -107,6 +121,58 @@
 
     return result;
   }
+
+  function countLabel(): string {
+    const count = getBooks().length;
+    return `${count} ${count === 1 ? "title" : "titles"}`;
+  }
+
+  function openImportPicker() {
+    importInputRef?.click();
+  }
+
+  function dropLibrary() {
+    if (getBooks().length === 0) {
+      showToast("Library is already empty.");
+      return;
+    }
+    dropConfirmOpen = true;
+  }
+
+  function cancelDropLibrary() {
+    dropConfirmOpen = false;
+  }
+
+  function confirmDropLibrary() {
+    clearLibraryCollection();
+    selectedBook = null;
+    dropConfirmOpen = false;
+  }
+
+  async function handleImportChange(e: Event) {
+    const input = e.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    try {
+      const content = await file.text();
+      const importedBooks = parseImportedBooks(content, file.name);
+      const summary = importBooksToCollection(importedBooks);
+      if (summary.total === 0) {
+        showToast("No valid books found in file.");
+      } else if (summary.added === 0) {
+        showToast("No new books imported (duplicates or invalid rows).");
+      } else {
+        showToast(
+          `Imported ${summary.added} book${summary.added === 1 ? "" : "s"} (${summary.skipped} skipped${summary.failed > 0 ? `, ${summary.failed} failed` : ""}).`,
+        );
+      }
+    } catch (error: unknown) {
+      showToast(getErrorMessage(error, "Import failed"));
+    } finally {
+      input.value = "";
+    }
+  }
 </script>
 
 <svelte:window onclick={closeMenus} />
@@ -120,9 +186,24 @@
         value={getLibraryName()}
         oninput={(e) => setLibraryName(e.currentTarget.value)}
       />
-      <span class="count">{getBooks().length}</span>
+      <span class="library-count" aria-label={`${getBooks().length} books in library`}>
+        {countLabel()}
+      </span>
     </div>
     <div class="library-header-actions">
+      <button class="view-toggle" onclick={dropLibrary} aria-label="Drop library">
+        Drop
+      </button>
+      <button class="view-toggle" onclick={openImportPicker} aria-label="Import books">
+        Import
+      </button>
+      <input
+        bind:this={importInputRef}
+        type="file"
+        accept=".json,.csv,.css"
+        style="display:none"
+        onchange={handleImportChange}
+      />
       <button class="view-toggle" onclick={() => viewMode = viewMode === 'card' ? 'list' : 'card'} aria-label="Toggle view">
         {#if viewMode === 'card'}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -214,4 +295,15 @@
   {#if selectedBook}
     <BookDetail book={selectedBook} onClose={() => (selectedBook = null)} />
   {/if}
+
+  <ConfirmDialog
+    open={dropConfirmOpen}
+    title="Drop Library"
+    message="Delete all books from this library? This cannot be undone."
+    confirmLabel="Delete"
+    cancelLabel="Cancel"
+    danger
+    onConfirm={confirmDropLibrary}
+    onCancel={cancelDropLibrary}
+  />
 </div>

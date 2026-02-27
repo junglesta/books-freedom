@@ -1,4 +1,5 @@
 <script lang="ts">
+  import ConfirmDialog from "./ConfirmDialog.svelte";
   import type { Book } from '../lib/types';
   import { updateBookInCollection, removeBookFromCollection } from '../lib/stores.svelte.ts';
 
@@ -16,6 +17,7 @@
   let tagsInput = $state('');
   let saving = $state(false);
   let statusOpen = $state(false);
+  let removeConfirmOpen = $state(false);
 
   $effect(() => {
     status = book.status;
@@ -53,11 +55,18 @@
     }
   }
 
-  async function remove() {
-    if (confirm(`Remove "${book.title}" from your library?`)) {
-      await removeBookFromCollection(book.id);
-      onClose();
-    }
+  function remove() {
+    removeConfirmOpen = true;
+  }
+
+  function cancelRemove() {
+    removeConfirmOpen = false;
+  }
+
+  async function confirmRemove() {
+    await removeBookFromCollection(book.id);
+    removeConfirmOpen = false;
+    onClose();
   }
 </script>
 
@@ -145,3 +154,14 @@
     </div>
   </div>
 </div>
+
+<ConfirmDialog
+  open={removeConfirmOpen}
+  title="Remove Book"
+  message={`Remove "${book.title}" from your library?`}
+  confirmLabel="Delete"
+  cancelLabel="Cancel"
+  danger
+  onConfirm={confirmRemove}
+  onCancel={cancelRemove}
+/>

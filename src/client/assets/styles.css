@@ -660,7 +660,7 @@ h1 .count {
 
 .library-header-left {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 8px;
   min-width: 0;
 }
@@ -688,11 +688,20 @@ h1 .count {
   background: var(--bg-card);
 }
 
-.library-header-left .count {
-  color: var(--primary);
-  font-weight: 400;
-  font-size: 20px;
-  margin-right: 8px;
+.library-header-left .library-count {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  margin-right: 4px;
 }
 
 .library-header-actions {

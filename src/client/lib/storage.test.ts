@@ -1,5 +1,6 @@
 import {
   addBook,
+  clearBooks,
   deleteBook,
   getAllBooks,
   getBookByIsbn,
@@ -214,5 +215,13 @@ describe("getRawCollection", () => {
     const raw = getRawCollection();
     expect(raw.version).toBe(1);
     expect(raw.books).toHaveLength(1);
+  });
+});
+
+describe("clearBooks", () => {
+  it("removes all books from storage", () => {
+    seedCollection([makeBook(), makeBook({ id: "book-2" })]);
+    clearBooks();
+    expect(getAllBooks()).toEqual([]);
   });
 });

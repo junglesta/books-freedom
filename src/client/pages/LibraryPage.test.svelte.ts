@@ -11,6 +11,9 @@ const {
   setLibraryName,
   updateBookInCollection,
   removeBookFromCollection,
+  clearLibraryCollection,
+  importBooksToCollection,
+  showToast,
 } = vi.hoisted(() => ({
   getBooks: vi.fn(),
   isLoading: vi.fn(),
@@ -19,6 +22,9 @@ const {
   setLibraryName: vi.fn(),
   updateBookInCollection: vi.fn(),
   removeBookFromCollection: vi.fn(),
+  clearLibraryCollection: vi.fn(),
+  importBooksToCollection: vi.fn(),
+  showToast: vi.fn(),
 }));
 
 vi.mock("../lib/stores.svelte.ts", () => ({
@@ -29,6 +35,9 @@ vi.mock("../lib/stores.svelte.ts", () => ({
   setLibraryName,
   updateBookInCollection,
   removeBookFromCollection,
+  clearLibraryCollection,
+  importBooksToCollection,
+  showToast,
 }));
 
 function makeBook(overrides: Partial<Book> = {}): Book {
@@ -52,6 +61,8 @@ describe("LibraryPage", () => {
     getBooks.mockReturnValue([makeBook()]);
     updateBookInCollection.mockResolvedValue(makeBook({ status: "read" }));
     removeBookFromCollection.mockResolvedValue(undefined);
+    clearLibraryCollection.mockImplementation(() => {});
+    importBooksToCollection.mockReturnValue({ total: 0, added: 0, skipped: 0, failed: 0 });
   });
 
   it("loads books on mount and opens detail when selecting a book", async () => {
@@ -80,15 +91,22 @@ describe("LibraryPage", () => {
 
   it("removes a book after confirmation", async () => {
     const user = userEvent.setup();
-    vi.stubGlobal(
-      "confirm",
-      vi.fn(() => true),
-    );
 
     render(LibraryPage);
     await user.click(screen.getByRole("button", { name: /Pride and Prejudice/i }));
     await user.click(screen.getByRole("button", { name: "Remove" }));
+    await user.click(screen.getByRole("button", { name: "Delete" }));
 
     expect(removeBookFromCollection).toHaveBeenCalledWith("book-1");
+  });
+
+  it("drops the whole library after confirmation", async () => {
+    const user = userEvent.setup();
+
+    render(LibraryPage);
+    await user.click(screen.getByRole("button", { name: "Drop library" }));
+    await user.click(screen.getByRole("button", { name: "Delete" }));
+
+    expect(clearLibraryCollection).toHaveBeenCalled();
   });
 });

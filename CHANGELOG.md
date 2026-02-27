@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.12
+
+- Fixed "Scan Another" flow by resetting scanner instance deterministically
+- Added library append import for JSON/CSV (and `.css` CSV fallback) with dedupe + import summary feedback
+- Preserved `coverUrl` and related metadata during JSON import so cover previews survive import
+- Added "Drop" action to clear entire library
+- Replaced browser delete confirms with in-app confirmation dialogs (book remove + drop library)
+- Improved Library header count UX (`N titles` badge instead of unlabeled number)
+
 ## 0.3.11
 
 - Added page-level UI tests (Scan, Export, Library) with Testing Library + jsdom setup

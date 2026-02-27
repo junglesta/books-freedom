@@ -1,7 +1,7 @@
 import { getErrorMessage } from "./error";
 import { lookupIsbn } from "./isbn-lookup";
 import { scanIsbnWithDeps } from "./scan";
-import { addBook, deleteBook, getAllBooks, getBookByIsbn, updateBook } from "./storage";
+import { addBook, clearBooks, deleteBook, getAllBooks, getBookByIsbn, updateBook } from "./storage";
 import { LEGACY_LIBRARY_NAME_STORAGE_KEY, LIBRARY_NAME_STORAGE_KEY } from "./storage-keys";
 import type { Book, ScanResult } from "./types";
 
@@ -92,6 +92,46 @@ export function addBookToCollection(book: Partial<Book>) {
   }
 }
 
+export interface ImportBooksSummary {
+  total: number;
+  added: number;
+  skipped: number;
+  failed: number;
+}
+
+export function importBooksToCollection(imported: Partial<Book>[]): ImportBooksSummary {
+  const existingIsbns = new Set(books.map((b) => b.isbn13));
+  const addedBooks: Book[] = [];
+  let added = 0;
+  let skipped = 0;
+  let failed = 0;
+
+  for (const candidate of imported) {
+    if (typeof candidate.isbn13 !== "string" || existingIsbns.has(candidate.isbn13)) {
+      skipped++;
+      continue;
+    }
+    try {
+      const saved = addBook({
+        ...candidate,
+        status: candidate.status || "to-read",
+        source: candidate.source || "manual",
+      });
+      existingIsbns.add(saved.isbn13);
+      addedBooks.push(saved);
+      added++;
+    } catch {
+      failed++;
+    }
+  }
+
+  if (addedBooks.length > 0) {
+    books = [...books, ...addedBooks];
+  }
+
+  return { total: imported.length, added, skipped, failed };
+}
+
 export function updateBookInCollection(id: string, updates: Partial<Book>) {
   try {
     const updated = updateBook(id, updates);
@@ -111,6 +151,17 @@ export function removeBookFromCollection(id: string) {
     showToast("Book removed.");
   } catch (e: unknown) {
     showToast(getErrorMessage(e, "Failed to remove book"));
+    throw e;
+  }
+}
+
+export function clearLibraryCollection() {
+  try {
+    clearBooks();
+    books = [];
+    showToast("Library cleared.");
+  } catch (e: unknown) {
+    showToast(getErrorMessage(e, "Failed to clear library"));
     throw e;
   }
 }

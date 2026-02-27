@@ -229,6 +229,10 @@ export function deleteBook(id: string): void {
   saveCollection(collection);
 }
 
+export function clearBooks(): void {
+  saveCollection(emptyCollection());
+}
+
 export function getRawCollection(): BookCollection {
   return loadCollection();
 }

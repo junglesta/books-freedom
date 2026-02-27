@@ -68,4 +68,22 @@ describe("ScanPage", () => {
     expect(showToast).toHaveBeenCalledWith("This book is already in your library.");
     expect(navigate).toHaveBeenCalledWith("#/library");
   });
+
+  it("allows scanning the same ISBN again after clicking Scan Another", async () => {
+    scanIsbn.mockResolvedValue({ book: makeBook(), alreadyExists: false });
+    addBookToCollection.mockResolvedValue(makeBook());
+
+    const user = userEvent.setup();
+    render(ScanPage);
+
+    await user.type(screen.getByPlaceholderText("978-3-161484-10-0"), "9780141439518");
+    await user.click(screen.getByRole("button", { name: "ISBN-13" }));
+    await user.click(await screen.findByRole("button", { name: "Add to Library" }));
+    await user.click(await screen.findByRole("button", { name: "Scan Another" }));
+
+    await user.type(screen.getByPlaceholderText("978-3-161484-10-0"), "9780141439518");
+    await user.click(screen.getByRole("button", { name: "ISBN-13" }));
+
+    expect(scanIsbn).toHaveBeenCalledTimes(2);
+  });
 });
