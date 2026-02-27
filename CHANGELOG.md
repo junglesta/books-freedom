@@ -1,8 +1,11 @@
 # Changelog
 
+## 0.3.10
 
-
-
+- Export hardening: neutralize spreadsheet formula-like cells in CSV/TSV exports
+- Added export tests for formula-injection regression coverage
+- Skills overhaul: updated all project skills from old Astro/server assumptions to Svelte + Vite static workflow
+- Updated preflight skill and executed preflight checks (format/lint/test/build passed; preview blocked by sandbox port restriction)
 ## 0.3.9
 
 - now using codex

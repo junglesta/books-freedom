@@ -69,6 +69,12 @@ describe("generateCsv", () => {
     const csv = generateCsv([book]);
     expect(csv).toContain("Author One; Author Two");
   });
+
+  it("neutralizes formula-like values", () => {
+    const book = makeBook({ title: '=HYPERLINK("http://evil")' });
+    const csv = generateCsv([book]);
+    expect(csv).toContain("'=HYPERLINK");
+  });
 });
 
 describe("generateGoodreadsCsv", () => {
@@ -105,6 +111,12 @@ describe("generateGoodreadsCsv", () => {
     const cols = lines[1].split(",");
     expect(cols[4]).toBe("0");
   });
+
+  it("neutralizes dangerous review text", () => {
+    const book = makeBook({ notes: "+SUM(1,1)" });
+    const csv = generateGoodreadsCsv([book]);
+    expect(csv).toContain("'+SUM(1,1)");
+  });
 });
 
 describe("generateLibraryThingTsv", () => {
@@ -128,5 +140,10 @@ describe("generateLibraryThingTsv", () => {
   it("formats dateRead as YYYY-MM-DD", () => {
     const tsv = generateLibraryThingTsv([makeBook()]);
     expect(tsv).toContain("2025-07-01");
+  });
+
+  it("neutralizes formula-like cells", () => {
+    const tsv = generateLibraryThingTsv([makeBook({ title: "  =1+1" })]);
+    expect(tsv).toContain("'  =1+1");
   });
 });

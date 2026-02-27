@@ -1,5 +1,14 @@
 import type { Book } from "./types";
 
+const FORMULA_PREFIX_RE = /^[\t\r\n ]*[=+\-@]/;
+
+function sanitizeSpreadsheetValue(val: string): string {
+  if (FORMULA_PREFIX_RE.test(val)) {
+    return `'${val}`;
+  }
+  return val;
+}
+
 function escapeCsv(val: string): string {
   if (val.includes(",") || val.includes('"') || val.includes("\n")) {
     return `"${val.replace(/"/g, '""')}"`;
@@ -27,21 +36,21 @@ export function generateCsv(books: Book[]): string {
   ];
 
   const rows = books.map((b) => [
-    escapeCsv(b.title),
-    escapeCsv(b.authors.join("; ")),
+    escapeCsv(sanitizeSpreadsheetValue(b.title)),
+    escapeCsv(sanitizeSpreadsheetValue(b.authors.join("; "))),
     b.isbn13,
     b.isbn10 || "",
-    escapeCsv(b.publisher || ""),
-    escapeCsv(b.publishDate || ""),
+    escapeCsv(sanitizeSpreadsheetValue(b.publisher || "")),
+    escapeCsv(sanitizeSpreadsheetValue(b.publishDate || "")),
     b.publishYear?.toString() || "",
     b.pageCount?.toString() || "",
-    b.language || "",
+    sanitizeSpreadsheetValue(b.language || ""),
     b.status,
     b.rating?.toString() || "",
     b.dateAdded,
     b.dateRead || "",
-    escapeCsv((b.tags || []).join("; ")),
-    escapeCsv(b.notes || ""),
+    escapeCsv(sanitizeSpreadsheetValue((b.tags || []).join("; "))),
+    escapeCsv(sanitizeSpreadsheetValue(b.notes || "")),
   ]);
 
   return [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
@@ -69,8 +78,8 @@ export function generateGoodreadsCsv(books: Book[]): string {
   };
 
   const rows = books.map((b) => [
-    escapeCsv(b.title),
-    escapeCsv(b.authors[0] || ""),
+    escapeCsv(sanitizeSpreadsheetValue(b.title)),
+    escapeCsv(sanitizeSpreadsheetValue(b.authors[0] || "")),
     `="${b.isbn10 || ""}"`,
     `="${b.isbn13}"`,
     b.rating?.toString() || "0",
@@ -79,7 +88,7 @@ export function generateGoodreadsCsv(books: Book[]): string {
     b.dateRead ? formatGoodreadsDate(b.dateRead) : "",
     formatGoodreadsDate(b.dateAdded),
     shelfMap[b.status] || "to-read",
-    escapeCsv(b.notes || ""),
+    escapeCsv(sanitizeSpreadsheetValue(b.notes || "")),
   ]);
 
   return [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
@@ -100,15 +109,15 @@ export function generateLibraryThingTsv(books: Book[]): string {
   ];
 
   const rows = books.map((b) => [
-    b.title,
-    b.authors[0] || "",
+    sanitizeSpreadsheetValue(b.title),
+    sanitizeSpreadsheetValue(b.authors[0] || ""),
     b.dateAdded ? b.dateAdded.split("T")[0] : "",
     b.isbn13,
     b.rating?.toString() || "",
-    (b.tags || []).join(", "),
-    b.notes || "",
+    sanitizeSpreadsheetValue((b.tags || []).join(", ")),
+    sanitizeSpreadsheetValue(b.notes || ""),
     b.pageCount?.toString() || "",
-    b.publisher || "",
+    sanitizeSpreadsheetValue(b.publisher || ""),
     b.dateRead ? b.dateRead.split("T")[0] : "",
   ]);
 
