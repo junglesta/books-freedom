@@ -95,6 +95,16 @@
     stopScanner();
   });
 
+  function killVideoTracks() {
+    if (!scannerRef) return;
+    const video = scannerRef.querySelector('video');
+    if (video?.srcObject) {
+      (video.srcObject as MediaStream).getTracks().forEach(t => t.stop());
+      video.srcObject = null;
+    }
+    scannerRef.querySelectorAll('video, canvas').forEach(el => el.remove());
+  }
+
   async function startScanner() {
     if (!scannerRef || isScanning) return;
     scannerError = '';
@@ -118,7 +128,8 @@
         (decodedText: string) => {
           const cleaned = decodedText.replace(/[^0-9]/g, '');
           if (cleaned.length === 13 || cleaned.length === 10) {
-            stopScanner();
+            // Defer stop to avoid re-entrancy inside library callback
+            setTimeout(() => stopScanner(), 0);
             onScan(cleaned);
           }
         },
@@ -126,18 +137,22 @@
       );
     } catch (err: any) {
       scannerError = err?.message || 'Failed to start camera';
+      killVideoTracks();
       isScanning = false;
     }
   }
 
-  async function stopScanner() {
+  function stopScanner() {
     const s = scanner;
     scanner = null;
     isScanning = false;
+    // Try library cleanup, but don't await — go sync for instant UI update
     if (s) {
-      try { await s.stop(); } catch {}
+      try { s.stop().catch(() => {}); } catch {}
       try { s.clear(); } catch {}
     }
+    // Force kill any remaining video streams and DOM
+    killVideoTracks();
   }
 
   function submitIsbn13(e: Event) {

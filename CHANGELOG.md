@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.7
+
+- Fixed frozen UI on stop/scan: force-kill video tracks directly via MediaStream API
+- Sync stopScanner for instant UI update (no await blocking)
+- Deferred stop in decode callback to avoid library re-entrancy freeze
+
 ## 0.3.6
 
 - Fixed camera not starting (reverted inner div approach that caused zero-size container)
