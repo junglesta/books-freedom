@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.5
+
+- Fixed stuck UI after failed ISBN lookup (scanner DOM separated from Svelte DOM)
+- "Try Again" button shown when book lookup fails
+- Scanner viewfinder improved (250x150 aspect ratio)
+
 ## 0.3.4
 
 - Improved scanner viewfinder aspect ratio (250x150, easier to aim)

@@ -8,6 +8,7 @@
   let { onScan }: Props = $props();
 
   let scannerRef: HTMLDivElement | undefined = $state();
+  let scannerInner: HTMLDivElement | undefined = $state();
   let scanner: any = null;
   let scannerError = $state('');
   let isScanning = $state(false);
@@ -96,12 +97,12 @@
   });
 
   async function startScanner() {
-    if (!scannerRef || isScanning) return;
+    if (!scannerInner || isScanning) return;
     scannerError = '';
 
     try {
       const { Html5Qrcode, Html5QrcodeSupportedFormats } = await import('html5-qrcode');
-      scanner = new Html5Qrcode(scannerRef.id);
+      scanner = new Html5Qrcode(scannerInner.id);
 
       await scanner.start(
         { facingMode: 'environment' },
@@ -138,7 +139,7 @@
       try { await s.stop(); } catch {}
       try { s.clear(); } catch {}
     }
-    if (scannerRef) scannerRef.innerHTML = '';
+    if (scannerInner) scannerInner.innerHTML = '';
   }
 
   function submitIsbn13(e: Event) {
@@ -167,7 +168,8 @@
 </script>
 
 <div class="scanner-container">
-  <div id="scanner-view" bind:this={scannerRef} class={isScanning ? 'scanner-view' : 'scanner-view-idle'}>
+  <div bind:this={scannerRef} class={isScanning ? 'scanner-view' : 'scanner-view-idle'}>
+    <div id="scanner-inner" bind:this={scannerInner}></div>
     {#if !isScanning}
       <button class="btn btn-primary scanner-start-btn" onclick={startScanner}>
         Open Camera Scanner

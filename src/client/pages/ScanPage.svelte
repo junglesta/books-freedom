@@ -13,12 +13,14 @@
     let scanning = $state(false);
     let lastScannedIsbn = $state("");
     let justAdded = $state(false);
+    let lookupError = $state("");
 
     async function handleScan(isbn: string) {
         if (isbn === lastScannedIsbn && preview) return;
         lastScannedIsbn = isbn;
         scanning = true;
         justAdded = false;
+        lookupError = "";
 
         try {
             const result = await scanIsbn(isbn);
@@ -27,7 +29,7 @@
                 showToast("This book is already in your library.");
             }
         } catch (e: any) {
-            showToast(e.message || "Book not found");
+            lookupError = e.message || "Book not found";
             preview = null;
         } finally {
             scanning = false;
@@ -53,6 +55,7 @@
         preview = null;
         lastScannedIsbn = "";
         justAdded = false;
+        lookupError = "";
     }
 </script>
 
@@ -65,6 +68,13 @@
         <div class="scan-loading">
             <div class="spinner"></div>
             <p>Looking up ISBN...</p>
+        </div>
+    {/if}
+
+    {#if lookupError}
+        <div class="scan-preview">
+            <p style="text-align:center;color:var(--danger);margin-bottom:12px">{lookupError}</p>
+            <button class="btn btn-primary" style="width:100%" onclick={scanAnother}>Try Again</button>
         </div>
     {/if}
 
