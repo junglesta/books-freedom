@@ -1,12 +1,5 @@
 <script lang="ts">
   import { getRoute, navigate } from '../lib/stores.svelte.ts';
-  import headerLogoUrl from '../assets/header-logo.svg';
-
-  interface Props {
-    onBrandClick?: () => void;
-  }
-
-  let { onBrandClick }: Props = $props();
 
   const tabs = [
     { hash: '#/scan', label: 'Add' },
@@ -16,9 +9,6 @@
 </script>
 
 <nav class="bottom_nav">
-  <div class="nav_brand" onclick={onBrandClick} onkeydown={(e) => e.key === 'Enter' && onBrandClick?.()} role="button" tabindex="0">
-    <img class="nav_brand_logo" src={headerLogoUrl} alt="Book Freedom" />
-  </div>
   {#each tabs as tab}
     <button
       class="nav_tab"

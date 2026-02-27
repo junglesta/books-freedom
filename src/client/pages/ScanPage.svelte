@@ -16,6 +16,7 @@
     let justAdded = $state(false);
     let lookupError = $state("");
     let scannerResetKey = $state(0);
+    let isbnInfoOpen = $state(false);
 
     async function handleScan(isbn: string) {
         if (isbn === lastScannedIsbn && preview) return;
@@ -64,7 +65,34 @@
 </script>
 
 <div class="scan_page" class:scan_page_relaxed={!preview && !lookupError && !scanning}>
-    <h2 class="export_heading">Scan ISBN</h2>
+    <div class="scan_header">
+        <h2 class="export_heading">Scan ISBN</h2>
+        <button class="help_btn" aria-label="What is ISBN?" onclick={() => (isbnInfoOpen = !isbnInfoOpen)}>
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="11" x2="12" y2="16" />
+                <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+        </button>
+    </div>
+
+    {#if isbnInfoOpen}
+        <details class="scan_info_accordion" open>
+            <summary>What is an ISBN?</summary>
+            <p>
+                ISBN means International Standard Book Number. It is a unique identifier for a specific
+                book edition, used by publishers, bookstores, and libraries to find, catalog, and track
+                books accurately.
+            </p>
+        </details>
+    {/if}
 
     <div class="scan_entry_zone">
         {#key scannerResetKey}

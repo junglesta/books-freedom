@@ -135,6 +135,23 @@ describe("lookupIsbn", () => {
     expect(book?.source).toBe("googlebooks");
   });
 
+  it("normalizes Google Books thumbnail URL to https", async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (url.includes("openlibrary.org/")) {
+        return Promise.resolve({ ok: false });
+      }
+      if (url.includes("googleapis.com/books/")) {
+        return mockGoogleBooks({
+          imageLinks: { thumbnail: "http://books.google.test/cover.jpg" },
+        });
+      }
+      return Promise.resolve({ ok: false });
+    });
+
+    const book = await lookupIsbn("9780141439518");
+    expect(book?.coverUrl).toBe("https://books.google.test/cover.jpg");
+  });
+
   it("returns null when both APIs fail", async () => {
     fetchMock.mockResolvedValue({ ok: false });
     const book = await lookupIsbn("9780141439518");

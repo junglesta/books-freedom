@@ -34,6 +34,7 @@
   let importInputRef = $state<HTMLInputElement>();
   let dropConfirmOpen = $state(false);
   let importFeedbackError = $state("");
+  let libraryNameInfoOpen = $state(false);
 
   const statusOptions = [
     { value: 'all', label: 'All' },
@@ -197,11 +198,29 @@
         value={getLibraryName()}
         oninput={(e) => setLibraryName(e.currentTarget.value)}
       />
+      <button
+        class="help_btn library_name_info_btn"
+        aria-label="Library name info"
+        onclick={() => (libraryNameInfoOpen = !libraryNameInfoOpen)}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="11" x2="12" y2="16" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
+        </svg>
+      </button>
+    </div>
+    <div class="library_header_actions">
       <span class="library_count" aria-label={`${getBooks().length} books in library`}>
         {countLabel()}
       </span>
-    </div>
-    <div class="library_header_actions">
       <button class="view_toggle" onclick={dropLibrary} aria-label="Drop library">
         Drop
       </button>
@@ -218,9 +237,8 @@
       <button class="view_toggle" onclick={() => viewMode = viewMode === 'card' ? 'list' : 'card'} aria-label="Toggle view">
         {#if viewMode === 'card'}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <line x1="4" y1="6" x2="20" y2="6" />
-            <line x1="4" y1="12" x2="20" y2="12" />
-            <line x1="4" y1="18" x2="20" y2="18" />
+            <rect x="4" y="5" width="16" height="5" rx="1.2" />
+            <rect x="4" y="14" width="16" height="5" rx="1.2" />
           </svg>
         {:else}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -234,10 +252,11 @@
 
       <div class="sort_menu_wrap">
         <button class="sort_trigger" onclick={toggleSortMenu} aria-label="Sort options">
-          <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-            <circle cx="12" cy="5" r="2" />
-            <circle cx="12" cy="12" r="2" />
-            <circle cx="12" cy="19" r="2" />
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+            <path d="M7 4v14" />
+            <path d="m4 15 3 3 3-3" />
+            <path d="M17 20V6" />
+            <path d="m14 9 3-3 3 3" />
           </svg>
         </button>
 
@@ -255,6 +274,16 @@
       </div>
     </div>
   </div>
+
+  {#if libraryNameInfoOpen}
+    <details class="rband_note" open>
+      <summary class="rband_note_summary">Library Name</summary>
+      <p>
+        You can edit this library name anytime. It is used in the app and carried into export file
+        names.
+      </p>
+    </details>
+  {/if}
 
   {#if dropConfirmOpen}
     <details class="rband_confirm rband_confirm_inline" open aria-label="Drop library confirmation">

@@ -63,7 +63,7 @@ describe("ExportPage", () => {
 
     render(ExportPage);
     await user.type(screen.getByPlaceholderText("Apps Script webhook URL..."), "http://invalid");
-    await user.click(screen.getByRole("button", { name: "Push to Google Sheets" }));
+    await user.click(screen.getByRole("button", { name: "Push" }));
 
     expect(showToast).toHaveBeenCalledWith("Webhook URL must start with https://");
   });
@@ -78,7 +78,7 @@ describe("ExportPage", () => {
       screen.getByPlaceholderText("Apps Script webhook URL..."),
       "https://script.google.com/macros/s/test/exec",
     );
-    await user.click(screen.getByRole("button", { name: "Push to Google Sheets" }));
+    await user.click(screen.getByRole("button", { name: "Push" }));
     await user.click(screen.getByRole("button", { name: "Send" }));
 
     expect(fetchSpy).toHaveBeenCalledWith(

@@ -253,11 +253,11 @@
                     class="sheets_input"
                 />
                 <button
-                    class="btn btn_primary"
+                    class="btn btn_primary sheets_push_btn"
                     onclick={pushToSheets}
                     disabled={exporting || getBooks().length === 0}
                 >
-                    {exporting ? "Exporting..." : "Push to Google Sheets"}
+                    {exporting ? "Exporting..." : "Push"}
                 </button>
                 {#if sheetsConfirmOpen}
                     <details class="rband_confirm rband_confirm_inline export_confirm" open aria-label="Google Sheets export confirmation">

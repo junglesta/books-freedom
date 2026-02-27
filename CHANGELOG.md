@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.2
+
+- Removed top logo-heavy branding from app layout; added subtle text footer with version and project attribution links
+- Added scan-title info accordion explaining ISBN purpose and usage
+- Refined library header UX: moved count to second row with actions, restored `titles` suffix, improved icon/row alignment
+- Improved import cover handling by normalizing multiple cover fields and converting legacy URL forms to usable `https` cover URLs
+- Polished export and footer details (button text/icons/link styling) and aligned tests to current labels
+
 ## 0.4.1
 
 - Refined Scan page visual balance and spacing between action sections for cleaner vertical rhythm

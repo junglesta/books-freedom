@@ -70,6 +70,36 @@ describe("parseImportedBooks", () => {
     expect(books[0].coverUrl).toBe("https://covers.openlibrary.org/b/id/12345-L.jpg");
   });
 
+  it("derives coverUrl from Open Library cover id fields", () => {
+    const books = parseImportedBooks(
+      JSON.stringify([
+        {
+          isbn13: "9780141439518",
+          title: "Pride and Prejudice",
+          authors: ["Jane Austen"],
+          cover_i: 54321,
+        },
+      ]),
+      "books.json",
+    );
+    expect(books[0].coverUrl).toBe("https://covers.openlibrary.org/b/id/54321-L.jpg");
+  });
+
+  it("normalizes http thumbnail URLs to https", () => {
+    const books = parseImportedBooks(
+      JSON.stringify([
+        {
+          isbn13: "9780141439518",
+          title: "Pride and Prejudice",
+          authors: ["Jane Austen"],
+          imageLinks: { thumbnail: "http://books.example/cover.jpg" },
+        },
+      ]),
+      "books.json",
+    );
+    expect(books[0].coverUrl).toBe("https://books.example/cover.jpg");
+  });
+
   it("supports .css extension as CSV fallback", () => {
     const csv = [
       "Title,Authors,ISBN-13,Status",

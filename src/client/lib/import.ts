@@ -55,6 +55,56 @@ function normalizeAuthors(value: unknown): string[] {
     .filter(Boolean);
 }
 
+function normalizeUrl(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+  if (trimmed.startsWith("//")) return `https:${trimmed}`;
+  if (trimmed.startsWith("http://")) return `https://${trimmed.slice("http://".length)}`;
+  if (trimmed.startsWith("https://")) return trimmed;
+  return undefined;
+}
+
+function firstCoverId(value: unknown): number | undefined {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim() !== "" && /^\d+$/.test(value.trim())) {
+    return Number(value);
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const id = firstCoverId(item);
+      if (id) return id;
+    }
+  }
+  return undefined;
+}
+
+function normalizeCoverUrl(raw: UnknownRecord): string | undefined {
+  const direct = normalizeUrl(
+    asString(raw.coverUrl) ||
+      asString(raw["Cover URL"]) ||
+      asString(raw.cover_url) ||
+      asString(raw.thumbnail) ||
+      asString(raw.image) ||
+      asString(raw.imageUrl) ||
+      asString(raw.image_url),
+  );
+  if (direct) return direct;
+
+  const imageLinksThumb = normalizeUrl(
+    asString(asRecord(raw.imageLinks)?.thumbnail) ||
+      asString(asRecord(raw.imageLinks)?.smallThumbnail),
+  );
+  if (imageLinksThumb) return imageLinksThumb;
+
+  const coverId = firstCoverId(
+    raw.cover_i || raw.coverId || raw.cover_id || raw["Cover ID"] || raw.covers || raw.cover,
+  );
+  if (coverId) return `https://covers.openlibrary.org/b/id/${coverId}-L.jpg`;
+
+  return undefined;
+}
+
 function normalizeImportedBook(input: unknown): Partial<Book> | null {
   const raw = asRecord(input);
   if (!raw) return null;
@@ -87,7 +137,7 @@ function normalizeImportedBook(input: unknown): Partial<Book> | null {
       .map((t) => t.trim())
       .filter(Boolean),
     subjects: asStringArray(raw.subjects),
-    coverUrl: asString(raw.coverUrl) || asString(raw["Cover URL"]),
+    coverUrl: normalizeCoverUrl(raw),
     dateAdded: asString(raw.dateAdded) || asString(raw["Date Added"]),
     dateRead: asString(raw.dateRead) || asString(raw["Date Read"]),
     source: parseSource(raw.source),
