@@ -69,44 +69,44 @@
   }
 </script>
 
-<div class="detail-overlay" role="dialog" aria-label="Book details">
-  <div class="detail-panel">
-    <div class="detail-topbar">
-      <button class="detail-close" onclick={onClose} aria-label="Close">&times;</button>
+<div class="detail_overlay" role="dialog" aria-label="Book details">
+  <div class="detail_panel">
+    <div class="detail_topbar">
+      <button class="detail_close" onclick={onClose} aria-label="Close">&times;</button>
     </div>
 
-    <div class="detail-header">
-      <div class="detail-cover">
+    <div class="detail_header">
+      <div class="detail_cover">
         {#if book.coverUrl}
           <img src={book.coverUrl} alt={book.title} />
         {:else}
-          <div class="cover-placeholder large">📕</div>
+          <div class="cover_placeholder large">📕</div>
         {/if}
       </div>
-      <div class="detail-title-area">
+      <div class="detail_title_area">
         <h2>{book.title}</h2>
-        <p class="detail-authors">{book.authors.join(', ')}</p>
+        <p class="detail_authors">{book.authors.join(', ')}</p>
         {#if book.publisher}
-          <p class="detail-publisher">{book.publisher}</p>
+          <p class="detail_publisher">{book.publisher}</p>
         {/if}
         {#if book.publishYear}
-          <p class="detail-year">{book.publishYear}</p>
+          <p class="detail_year">{book.publishYear}</p>
         {/if}
         {#if book.pageCount}
-          <p class="detail-pages">{book.pageCount} pages</p>
+          <p class="detail_pages">{book.pageCount} pages</p>
         {/if}
-        <p class="detail-isbn">ISBN: {book.isbn13}</p>
+        <p class="detail_isbn">ISBN: {book.isbn13}</p>
       </div>
     </div>
 
-    <div class="detail-form">
-      <div class="form-group">
+    <div class="detail_form">
+      <div class="form_group">
         <span>Status</span>
-        <div class="status-picker">
+        <div class="status_picker">
           {#each statusOptions as opt}
             <button
               type="button"
-              class="status-choice"
+              class="status_choice"
               class:active={status === opt.value}
               onclick={() => pickStatus(opt.value)}
             >{opt.label}</button>
@@ -114,13 +114,13 @@
         </div>
       </div>
 
-      <div class="form-group">
+      <div class="form_group">
         <span>Rating</span>
-        <div class="rating-input">
+        <div class="rating_input">
           {#each [1, 2, 3, 4, 5] as star}
             <button
               type="button"
-              class="star-btn"
+              class="star_btn"
               class:active={star <= rating}
               onclick={() => (rating = rating === star ? 0 : star)}
               aria-label="{star} star{star > 1 ? 's' : ''}"
@@ -129,38 +129,38 @@
         </div>
       </div>
 
-      <label class="form-group">
+      <label class="form_group">
         <span>Language</span>
         <input type="text" bind:value={language} placeholder="eng, it, fr..." />
       </label>
 
-      <label class="form-group">
+      <label class="form_group">
         <span>Notes</span>
         <textarea bind:value={notes} rows="3" placeholder="Your thoughts..."></textarea>
       </label>
 
-      <label class="form-group">
+      <label class="form_group">
         <span>Tags</span>
         <input type="text" bind:value={tagsInput} placeholder="fiction, sci-fi, favorite" />
       </label>
     </div>
 
-    <div class="detail-actions">
-      <button class="btn btn-primary" onclick={save} disabled={saving}>
+    <div class="detail_actions">
+      <button class="btn btn_primary" onclick={save} disabled={saving}>
         {saving ? 'Saving...' : 'Save'}
       </button>
-      <button class="btn btn-danger" onclick={remove}>Remove</button>
+      <button class="btn btn_danger" onclick={remove}>Remove</button>
     </div>
 
     {#if removeConfirmOpen}
-      <details class="rband-confirm rband-confirm-inline" open aria-label="Remove book confirmation">
-        <summary class="rband-confirm-summary">Remove Book</summary>
-        <div class="rband-confirm-copy">
+      <details class="rband_confirm rband_confirm_inline" open aria-label="Remove book confirmation">
+        <summary class="rband_confirm_summary">Remove Book</summary>
+        <div class="rband_confirm_copy">
           <p>Remove "{book.title}" from your library? This cannot be undone.</p>
         </div>
-        <div class="rband-confirm-actions">
-          <button class="btn btn-ghost" onclick={cancelRemove}>Cancel</button>
-          <button class="btn btn-danger" onclick={confirmRemove}>Delete</button>
+        <div class="rband_confirm_actions">
+          <button class="btn btn_ghost" onclick={cancelRemove}>Cancel</button>
+          <button class="btn btn_danger" onclick={confirmRemove}>Delete</button>
         </div>
       </details>
     {/if}

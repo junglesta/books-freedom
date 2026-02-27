@@ -180,18 +180,18 @@
     }
 </script>
 
-<div class="export-page">
-    <p class="export-subtitle">
+<div class="export_page">
+    <p class="export_subtitle">
         {getBooks().length} Books in
-        <span class="export-library-name">{getLibraryName()}</span>
+        <span class="export_library_name">{getLibraryName()}</span>
     </p>
-    <h2 class="export-heading">Export format:</h2>
+    <h2 class="export_heading">Export format:</h2>
 
     {#each formats as fmt}
-        <div class="export-section">
-            <div class="export-section-header">
+        <div class="export_section">
+            <div class="export_section_header">
                 <button
-                    class="export-card"
+                    class="export_card"
                     onclick={() =>
                         download(
                             fmt.id,
@@ -200,16 +200,16 @@
                     disabled={getBooks().length === 0 || cardState[fmt.id] === 'busy'}
                 >
                     {#if cardState[fmt.id] === 'busy'}
-                        <span class="export-card-feedback"><span class="spinner-small"></span> wait...</span>
+                        <span class="export_card_feedback"><span class="spinner_small"></span> wait...</span>
                     {:else if cardState[fmt.id] === 'done'}
-                        <span class="export-card-feedback">done</span>
+                        <span class="export_card_feedback">done</span>
                     {:else}
                         <h3>{fmt.label}</h3>
                         <p>{fmt.desc}</p>
                     {/if}
                 </button>
                 <button
-                    class="help-btn"
+                    class="help_btn"
                     onclick={() => toggleHelp(fmt.id)}
                     aria-label="Help for {fmt.label}"
                 >
@@ -228,7 +228,7 @@
                 </button>
             </div>
             {#if openHelp === fmt.id}
-                <div class="help-panel">
+                <div class="help_panel">
                     <ul>
                         {#each fmt.help as step}
                             <li>{step}</li>
@@ -239,38 +239,38 @@
         </div>
     {/each}
 
-    <div class="export-section">
-        <div class="export-section-header">
-            <div class="sheets-section">
+    <div class="export_section">
+        <div class="export_section_header">
+            <div class="sheets_section">
                 <h2>Google Sheets</h2>
-                <p class="sheets-desc">
+                <p class="sheets_desc">
                     Push your library to a Google Sheet via Apps Script webhook.
                 </p>
                 <input
                     type="url"
                     bind:value={webhookUrl}
                     placeholder="Apps Script webhook URL..."
-                    class="sheets-input"
+                    class="sheets_input"
                 />
                 <button
-                    class="btn btn-primary"
+                    class="btn btn_primary"
                     onclick={pushToSheets}
                     disabled={exporting || getBooks().length === 0}
                 >
                     {exporting ? "Exporting..." : "Push to Google Sheets"}
                 </button>
                 {#if sheetsConfirmOpen}
-                    <details class="rband-confirm rband-confirm-inline export-confirm" open aria-label="Google Sheets export confirmation">
-                        <summary class="rband-confirm-summary">Confirm Google Sheets Export</summary>
-                        <div class="rband-confirm-copy">
+                    <details class="rband_confirm rband_confirm_inline export_confirm" open aria-label="Google Sheets export confirmation">
+                        <summary class="rband_confirm_summary">Confirm Google Sheets Export</summary>
+                        <div class="rband_confirm_copy">
                             <p>
                                 Send {getBooks().length} books (including notes/tags) to
                                 {pendingWebhookHost}?
                             </p>
                         </div>
-                        <div class="rband-confirm-actions">
-                            <button class="btn btn-ghost" onclick={cancelPushToSheets}>Cancel</button>
-                            <button class="btn btn-primary" onclick={confirmPushToSheets} disabled={exporting}>
+                        <div class="rband_confirm_actions">
+                            <button class="btn btn_ghost" onclick={cancelPushToSheets}>Cancel</button>
+                            <button class="btn btn_primary" onclick={confirmPushToSheets} disabled={exporting}>
                                 {exporting ? "Sending..." : "Send"}
                             </button>
                         </div>
@@ -278,7 +278,7 @@
                 {/if}
             </div>
             <button
-                class="help-btn"
+                class="help_btn"
                 onclick={() => toggleHelp("sheets")}
                 aria-label="Help for Google Sheets"
             >
@@ -297,12 +297,12 @@
             </button>
         </div>
         {#if openHelp === "sheets"}
-            <div class="help-panel">
+            <div class="help_panel">
                 <ul>
                     <li>Open Google Sheets → Extensions → Apps Script.</li>
                     <li>
                         Paste this code and deploy as a web app:
-                        <code class="help-code"
+                        <code class="help_code"
                             >function doPost(e) &#123; const data =
                             JSON.parse(e.postData.contents); const sheet =
                             SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();

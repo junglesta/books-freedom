@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0
+
+- Applied CSS convention skill across app UI: migrated class naming to `snake_case` in Svelte markup, class directives, selector strings, and global stylesheet selectors
+- Updated dynamic status badge class binding in book cards to explicit `snake_case` mappings
+- Verified convention refactor with full format/lint/test/build preflight
+
 ## 0.3.13
 
 - Unified confirmation and error/feedback UX using branded in-app `<details>` panels (drop library, remove book, export push confirmation)

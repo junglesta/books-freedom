@@ -15,17 +15,17 @@
   ];
 </script>
 
-<nav class="bottom-nav">
-  <div class="nav-brand" onclick={onBrandClick} onkeydown={(e) => e.key === 'Enter' && onBrandClick?.()} role="button" tabindex="0">
-    <img class="nav-brand-logo" src={headerLogoUrl} alt="Book Freedom" />
+<nav class="bottom_nav">
+  <div class="nav_brand" onclick={onBrandClick} onkeydown={(e) => e.key === 'Enter' && onBrandClick?.()} role="button" tabindex="0">
+    <img class="nav_brand_logo" src={headerLogoUrl} alt="Book Freedom" />
   </div>
   {#each tabs as tab}
     <button
-      class="nav-tab"
+      class="nav_tab"
       class:active={getRoute() === tab.hash}
       onclick={() => navigate(tab.hash)}
     >
-      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg class="nav_icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         {#if tab.hash === '#/scan'}
           <line x1="12" y1="5" x2="12" y2="19" />
           <line x1="5" y1="12" x2="19" y2="12" />
@@ -38,7 +38,7 @@
           <line x1="12" y1="15" x2="12" y2="3" />
         {/if}
       </svg>
-      <span class="nav-label">{tab.label}</span>
+      <span class="nav_label">{tab.label}</span>
     </button>
   {/each}
 </nav>

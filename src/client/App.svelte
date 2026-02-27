@@ -28,28 +28,28 @@
 
 {#if !splashDone}
     <div class="splash">
-        <div class="splash-qr">
+        <div class="splash_qr">
             <img src={splashQrUrl} alt="QR code to open Book Freedom" />
             <p>Scan to open</p>
         </div>
-        <span class="splash-version">version {version}</span>
-        <img class="splash-logo" src={logoUrl} alt="Book's Freedom" />
+        <span class="splash_version">version {version}</span>
+        <img class="splash_logo" src={logoUrl} alt="Book's Freedom" />
     </div>
 {:else}
     {#if showSplash}
         <div
-            class="splash splash-popover"
+            class="splash splash_popover"
             onclick={toggleSplash}
             onkeydown={(e) => e.key === 'Enter' && toggleSplash()}
             role="button"
             tabindex="-1"
         >
-            <div class="splash-qr">
+            <div class="splash_qr">
                 <img src={splashQrUrl} alt="QR code to open Book Freedom" />
                 <p>Scan to open</p>
             </div>
-            <span class="splash-version">version {version}</span>
-            <img class="splash-logo" src={logoUrl} alt="Book's Freedom" />
+            <span class="splash_version">version {version}</span>
+            <img class="splash_logo" src={logoUrl} alt="Book's Freedom" />
         </div>
     {/if}
 
@@ -61,7 +61,7 @@
             role="button"
             tabindex="0"
         >
-            <img class="brand-logo" src={headerLogoUrl} alt="Book Freedom" />
+            <img class="brand_logo" src={headerLogoUrl} alt="Book Freedom" />
         </header>
         <main class="page">
             {#if getRoute() === "#/scan" || getRoute() === "" || getRoute() === "#/"}

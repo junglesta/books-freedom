@@ -193,28 +193,28 @@
   }
 </script>
 
-<div class="scanner-container">
+<div class="scanner_container">
   <div id="scanner-view" bind:this={scannerRef} class={isScanning ? 'scanner-view' : 'scanner-view-idle'}>
     {#if !isScanning}
-      <button class="btn btn-primary scanner-start-btn" onclick={startScanner}>
+      <button class="btn btn_primary scanner_start_btn" onclick={startScanner}>
         Open Camera Scanner
       </button>
     {/if}
   </div>
   {#if isScanning}
-    <button class="btn btn-primary" onclick={stopScanner}>Stop Camera</button>
+    <button class="btn btn_primary" onclick={stopScanner}>Stop Camera</button>
   {/if}
   {#if !isScanning && scannerError}
-    <details class="rband-note rband-note-error" open>
-      <summary class="rband-note-summary">Camera Error</summary>
+    <details class="rband_note rband_note_error" open>
+      <summary class="rband_note_summary">Camera Error</summary>
       <p>{scannerError}</p>
     </details>
   {/if}
 
-  <div class="manual-section">
-    <p class="manual-label">Or enter ISBN manually</p>
+  <div class="manual_section">
+    <p class="manual_label">Or enter ISBN manually</p>
 
-    <form class="manual-input" onsubmit={submitIsbn13}>
+    <form class="manual_input" onsubmit={submitIsbn13}>
       <input
         type="text"
         value={isbn13}
@@ -223,10 +223,10 @@
         inputmode="numeric"
         maxlength="17"
       />
-      <button type="submit" class="btn btn-primary" disabled={!isbn13.trim()}>ISBN-13</button>
+      <button type="submit" class="btn btn_primary" disabled={!isbn13.trim()}>ISBN-13</button>
     </form>
 
-    <form class="manual-input" onsubmit={submitIsbn10}>
+    <form class="manual_input" onsubmit={submitIsbn10}>
       <input
         type="text"
         value={isbn10}
@@ -235,12 +235,12 @@
         inputmode="numeric"
         maxlength="13"
       />
-      <button type="submit" class="btn btn-primary" disabled={!isbn10.trim()}>ISBN-10</button>
+      <button type="submit" class="btn btn_primary" disabled={!isbn10.trim()}>ISBN-10</button>
     </form>
 
     {#if inputError}
-      <details class="rband-note rband-note-error" open>
-        <summary class="rband-note-summary">Invalid ISBN</summary>
+      <details class="rband_note rband_note_error" open>
+        <summary class="rband_note_summary">Invalid ISBN</summary>
         <p>{inputError}</p>
       </details>
     {/if}

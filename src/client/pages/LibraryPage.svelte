@@ -81,10 +81,10 @@
 
   function closeMenus(e: MouseEvent) {
     const target = e.target as HTMLElement;
-    if (!target.closest('.sort-menu-wrap')) {
+    if (!target.closest('.sort_menu_wrap')) {
       sortMenuOpen = false;
     }
-    if (!target.closest('.lang-menu-wrap')) {
+    if (!target.closest('.lang_menu_wrap')) {
       languageMenuOpen = false;
     }
   }
@@ -188,24 +188,24 @@
 
 <svelte:window onclick={closeMenus} />
 
-<div class="library-page">
-  <div class="library-header">
-    <div class="library-header-left">
+<div class="library_page">
+  <div class="library_header">
+    <div class="library_header_left">
       <input
-        class="library-name-input"
+        class="library_name_input"
         type="text"
         value={getLibraryName()}
         oninput={(e) => setLibraryName(e.currentTarget.value)}
       />
-      <span class="library-count" aria-label={`${getBooks().length} books in library`}>
+      <span class="library_count" aria-label={`${getBooks().length} books in library`}>
         {countLabel()}
       </span>
     </div>
-    <div class="library-header-actions">
-      <button class="view-toggle" onclick={dropLibrary} aria-label="Drop library">
+    <div class="library_header_actions">
+      <button class="view_toggle" onclick={dropLibrary} aria-label="Drop library">
         Drop
       </button>
-      <button class="view-toggle" onclick={openImportPicker} aria-label="Import books">
+      <button class="view_toggle" onclick={openImportPicker} aria-label="Import books">
         Import
       </button>
       <input
@@ -215,7 +215,7 @@
         style="display:none"
         onchange={handleImportChange}
       />
-      <button class="view-toggle" onclick={() => viewMode = viewMode === 'card' ? 'list' : 'card'} aria-label="Toggle view">
+      <button class="view_toggle" onclick={() => viewMode = viewMode === 'card' ? 'list' : 'card'} aria-label="Toggle view">
         {#if viewMode === 'card'}
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <line x1="4" y1="6" x2="20" y2="6" />
@@ -232,8 +232,8 @@
         {/if}
       </button>
 
-      <div class="sort-menu-wrap">
-        <button class="sort-trigger" onclick={toggleSortMenu} aria-label="Sort options">
+      <div class="sort_menu_wrap">
+        <button class="sort_trigger" onclick={toggleSortMenu} aria-label="Sort options">
           <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
             <circle cx="12" cy="5" r="2" />
             <circle cx="12" cy="12" r="2" />
@@ -242,10 +242,10 @@
         </button>
 
         {#if sortMenuOpen}
-          <div class="sort-dropdown">
+          <div class="sort_dropdown">
             {#each sortOptions as opt}
               <button
-                class="sort-option"
+                class="sort_option"
                 class:active={sortBy === opt.value}
                 onclick={() => pickSort(opt.value)}
               >{opt.label}</button>
@@ -257,29 +257,29 @@
   </div>
 
   {#if dropConfirmOpen}
-    <details class="rband-confirm rband-confirm-inline" open aria-label="Drop library confirmation">
-      <summary class="rband-confirm-summary">Drop Library</summary>
-      <div class="rband-confirm-copy">
+    <details class="rband_confirm rband_confirm_inline" open aria-label="Drop library confirmation">
+      <summary class="rband_confirm_summary">Drop Library</summary>
+      <div class="rband_confirm_copy">
         <p>Delete all books from this library? This cannot be undone.</p>
       </div>
-      <div class="rband-confirm-actions">
-        <button class="btn btn-ghost" onclick={cancelDropLibrary}>Cancel</button>
-        <button class="btn btn-danger" onclick={confirmDropLibrary}>Delete</button>
+      <div class="rband_confirm_actions">
+        <button class="btn btn_ghost" onclick={cancelDropLibrary}>Cancel</button>
+        <button class="btn btn_danger" onclick={confirmDropLibrary}>Delete</button>
       </div>
     </details>
   {/if}
 
   {#if importFeedbackError}
-    <details class="rband-note rband-note-error" open>
-      <summary class="rband-note-summary">Import Error</summary>
+    <details class="rband_note rband_note_error" open>
+      <summary class="rband_note_summary">Import Error</summary>
       <p>{importFeedbackError}</p>
     </details>
   {/if}
 
   <SearchBar value={searchQuery} onInput={(v) => (searchQuery = v)} />
 
-  <div class="library-controls">
-    <div class="status-tabs">
+  <div class="library_controls">
+    <div class="status_tabs">
       {#each statusOptions as opt}
         <button
           class="tab"
@@ -290,21 +290,21 @@
     </div>
 
     {#if uniqueLanguages().length > 0}
-      <div class="lang-menu-wrap">
-        <button class="lang-trigger" onclick={toggleLanguageMenu} aria-label="Filter by language">
+      <div class="lang_menu_wrap">
+        <button class="lang_trigger" onclick={toggleLanguageMenu} aria-label="Filter by language">
           {languageFilter === 'all' ? 'Lang' : languageFilter === '' ? '??' : languageFilter.toUpperCase()} ▾
         </button>
 
         {#if languageMenuOpen}
-          <div class="lang-dropdown">
+          <div class="lang_dropdown">
             <button
-              class="lang-option"
+              class="lang_option"
               class:active={languageFilter === 'all'}
               onclick={() => pickLanguage('all')}
             >All</button>
             {#each uniqueLanguages() as lang}
               <button
-                class="lang-option"
+                class="lang_option"
                 class:active={languageFilter === lang}
                 onclick={() => pickLanguage(lang)}
               >{lang === '' ? '??' : lang.toUpperCase()}</button>
