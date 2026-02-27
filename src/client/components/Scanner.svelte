@@ -8,7 +8,6 @@
   let { onScan }: Props = $props();
 
   let scannerRef: HTMLDivElement | undefined = $state();
-  let scannerInner: HTMLDivElement | undefined = $state();
   let scanner: any = null;
   let scannerError = $state('');
   let isScanning = $state(false);
@@ -97,12 +96,13 @@
   });
 
   async function startScanner() {
-    if (!scannerInner || isScanning) return;
+    if (!scannerRef || isScanning) return;
     scannerError = '';
+    isScanning = true;
 
     try {
       const { Html5Qrcode, Html5QrcodeSupportedFormats } = await import('html5-qrcode');
-      scanner = new Html5Qrcode(scannerInner.id);
+      scanner = new Html5Qrcode(scannerRef.id);
 
       await scanner.start(
         { facingMode: 'environment' },
@@ -124,7 +124,6 @@
         },
         () => {}
       );
-      isScanning = true;
     } catch (err: any) {
       scannerError = err?.message || 'Failed to start camera';
       isScanning = false;
@@ -139,7 +138,6 @@
       try { await s.stop(); } catch {}
       try { s.clear(); } catch {}
     }
-    if (scannerInner) scannerInner.innerHTML = '';
   }
 
   function submitIsbn13(e: Event) {
@@ -168,8 +166,7 @@
 </script>
 
 <div class="scanner-container">
-  <div bind:this={scannerRef} class={isScanning ? 'scanner-view' : 'scanner-view-idle'}>
-    <div id="scanner-inner" bind:this={scannerInner}></div>
+  <div id="scanner-view" bind:this={scannerRef} class={isScanning ? 'scanner-view' : 'scanner-view-idle'}>
     {#if !isScanning}
       <button class="btn btn-primary scanner-start-btn" onclick={startScanner}>
         Open Camera Scanner

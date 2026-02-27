@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.6
+
+- Fixed camera not starting (reverted inner div approach that caused zero-size container)
+- Set isScanning early so container has proper dimensions before library renders
+- Removed innerHTML clearing — library clear() + Svelte reactivity handle cleanup
+- "Try Again" button on failed ISBN lookup (from 0.3.5)
+
 ## 0.3.5
 
 - Fixed stuck UI after failed ISBN lookup (scanner DOM separated from Svelte DOM)
