@@ -1,5 +1,6 @@
 import { lookupIsbn } from "./isbn-lookup";
 import { addBook, deleteBook, getAllBooks, getBookByIsbn, updateBook } from "./storage";
+import { LEGACY_LIBRARY_NAME_STORAGE_KEY, LIBRARY_NAME_STORAGE_KEY } from "./storage-keys";
 import type { Book, ScanResult } from "./types";
 
 // Book collection state
@@ -12,8 +13,21 @@ let toastMessage = $state("");
 let toastVisible = $state(false);
 let toastTimeout: ReturnType<typeof setTimeout> | null = null;
 
+function loadLibraryName(): string {
+  const current = localStorage.getItem(LIBRARY_NAME_STORAGE_KEY);
+  if (current) return current;
+
+  const legacy = localStorage.getItem(LEGACY_LIBRARY_NAME_STORAGE_KEY);
+  if (legacy) {
+    localStorage.setItem(LIBRARY_NAME_STORAGE_KEY, legacy);
+    return legacy;
+  }
+
+  return "Library";
+}
+
 // Library name state
-let libraryName = $state(localStorage.getItem("sokola_library_name") || "Library");
+let libraryName = $state(loadLibraryName());
 
 export function getLibraryName() {
   return libraryName;
@@ -21,7 +35,7 @@ export function getLibraryName() {
 
 export function setLibraryName(name: string) {
   libraryName = name;
-  localStorage.setItem("sokola_library_name", name);
+  localStorage.setItem(LIBRARY_NAME_STORAGE_KEY, name);
 }
 
 // Current route

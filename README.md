@@ -2,21 +2,13 @@
   <img src="logo.svg" alt="Book Freedom" width="480">
 </p>
 
-> no account, no cloud, no tracking.
-
-scan it. shelve it. own your data.
+>  scan it. shelve it. own your data. no account, no cloud, no tracking.
 
 ## why
 
 because your reading list shouldn't live on some corpo platform that sells your habits, goes down randomly, or gets acqui-hired into oblivion.
 
 your books, your device, your rules.
-
-## what
-
-a dead-simple book library app. point your camera at a barcode, get the book info, done.
-
-everything stays on your device in localStorage. nothing leaves the browser.
 
 ## how
 
@@ -27,9 +19,17 @@ everything stays on your device in localStorage. nothing leaves the browser.
 - export anywhere: JSON, CSV, Goodreads, LibraryThing, Google Sheets
 - works offline as a PWA — install it like a native app
 
+## what
+
+a dead-simple book library app. point your camera at a barcode, get the book info, done.
+
+everything stays on your device in localStorage. nothing leaves the browser.
+
+
+
 ## stack
 
-svelte 5 + vite. pure static SPA. dark mode only. deploy anywhere.
+svelte 5 + vite. pure static SPA. local storage and ISBN lookup logic. dark mode only. deploy anywhere. 
 
 ## run it
 
@@ -40,6 +40,9 @@ pnpm dev
 
 ## license
 
-CC BY-SA 4.0 — share it, remix it, just keep it open.
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.en) — share it, remix it, just keep it open.
+
+
+## commercial
 
 want to use our SDK or build something commercial? hit us up at **info@junglestar.org**

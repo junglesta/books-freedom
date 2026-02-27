@@ -4,3 +4,4 @@ data/books.json
 *.log
 .DS_Store
 certs/
+Icon

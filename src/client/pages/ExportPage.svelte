@@ -7,8 +7,25 @@
         generateLibraryThingTsv,
         downloadBlob,
     } from "../lib/export";
+    import {
+        LEGACY_SHEETS_URL_STORAGE_KEY,
+        SHEETS_URL_STORAGE_KEY,
+    } from "../lib/storage-keys";
 
-    let webhookUrl = $state(localStorage.getItem("sokola_sheets_url") || "");
+    function loadWebhookUrl(): string {
+        const current = localStorage.getItem(SHEETS_URL_STORAGE_KEY);
+        if (current) return current;
+
+        const legacy = localStorage.getItem(LEGACY_SHEETS_URL_STORAGE_KEY);
+        if (legacy) {
+            localStorage.setItem(SHEETS_URL_STORAGE_KEY, legacy);
+            return legacy;
+        }
+
+        return "";
+    }
+
+    let webhookUrl = $state(loadWebhookUrl());
     let exporting = $state(false);
     let openHelp = $state<string | null>(null);
     let cardState = $state<Record<string, 'idle' | 'busy' | 'done'>>({});
@@ -110,7 +127,7 @@
             return;
         }
 
-        localStorage.setItem("sokola_sheets_url", webhookUrl);
+        localStorage.setItem(SHEETS_URL_STORAGE_KEY, webhookUrl);
         exporting = true;
 
         try {

@@ -1,6 +1,5 @@
+import { COLLECTION_STORAGE_KEY } from "./storage-keys";
 import type { Book, BookCollection } from "./types";
-
-const STORAGE_KEY = "books-freedom";
 
 function emptyCollection(): BookCollection {
   return { version: 1, books: [] };
@@ -8,7 +7,7 @@ function emptyCollection(): BookCollection {
 
 export function loadCollection(): BookCollection {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(COLLECTION_STORAGE_KEY);
     if (!raw) return emptyCollection();
     return JSON.parse(raw) as BookCollection;
   } catch {
@@ -17,7 +16,7 @@ export function loadCollection(): BookCollection {
 }
 
 export function saveCollection(collection: BookCollection): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(collection));
+  localStorage.setItem(COLLECTION_STORAGE_KEY, JSON.stringify(collection));
 }
 
 export function getAllBooks(): Book[] {

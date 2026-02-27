@@ -1,7 +1,20 @@
 # Changelog
 
+
+
+
+## 0.3.9
+
+- now using codex
+- Repo Consistency Cleanup (P3): 
+- Resolve duplicate PWA artifacts and keep one canonical manifest/sw.
+- Standardize localStorage key namespace (books-freedom vs sokola_*), with migration.
+- Files: `src/client/manifest.json`, `src/client/public/manifest.json`,`src/client/sw.js`, `src/client/public/sw.js`, `storage.ts`, `stores.svelte.ts`, `ExportPage.svelte`
+
+
 ## 0.3.8
 
+- till now used claudecode 
 - Fixed leftover viewfinder overlay after scan (cleanup library DOM after Svelte re-render)
 - Added Vitest unit tests (storage, export, isbn-lookup) — 41 tests
 - Added Biome linter/formatter (v2.4.4)
