@@ -1,5 +1,7 @@
 /* ===== Reset & Base ===== */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -43,9 +45,12 @@
   color-scheme: dark;
 }
 
-html, body {
+html,
+body {
   height: 100%;
-  font-family: ui-monospace, 'SF Mono', SFMono-Regular, 'Cascadia Code', 'Consolas', 'Liberation Mono', Menlo, monospace;
+  font-family:
+    ui-monospace, "SF Mono", SFMono-Regular, "Cascadia Code", "Consolas", "Liberation Mono", Menlo,
+    monospace;
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
@@ -75,7 +80,7 @@ html, body {
 }
 
 .splash::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   z-index: -1;
@@ -107,22 +112,34 @@ html, body {
 }
 
 @keyframes splash-draw {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes splash-fade {
-  to { opacity: 0; }
+  to {
+    opacity: 0;
+  }
 }
 
 .splash-popover {
-  animation: splash-in 0.25s ease forwards !important;
+  animation: splash-in 0.25s ease forwards;
   cursor: pointer;
 }
 
 @keyframes splash-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ===== Brand Header ===== */
@@ -262,7 +279,9 @@ html, body {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s, opacity 0.2s;
+  transition:
+    background 0.2s,
+    opacity 0.2s;
 }
 
 .btn:disabled {
@@ -313,7 +332,7 @@ h1 .count {
 }
 
 .hidden {
-  display: none !important;
+  display: none;
 }
 
 /* ===== Scanner ===== */
@@ -446,7 +465,9 @@ h1 .count {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading {
@@ -1147,7 +1168,7 @@ h1 .count {
 }
 
 .help-panel li::before {
-  content: '›';
+  content: "›";
   position: absolute;
   left: 0;
   color: var(--primary);
@@ -1169,8 +1190,14 @@ h1 .count {
 }
 
 @keyframes help-in {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .export-card:hover:not(:disabled) {
@@ -1274,7 +1301,8 @@ h1 .count {
 
 /* ===== Desktop Frame ===== */
 @media (min-width: 1235px) {
-  html, body {
+  html,
+  body {
     overflow: hidden;
     height: 100%;
   }
@@ -1287,7 +1315,7 @@ h1 .count {
   }
 
   body::before {
-    content: '';
+    content: "";
     position: fixed;
     inset: 0;
     z-index: -1;

@@ -12,12 +12,12 @@ export interface Book {
   subjects?: string[];
   coverUrl?: string;
   rating?: number;
-  status: 'to-read' | 'reading' | 'read';
+  status: "to-read" | "reading" | "read";
   notes?: string;
   tags?: string[];
   dateAdded: string;
   dateRead?: string;
-  source: 'openlibrary' | 'googlebooks' | 'manual';
+  source: "openlibrary" | "googlebooks" | "manual";
 }
 
 export interface BookCollection {

@@ -1,7 +1,7 @@
-import type { Book } from './types';
+import type { Book } from "./types";
 
 export async function lookupIsbn(isbn: string): Promise<Book | null> {
-  const cleaned = isbn.replace(/[-\s]/g, '');
+  const cleaned = isbn.replace(/[-\s]/g, "");
 
   // Try Open Library first
   const olResult = await tryOpenLibrary(cleaned);
@@ -38,7 +38,7 @@ async function tryOpenLibrary(isbn: string): Promise<Book | null> {
             const authorResp = await fetch(`https://openlibrary.org${key}.json`);
             if (authorResp.ok) {
               const authorData = await authorResp.json();
-              authors.push(authorData.name || 'Unknown Author');
+              authors.push(authorData.name || "Unknown Author");
             }
           } catch {
             // Skip failed author lookups
@@ -49,7 +49,7 @@ async function tryOpenLibrary(isbn: string): Promise<Book | null> {
 
     // Extract ISBNs
     const isbn13 = normalizeToIsbn13(isbn);
-    const isbn10 = isbn.length === 10 ? isbn : (data.isbn_10?.[0] || undefined);
+    const isbn10 = isbn.length === 10 ? isbn : data.isbn_10?.[0] || undefined;
 
     // Extract cover URL
     const coverId = data.covers?.[0];
@@ -74,21 +74,21 @@ async function tryOpenLibrary(isbn: string): Promise<Book | null> {
     }
 
     return {
-      id: '',
+      id: "",
       isbn13,
       isbn10,
-      title: data.title || 'Unknown Title',
+      title: data.title || "Unknown Title",
       authors,
       publisher: data.publishers?.[0] || undefined,
       publishDate,
       publishYear,
       pageCount: data.number_of_pages || undefined,
-      language: data.languages?.[0]?.key?.replace('/languages/', '') || undefined,
+      language: data.languages?.[0]?.key?.replace("/languages/", "") || undefined,
       subjects,
       coverUrl,
-      status: 'to-read',
-      dateAdded: '',
-      source: 'openlibrary',
+      status: "to-read",
+      dateAdded: "",
+      source: "openlibrary",
     };
   } catch {
     return null;
@@ -110,17 +110,17 @@ async function tryGoogleBooks(isbn: string): Promise<Book | null> {
     let isbn10: string | undefined;
     if (vol.industryIdentifiers) {
       for (const id of vol.industryIdentifiers) {
-        if (id.type === 'ISBN_10') isbn10 = id.identifier;
+        if (id.type === "ISBN_10") isbn10 = id.identifier;
       }
     }
 
     const publishYear = vol.publishedDate ? extractYear(vol.publishedDate) : undefined;
 
     return {
-      id: '',
+      id: "",
       isbn13,
       isbn10,
-      title: vol.title || 'Unknown Title',
+      title: vol.title || "Unknown Title",
       authors: vol.authors || [],
       publisher: vol.publisher || undefined,
       publishDate: vol.publishedDate || undefined,
@@ -128,10 +128,10 @@ async function tryGoogleBooks(isbn: string): Promise<Book | null> {
       pageCount: vol.pageCount || undefined,
       language: vol.language || undefined,
       subjects: vol.categories?.slice(0, 10),
-      coverUrl: vol.imageLinks?.thumbnail?.replace('http:', 'https:') || undefined,
-      status: 'to-read',
-      dateAdded: '',
-      source: 'googlebooks',
+      coverUrl: vol.imageLinks?.thumbnail?.replace("http:", "https:") || undefined,
+      status: "to-read",
+      dateAdded: "",
+      source: "googlebooks",
     };
   } catch {
     return null;
@@ -150,12 +150,12 @@ async function tryGoogleBooksLanguage(isbn: string): Promise<string | null> {
 }
 
 function normalizeToIsbn13(isbn: string): string {
-  const cleaned = isbn.replace(/[-\s]/g, '');
+  const cleaned = isbn.replace(/[-\s]/g, "");
   if (cleaned.length === 13) return cleaned;
-  const prefix = '978' + cleaned.slice(0, 9);
+  const prefix = `978${cleaned.slice(0, 9)}`;
   let sum = 0;
   for (let i = 0; i < 12; i++) {
-    sum += parseInt(prefix[i]) * (i % 2 === 0 ? 1 : 3);
+    sum += parseInt(prefix[i], 10) * (i % 2 === 0 ? 1 : 3);
   }
   const check = (10 - (sum % 10)) % 10;
   return prefix + check;
@@ -163,5 +163,5 @@ function normalizeToIsbn13(isbn: string): string {
 
 function extractYear(dateStr: string): number | undefined {
   const match = dateStr.match(/(\d{4})/);
-  return match ? parseInt(match[1]) : undefined;
+  return match ? parseInt(match[1], 10) : undefined;
 }

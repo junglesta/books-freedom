@@ -1,6 +1,6 @@
-import type { Book, ScanResult } from './types';
-import { getAllBooks, addBook, updateBook, deleteBook, getBookByIsbn } from './storage';
-import { lookupIsbn } from './isbn-lookup';
+import { lookupIsbn } from "./isbn-lookup";
+import { addBook, deleteBook, getAllBooks, getBookByIsbn, updateBook } from "./storage";
+import type { Book, ScanResult } from "./types";
 
 // Book collection state
 let books = $state<Book[]>([]);
@@ -8,12 +8,12 @@ let loading = $state(false);
 let error = $state<string | null>(null);
 
 // Toast state
-let toastMessage = $state('');
+let toastMessage = $state("");
 let toastVisible = $state(false);
 let toastTimeout: ReturnType<typeof setTimeout> | null = null;
 
 // Library name state
-let libraryName = $state(localStorage.getItem('sokola_library_name') || 'Library');
+let libraryName = $state(localStorage.getItem("sokola_library_name") || "Library");
 
 export function getLibraryName() {
   return libraryName;
@@ -21,15 +21,15 @@ export function getLibraryName() {
 
 export function setLibraryName(name: string) {
   libraryName = name;
-  localStorage.setItem('sokola_library_name', name);
+  localStorage.setItem("sokola_library_name", name);
 }
 
 // Current route
-let currentRoute = $state(window.location.hash || '#/scan');
+let currentRoute = $state(window.location.hash || "#/scan");
 
 // Listen for hash changes
-window.addEventListener('hashchange', () => {
-  currentRoute = window.location.hash || '#/scan';
+window.addEventListener("hashchange", () => {
+  currentRoute = window.location.hash || "#/scan";
 });
 
 export function getRoute() {
@@ -68,7 +68,7 @@ export function addBookToCollection(book: Partial<Book>) {
   try {
     const saved = addBook(book);
     books = [...books, saved];
-    showToast('Book added to library!');
+    showToast("Book added to library!");
     return saved;
   } catch (e: any) {
     showToast(e.message);
@@ -80,7 +80,7 @@ export function updateBookInCollection(id: string, updates: Partial<Book>) {
   try {
     const updated = updateBook(id, updates);
     books = books.map((b) => (b.id === id ? updated : b));
-    showToast('Book updated!');
+    showToast("Book updated!");
     return updated;
   } catch (e: any) {
     showToast(e.message);
@@ -92,7 +92,7 @@ export function removeBookFromCollection(id: string) {
   try {
     deleteBook(id);
     books = books.filter((b) => b.id !== id);
-    showToast('Book removed.');
+    showToast("Book removed.");
   } catch (e: any) {
     showToast(e.message);
     throw e;
@@ -100,9 +100,9 @@ export function removeBookFromCollection(id: string) {
 }
 
 export async function scanIsbn(isbn: string): Promise<ScanResult> {
-  const cleaned = isbn.replace(/[-\s]/g, '');
+  const cleaned = isbn.replace(/[-\s]/g, "");
   if (!/^(\d{10}|\d{13})$/.test(cleaned)) {
-    throw new Error('Invalid ISBN format');
+    throw new Error("Invalid ISBN format");
   }
 
   // Check if already in collection
@@ -114,7 +114,7 @@ export async function scanIsbn(isbn: string): Promise<ScanResult> {
 
   const book = await lookupIsbn(cleaned);
   if (!book) {
-    throw new Error('Book not found');
+    throw new Error("Book not found");
   }
 
   return { book, alreadyExists: false };
@@ -138,10 +138,10 @@ export function isToastVisible() {
 }
 
 function normalizeToIsbn13(isbn: string): string {
-  const prefix = '978' + isbn.slice(0, 9);
+  const prefix = `978${isbn.slice(0, 9)}`;
   let sum = 0;
   for (let i = 0; i < 12; i++) {
-    sum += parseInt(prefix[i]) * (i % 2 === 0 ? 1 : 3);
+    sum += parseInt(prefix[i], 10) * (i % 2 === 0 ? 1 : 3);
   }
   const check = (10 - (sum % 10)) % 10;
   return prefix + check;

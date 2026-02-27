@@ -1,6 +1,6 @@
-import type { Book, BookCollection } from './types';
+import type { Book, BookCollection } from "./types";
 
-const STORAGE_KEY = 'books-freedom';
+const STORAGE_KEY = "books-freedom";
 
 function emptyCollection(): BookCollection {
   return { version: 1, books: [] };
@@ -43,7 +43,7 @@ export function addBook(book: Partial<Book>): Book {
 export function updateBook(id: string, updates: Partial<Book>): Book {
   const collection = loadCollection();
   const index = collection.books.findIndex((b) => b.id === id);
-  if (index === -1) throw new Error('Book not found');
+  if (index === -1) throw new Error("Book not found");
   const updated = { ...collection.books[index], ...updates, id };
   collection.books[index] = updated;
   saveCollection(collection);

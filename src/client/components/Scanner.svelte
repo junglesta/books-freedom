@@ -146,13 +146,19 @@
     const s = scanner;
     scanner = null;
     isScanning = false;
-    // Try library cleanup, but don't await — go sync for instant UI update
     if (s) {
       try { s.stop().catch(() => {}); } catch {}
       try { s.clear(); } catch {}
     }
-    // Force kill any remaining video streams and DOM
     killVideoTracks();
+    // Remove leftover library DOM (viewfinder overlays) after Svelte re-renders the button
+    setTimeout(() => {
+      if (scannerRef && !isScanning) {
+        Array.from(scannerRef.children).forEach(el => {
+          if (el.tagName !== 'BUTTON') el.remove();
+        });
+      }
+    }, 50);
   }
 
   function submitIsbn13(e: Event) {

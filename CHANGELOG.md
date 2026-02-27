@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.8
+
+- Fixed leftover viewfinder overlay after scan (cleanup library DOM after Svelte re-render)
+- Added Vitest unit tests (storage, export, isbn-lookup) — 41 tests
+- Added Biome linter/formatter (v2.4.4)
+- Biome auto-fix: template literals, parseInt radix, import ordering
+- New scripts: test, test:watch, lint, format
+
 ## 0.3.7
 
 - Fixed frozen UI on stop/scan: force-kill video tracks directly via MediaStream API

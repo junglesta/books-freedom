@@ -10,7 +10,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "types": ["bun-types"]
+    "types": ["vitest/globals"]
   },
   "include": ["src/**/*.ts", "src/**/*.svelte"],
   "exclude": ["node_modules", "dist"]
