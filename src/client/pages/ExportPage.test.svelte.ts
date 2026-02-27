@@ -59,10 +59,6 @@ describe("ExportPage", () => {
 
   it("shows validation errors for invalid webhook URL", async () => {
     const user = userEvent.setup();
-    vi.stubGlobal(
-      "confirm",
-      vi.fn(() => true),
-    );
     vi.stubGlobal("fetch", vi.fn());
 
     render(ExportPage);
@@ -74,9 +70,7 @@ describe("ExportPage", () => {
 
   it("posts collection to webhook after user confirmation", async () => {
     const user = userEvent.setup();
-    const confirmSpy = vi.fn(() => true);
     const fetchSpy = vi.fn(async () => new Response("ok", { status: 200 }));
-    vi.stubGlobal("confirm", confirmSpy);
     vi.stubGlobal("fetch", fetchSpy);
 
     render(ExportPage);
@@ -85,8 +79,8 @@ describe("ExportPage", () => {
       "https://script.google.com/macros/s/test/exec",
     );
     await user.click(screen.getByRole("button", { name: "Push to Google Sheets" }));
+    await user.click(screen.getByRole("button", { name: "Send" }));
 
-    expect(confirmSpy).toHaveBeenCalled();
     expect(fetchSpy).toHaveBeenCalledWith(
       "https://script.google.com/macros/s/test/exec",
       expect.objectContaining({ method: "POST" }),

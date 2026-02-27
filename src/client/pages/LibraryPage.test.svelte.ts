@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/svelte";
+import { fireEvent, render, screen, within } from "@testing-library/svelte";
 import userEvent from "@testing-library/user-event";
 import type { Book } from "../lib/types";
 import LibraryPage from "./LibraryPage.svelte";
@@ -108,5 +108,21 @@ describe("LibraryPage", () => {
     await user.click(screen.getByRole("button", { name: "Delete" }));
 
     expect(clearLibraryCollection).toHaveBeenCalled();
+  });
+
+  it("shows inline RBAND error for unsupported import file type", async () => {
+    const { container } = render(LibraryPage);
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(["hello"], "notes.txt", { type: "text/plain" });
+
+    Object.defineProperty(input, "files", {
+      value: [file],
+      configurable: true,
+    });
+    await fireEvent.change(input);
+
+    expect(screen.getByText("Import Error")).toBeTruthy();
+    expect(screen.getByText(/Unsupported file type \(notes\.txt\)\. Use/i)).toBeTruthy();
+    expect(showToast).not.toHaveBeenCalledWith(expect.stringContaining("Unsupported file type"));
   });
 });

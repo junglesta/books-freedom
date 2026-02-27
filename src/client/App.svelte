@@ -8,6 +8,7 @@
     import { getRoute, loadBooks } from "./lib/stores.svelte";
     import logoUrl from "./assets/logo.svg";
     import headerLogoUrl from "./assets/header-logo.svg";
+    import splashQrUrl from "./assets/splash-qr.svg";
     import { version } from "../../package.json";
 
     let splashDone = $state(false);
@@ -27,6 +28,10 @@
 
 {#if !splashDone}
     <div class="splash">
+        <div class="splash-qr">
+            <img src={splashQrUrl} alt="QR code to open Book Freedom" />
+            <p>Scan to open</p>
+        </div>
         <span class="splash-version">version {version}</span>
         <img class="splash-logo" src={logoUrl} alt="Book's Freedom" />
     </div>
@@ -39,6 +44,10 @@
             role="button"
             tabindex="-1"
         >
+            <div class="splash-qr">
+                <img src={splashQrUrl} alt="QR code to open Book Freedom" />
+                <p>Scan to open</p>
+            </div>
             <span class="splash-version">version {version}</span>
             <img class="splash-logo" src={logoUrl} alt="Book's Freedom" />
         </div>

@@ -3,6 +3,7 @@ import type { Book } from "./types";
 
 const BOOK_STATUSES = new Set<Book["status"]>(["to-read", "reading", "read"]);
 const BOOK_SOURCES = new Set<Book["source"]>(["openlibrary", "googlebooks", "manual"]);
+const SUPPORTED_IMPORT_EXTENSIONS = [".json", ".csv", ".css"] as const;
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -126,7 +127,9 @@ function parseCsv(content: string): Partial<Book>[] {
     .replace(/\r/g, "\n")
     .split("\n")
     .filter((line) => line.trim().length > 0);
-  if (lines.length < 2) return [];
+  if (lines.length < 2) {
+    throw new Error("Invalid CSV/CSS file. Expected a header row and at least one data row.");
+  }
 
   const headers = splitCsvLine(lines[0]).map((h) => h.trim());
   const books: Partial<Book>[] = [];
@@ -145,7 +148,12 @@ function parseCsv(content: string): Partial<Book>[] {
 }
 
 function parseJson(content: string): Partial<Book>[] {
-  const parsed = JSON.parse(content);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(content);
+  } catch {
+    throw new Error("Invalid JSON file. Expected exported library JSON or a books array.");
+  }
   const records = Array.isArray(parsed)
     ? parsed
     : Array.isArray(asRecord(parsed)?.books)
@@ -154,7 +162,24 @@ function parseJson(content: string): Partial<Book>[] {
   return records.map((r) => normalizeImportedBook(r)).filter((b): b is Partial<Book> => b !== null);
 }
 
+export function isSupportedImportFileName(fileName: string): boolean {
+  const name = fileName.toLowerCase();
+  return SUPPORTED_IMPORT_EXTENSIONS.some((ext) => name.endsWith(ext));
+}
+
+export function getSupportedImportExtensionsLabel(): string {
+  return SUPPORTED_IMPORT_EXTENSIONS.join(", ");
+}
+
 export function parseImportedBooks(content: string, fileName: string): Partial<Book>[] {
+  if (!isSupportedImportFileName(fileName)) {
+    throw new Error(`Unsupported file type. Use ${getSupportedImportExtensionsLabel()}.`);
+  }
+
+  if (content.trim().length === 0) {
+    throw new Error("Import file is empty.");
+  }
+
   const name = fileName.toLowerCase();
   if (name.endsWith(".json")) {
     return parseJson(content);
@@ -162,5 +187,5 @@ export function parseImportedBooks(content: string, fileName: string): Partial<B
   if (name.endsWith(".csv") || name.endsWith(".css")) {
     return parseCsv(content);
   }
-  throw new Error("Unsupported file type. Use JSON or CSV.");
+  throw new Error(`Unsupported file type. Use ${getSupportedImportExtensionsLabel()}.`);
 }

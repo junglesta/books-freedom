@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.13
+
+- Unified confirmation and error/feedback UX using branded in-app `<details>` panels (drop library, remove book, export push confirmation)
+- Refactored scan/manual ISBN feedback to RBAND-style inline notes (camera errors, invalid ISBN checksum, lookup errors)
+- Hardened import feedback: unsupported or invalid import files now show in-app RBAND import errors; added parser validation for empty/invalid JSON/CSV
+- Export format titles now use limegreen brand accent for clearer visual hierarchy
+- Removed unused `ConfirmDialog` component after migrating to inline detail-based confirmations
+
 ## 0.3.12
 
 - Fixed "Scan Another" flow by resetting scanner instance deterministically

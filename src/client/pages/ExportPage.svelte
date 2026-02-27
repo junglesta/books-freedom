@@ -35,6 +35,9 @@
     let exporting = $state(false);
     let openHelp = $state<string | null>(null);
     let cardState = $state<Record<string, 'idle' | 'busy' | 'done'>>({});
+    let sheetsConfirmOpen = $state(false);
+    let pendingWebhookUrl = $state("");
+    let pendingWebhookHost = $state("");
 
     function toggleHelp(id: string) {
         openHelp = openHelp === id ? null : id;
@@ -127,7 +130,7 @@
         }, 50);
     }
 
-    async function pushToSheets() {
+    function pushToSheets() {
         const validation = validateWebhookUrl(webhookUrl);
         if (!validation.ok || !validation.normalizedUrl) {
             showToast(validation.error || "Webhook URL is not valid");
@@ -135,17 +138,29 @@
         }
 
         const collection = getRawCollection();
-        const confirmed = confirm(
-            `This will send ${collection.books.length} books (including notes/tags) to ${getWebhookHost(validation.normalizedUrl)}. Continue?`,
-        );
-        if (!confirmed) return;
+        if (collection.books.length === 0) {
+            showToast("No books to export.");
+            return;
+        }
 
+        pendingWebhookUrl = validation.normalizedUrl;
+        pendingWebhookHost = getWebhookHost(validation.normalizedUrl);
         webhookUrl = validation.normalizedUrl;
-        localStorage.setItem(SHEETS_URL_STORAGE_KEY, validation.normalizedUrl);
+        sheetsConfirmOpen = true;
+    }
+
+    function cancelPushToSheets() {
+        sheetsConfirmOpen = false;
+    }
+
+    async function confirmPushToSheets() {
+        if (!pendingWebhookUrl || exporting) return;
         exporting = true;
 
         try {
-            const resp = await fetch(validation.normalizedUrl, {
+            localStorage.setItem(SHEETS_URL_STORAGE_KEY, pendingWebhookUrl);
+            const collection = getRawCollection();
+            const resp = await fetch(pendingWebhookUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(collection),
@@ -160,6 +175,7 @@
             showToast(getErrorMessage(e, "Export failed"));
         } finally {
             exporting = false;
+            sheetsConfirmOpen = false;
         }
     }
 </script>
@@ -243,6 +259,23 @@
                 >
                     {exporting ? "Exporting..." : "Push to Google Sheets"}
                 </button>
+                {#if sheetsConfirmOpen}
+                    <details class="rband-confirm rband-confirm-inline export-confirm" open aria-label="Google Sheets export confirmation">
+                        <summary class="rband-confirm-summary">Confirm Google Sheets Export</summary>
+                        <div class="rband-confirm-copy">
+                            <p>
+                                Send {getBooks().length} books (including notes/tags) to
+                                {pendingWebhookHost}?
+                            </p>
+                        </div>
+                        <div class="rband-confirm-actions">
+                            <button class="btn btn-ghost" onclick={cancelPushToSheets}>Cancel</button>
+                            <button class="btn btn-primary" onclick={confirmPushToSheets} disabled={exporting}>
+                                {exporting ? "Sending..." : "Send"}
+                            </button>
+                        </div>
+                    </details>
+                {/if}
             </div>
             <button
                 class="help-btn"

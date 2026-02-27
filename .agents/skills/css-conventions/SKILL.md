@@ -7,25 +7,26 @@ description: CSS naming and style rules for this Svelte/Vite client app
 
 Conventions for styles in `src/client/assets/styles.css` and component styles.
 
-## Naming Convention: kebab-case
+## Naming Convention: snake_case
 
-Use `kebab-case` class names to match existing codebase patterns.
+Use `snake_case` class names to match existing codebase patterns.
 
 ```css
 /* correct */
-.scan-page
-.library-header
-.book-card
-.export-section
+.scan_page
+.library_header
+.book_card
+.export_section
 
 /* wrong */
 .scanPage
-.library_header
+.library-header
 ```
 
 ## CSS Organization
 
 - Prefer global tokens/variables in `src/client/assets/styles.css`
+- Make use of CSS layers and all Base 2025 API and Standards.
 - Keep component-specific rules close to component only when it improves readability
 - Avoid deep selector chains; prefer class-based selectors
 

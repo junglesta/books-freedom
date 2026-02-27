@@ -1,5 +1,4 @@
 <script lang="ts">
-  import ConfirmDialog from "./ConfirmDialog.svelte";
   import type { Book } from '../lib/types';
   import { updateBookInCollection, removeBookFromCollection } from '../lib/stores.svelte.ts';
 
@@ -56,7 +55,7 @@
   }
 
   function remove() {
-    removeConfirmOpen = true;
+    removeConfirmOpen = !removeConfirmOpen;
   }
 
   function cancelRemove() {
@@ -152,16 +151,18 @@
       </button>
       <button class="btn btn-danger" onclick={remove}>Remove</button>
     </div>
+
+    {#if removeConfirmOpen}
+      <details class="rband-confirm rband-confirm-inline" open aria-label="Remove book confirmation">
+        <summary class="rband-confirm-summary">Remove Book</summary>
+        <div class="rband-confirm-copy">
+          <p>Remove "{book.title}" from your library? This cannot be undone.</p>
+        </div>
+        <div class="rband-confirm-actions">
+          <button class="btn btn-ghost" onclick={cancelRemove}>Cancel</button>
+          <button class="btn btn-danger" onclick={confirmRemove}>Delete</button>
+        </div>
+      </details>
+    {/if}
   </div>
 </div>
-
-<ConfirmDialog
-  open={removeConfirmOpen}
-  title="Remove Book"
-  message={`Remove "${book.title}" from your library?`}
-  confirmLabel="Delete"
-  cancelLabel="Cancel"
-  danger
-  onConfirm={confirmRemove}
-  onCancel={cancelRemove}
-/>

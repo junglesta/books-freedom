@@ -82,4 +82,14 @@ describe("parseImportedBooks", () => {
   it("rejects unsupported extension", () => {
     expect(() => parseImportedBooks("{}", "books.txt")).toThrow("Unsupported file type");
   });
+
+  it("rejects invalid JSON content", () => {
+    expect(() => parseImportedBooks("{not-json", "books.json")).toThrow("Invalid JSON file");
+  });
+
+  it("rejects CSV/CSS without data rows", () => {
+    expect(() => parseImportedBooks("Title,Authors,ISBN-13", "books.csv")).toThrow(
+      "Invalid CSV/CSS file",
+    );
+  });
 });

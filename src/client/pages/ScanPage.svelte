@@ -78,8 +78,11 @@
     {/if}
 
     {#if lookupError}
-        <div class="scan-preview">
-            <p style="text-align:center;color:var(--danger);margin-bottom:12px">{lookupError}</p>
+        <div class="scan-preview scan-error-panel">
+            <details class="rband-note rband-note-error" open>
+                <summary class="rband-note-summary">Lookup Error</summary>
+                <p>{lookupError}</p>
+            </details>
             <button class="btn btn-primary" style="width:100%" onclick={scanAnother}>Try Again</button>
         </div>
     {/if}

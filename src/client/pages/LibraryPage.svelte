@@ -2,10 +2,13 @@
   import { onMount } from 'svelte';
   import BookList from '../components/BookList.svelte';
   import BookDetail from '../components/BookDetail.svelte';
-  import ConfirmDialog from "../components/ConfirmDialog.svelte";
   import SearchBar from '../components/SearchBar.svelte';
   import { getErrorMessage } from "../lib/error";
-  import { parseImportedBooks } from "../lib/import";
+  import {
+    getSupportedImportExtensionsLabel,
+    isSupportedImportFileName,
+    parseImportedBooks,
+  } from "../lib/import";
   import {
     clearLibraryCollection,
     getBooks,
@@ -30,6 +33,7 @@
   let languageMenuOpen = $state(false);
   let importInputRef = $state<HTMLInputElement>();
   let dropConfirmOpen = $state(false);
+  let importFeedbackError = $state("");
 
   const statusOptions = [
     { value: 'all', label: 'All' },
@@ -128,6 +132,7 @@
   }
 
   function openImportPicker() {
+    importFeedbackError = "";
     importInputRef?.click();
   }
 
@@ -136,7 +141,7 @@
       showToast("Library is already empty.");
       return;
     }
-    dropConfirmOpen = true;
+    dropConfirmOpen = !dropConfirmOpen;
   }
 
   function cancelDropLibrary() {
@@ -155,8 +160,14 @@
     if (!file) return;
 
     try {
+      if (!isSupportedImportFileName(file.name)) {
+        importFeedbackError = `Unsupported file type (${file.name}). Use ${getSupportedImportExtensionsLabel()}.`;
+        return;
+      }
+
       const content = await file.text();
       const importedBooks = parseImportedBooks(content, file.name);
+      importFeedbackError = "";
       const summary = importBooksToCollection(importedBooks);
       if (summary.total === 0) {
         showToast("No valid books found in file.");
@@ -168,7 +179,7 @@
         );
       }
     } catch (error: unknown) {
-      showToast(getErrorMessage(error, "Import failed"));
+      importFeedbackError = getErrorMessage(error, "Import failed");
     } finally {
       input.value = "";
     }
@@ -245,6 +256,26 @@
     </div>
   </div>
 
+  {#if dropConfirmOpen}
+    <details class="rband-confirm rband-confirm-inline" open aria-label="Drop library confirmation">
+      <summary class="rband-confirm-summary">Drop Library</summary>
+      <div class="rband-confirm-copy">
+        <p>Delete all books from this library? This cannot be undone.</p>
+      </div>
+      <div class="rband-confirm-actions">
+        <button class="btn btn-ghost" onclick={cancelDropLibrary}>Cancel</button>
+        <button class="btn btn-danger" onclick={confirmDropLibrary}>Delete</button>
+      </div>
+    </details>
+  {/if}
+
+  {#if importFeedbackError}
+    <details class="rband-note rband-note-error" open>
+      <summary class="rband-note-summary">Import Error</summary>
+      <p>{importFeedbackError}</p>
+    </details>
+  {/if}
+
   <SearchBar value={searchQuery} onInput={(v) => (searchQuery = v)} />
 
   <div class="library-controls">
@@ -295,15 +326,4 @@
   {#if selectedBook}
     <BookDetail book={selectedBook} onClose={() => (selectedBook = null)} />
   {/if}
-
-  <ConfirmDialog
-    open={dropConfirmOpen}
-    title="Drop Library"
-    message="Delete all books from this library? This cannot be undone."
-    confirmLabel="Delete"
-    cancelLabel="Cancel"
-    danger
-    onConfirm={confirmDropLibrary}
-    onCancel={cancelDropLibrary}
-  />
 </div>

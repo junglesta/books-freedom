@@ -5,7 +5,7 @@ description: Show package.json version in a Svelte footer component
 
 # Version Display — Footer (Svelte)
 
-Show app version from `package.json` in a footer component when needed.
+Show app version from `package.json` in a footer or splash screen component when needed.
 
 ## How it works
 
@@ -32,16 +32,16 @@ Keep it subtle — smaller text, lower contrast:
 ```css
 .version-tag {
   font-size: 0.75em;
-  opacity: 0.6;
+  opacity: 0.7;
 }
 ```
 
 ## Result
 
-- Footer can read: `v0.3.10`
+- Footer/SpalshScren can read: `v0.3.10`
 - Version updates automatically on every `package.json` bump — no manual edits needed
 
 ## Notes
 
-- Use this only if the UI actually has a footer
+- Use this only if the UI actually has a footer, otherwise spash screen.
 - Keep version display consistent with splash/header if both are present

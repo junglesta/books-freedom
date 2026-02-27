@@ -205,9 +205,10 @@
     <button class="btn btn-primary" onclick={stopScanner}>Stop Camera</button>
   {/if}
   {#if !isScanning && scannerError}
-    <div class="scanner-error">
+    <details class="rband-note rband-note-error" open>
+      <summary class="rband-note-summary">Camera Error</summary>
       <p>{scannerError}</p>
-    </div>
+    </details>
   {/if}
 
   <div class="manual-section">
@@ -238,7 +239,10 @@
     </form>
 
     {#if inputError}
-      <p class="input-error">{inputError}</p>
+      <details class="rband-note rband-note-error" open>
+        <summary class="rband-note-summary">Invalid ISBN</summary>
+        <p>{inputError}</p>
+      </details>
     {/if}
   </div>
 </div>
