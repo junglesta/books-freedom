@@ -107,7 +107,7 @@
         { facingMode: 'environment' },
         {
           fps: 10,
-          qrbox: { width: 280, height: 100 },
+          qrbox: { width: 250, height: 150 },
           formatsToSupport: [
             Html5QrcodeSupportedFormats.EAN_13,
             Html5QrcodeSupportedFormats.EAN_8,

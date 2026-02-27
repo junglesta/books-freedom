@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.4
+
+- Improved scanner viewfinder aspect ratio (250x150, easier to aim)
+
 ## 0.3.3
 
 - Camera auto-stops after successful barcode scan
