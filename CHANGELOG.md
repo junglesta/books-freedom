@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.1
+
+- Refined Scan page visual balance and spacing between action sections for cleaner vertical rhythm
+- Aligned Scan and manual-entry heading treatment for consistent hierarchy
+- Updated scanner entry/button alignment: camera button now fit-content and centered, manual ISBN action rows use clearer input/button grid alignment
+
 ## 0.4.0
 
 - Applied CSS convention skill across app UI: migrated class naming to `snake_case` in Svelte markup, class directives, selector strings, and global stylesheet selectors

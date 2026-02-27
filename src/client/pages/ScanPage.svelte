@@ -63,12 +63,14 @@
     }
 </script>
 
-<div class="scan_page">
-    <h1>Scan ISBN</h1>
+<div class="scan_page" class:scan_page_relaxed={!preview && !lookupError && !scanning}>
+    <h2 class="export_heading">Scan ISBN</h2>
 
-    {#key scannerResetKey}
-        <Scanner onScan={handleScan} />
-    {/key}
+    <div class="scan_entry_zone">
+        {#key scannerResetKey}
+            <Scanner onScan={handleScan} />
+        {/key}
+    </div>
 
     {#if scanning}
         <div class="scan_loading">

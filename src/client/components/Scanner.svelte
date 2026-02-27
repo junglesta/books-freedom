@@ -194,7 +194,7 @@
 </script>
 
 <div class="scanner_container">
-  <div id="scanner-view" bind:this={scannerRef} class={isScanning ? 'scanner-view' : 'scanner-view-idle'}>
+  <div id="scanner-view" bind:this={scannerRef} class={isScanning ? 'scanner_view' : 'scanner_view_idle'}>
     {#if !isScanning}
       <button class="btn btn_primary scanner_start_btn" onclick={startScanner}>
         Open Camera Scanner
@@ -212,7 +212,7 @@
   {/if}
 
   <div class="manual_section">
-    <p class="manual_label">Or enter ISBN manually</p>
+    <p class="manual_label export_heading">Or enter ISBN manually</p>
 
     <form class="manual_input" onsubmit={submitIsbn13}>
       <input
