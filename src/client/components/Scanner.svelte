@@ -18,6 +18,7 @@
   let scanner: ActiveScanner | null = null;
   let scannerError = $state('');
   let isScanning = $state(false);
+  let scannerViewKey = $state(0);
 
   let isbn13 = $state('');
   let isbn10 = $state('');
@@ -152,20 +153,14 @@
   function stopScanner() {
     const s = scanner;
     scanner = null;
-    isScanning = false;
     if (s) {
       try { s.stop().catch(() => {}); } catch {}
       try { s.clear(); } catch {}
     }
     killVideoTracks();
-    // Remove leftover library DOM (viewfinder overlays) after Svelte re-renders the button
-    setTimeout(() => {
-      if (scannerRef && !isScanning) {
-        Array.from(scannerRef.children).forEach(el => {
-          if (el.tagName !== 'BUTTON') el.remove();
-        });
-      }
-    }, 50);
+    isScanning = false;
+    // Force a clean scanner viewport so the idle CTA always returns.
+    scannerViewKey += 1;
   }
 
   function submitIsbn13(e: Event) {
@@ -194,13 +189,15 @@
 </script>
 
 <div class="scanner_container">
-  <div id="scanner-view" bind:this={scannerRef} class={isScanning ? 'scanner_view' : 'scanner_view_idle'}>
-    {#if !isScanning}
-      <button class="btn btn_primary scanner_start_btn" onclick={startScanner}>
-        Open Camera Scanner
-      </button>
-    {/if}
-  </div>
+  {#key scannerViewKey}
+    <div id="scanner-view" bind:this={scannerRef} class={isScanning ? 'scanner_view' : 'scanner_view_idle'}>
+      {#if !isScanning}
+        <button class="btn btn_primary scanner_start_btn" onclick={startScanner}>
+          Open Camera Scanner
+        </button>
+      {/if}
+    </div>
+  {/key}
   {#if isScanning}
     <button class="btn btn_primary" onclick={stopScanner}>Stop Camera</button>
   {/if}

@@ -1,14 +1,19 @@
 {
   "name": "Books Freedom",
-  "short_name": "Books Freedom",
+  "short_name": "Books",
   "description": "Scan ISBN barcodes and manage your book collection. No account, no cloud, no tracking.",
+  "lang": "en",
+  "dir": "ltr",
   "id": "/",
   "scope": "/",
   "start_url": "/",
+  "display_override": ["standalone", "minimal-ui"],
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",
   "orientation": "portrait",
+  "categories": ["books", "utilities", "productivity"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icon-192.png",
@@ -25,6 +30,21 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Scan ISBN",
+      "short_name": "Scan",
+      "description": "Open scanner to add books quickly",
+      "url": "/?view=scan",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }

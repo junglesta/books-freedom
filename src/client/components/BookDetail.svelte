@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Book } from '../lib/types';
   import { updateBookInCollection, removeBookFromCollection } from '../lib/stores.svelte.ts';
+  import { getCoverCandidates } from '../lib/cover';
 
   interface Props {
     book: Book;
@@ -8,6 +9,9 @@
   }
 
   let { book, onClose }: Props = $props();
+  let coverCandidates = $state<string[]>([]);
+  let coverIndex = $state(0);
+  let coverLoaded = $state(false);
 
   let status = $state<Book['status']>('to-read');
   let rating = $state(0);
@@ -24,6 +28,9 @@
     language = book.language || '';
     notes = book.notes || '';
     tagsInput = (book.tags || []).join(', ');
+    coverCandidates = getCoverCandidates(book);
+    coverIndex = 0;
+    coverLoaded = false;
   });
 
   const statusOptions: { value: Book['status']; label: string }[] = [
@@ -67,6 +74,19 @@
     removeConfirmOpen = false;
     onClose();
   }
+
+  function tryNextCover() {
+    coverLoaded = false;
+    if (coverIndex < coverCandidates.length - 1) {
+      coverIndex += 1;
+    } else {
+      coverIndex = -1;
+    }
+  }
+
+  function handleCoverLoaded() {
+    coverLoaded = true;
+  }
 </script>
 
 <div class="detail_overlay" role="dialog" aria-label="Book details">
@@ -77,10 +97,48 @@
 
     <div class="detail_header">
       <div class="detail_cover">
-        {#if book.coverUrl}
-          <img src={book.coverUrl} alt={book.title} />
+        {#if coverIndex >= 0 && coverCandidates[coverIndex]}
+          {#if !coverLoaded}
+            <div class="cover_placeholder large">
+              <svg
+                class="cover_placeholder_icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+              </svg>
+            </div>
+          {/if}
+          <img
+            class:cover_img_loaded={coverLoaded}
+            src={coverCandidates[coverIndex]}
+            alt={book.title}
+            referrerpolicy="no-referrer"
+            onload={handleCoverLoaded}
+            onerror={tryNextCover}
+          />
         {:else}
-          <div class="cover_placeholder large">📕</div>
+          <div class="cover_placeholder large">
+            <svg
+              class="cover_placeholder_icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+            </svg>
+          </div>
         {/if}
       </div>
       <div class="detail_title_area">

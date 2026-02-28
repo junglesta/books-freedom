@@ -183,6 +183,9 @@ body {
 
 .page {
   flex: 1;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
   padding: 16px;
   padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 16px);
   max-width: 600px;
@@ -191,10 +194,11 @@ body {
 }
 
 .app_brand_footer {
+  margin-top: auto;
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding-top: clamp(96px, 18vh, 180px);
+  padding-top: 24px;
   padding-bottom: 8px;
   text-align: center;
   color: var(--text-muted);
@@ -401,6 +405,7 @@ h1 .count {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-top: 24px;
 }
 
 .manual_label {
@@ -508,13 +513,24 @@ h1 .count {
 }
 
 .scan_page_relaxed {
-  min-height: calc(100dvh - var(--nav-height) - var(--safe-bottom) - 48px);
+  flex: 1;
   justify-content: flex-start;
-  padding-block: 8px 16px;
+  padding-block: 12px;
 }
 
 .scan_page_relaxed .scan_entry_zone {
+  flex: 0 0 auto;
+  display: block;
   margin-top: 0;
+}
+
+.scan_page_relaxed .scanner_view_idle,
+.scan_page_relaxed .scanner_view {
+  flex: 0 0 auto;
+  aspect-ratio: 5 / 3;
+  min-height: 0;
+  max-height: 240px;
+  margin-block: 12px 20px;
 }
 
 .scan_preview {
@@ -628,6 +644,7 @@ h1 .count {
 
 .book_cover {
   flex-shrink: 0;
+  position: relative;
   width: 60px;
   height: 90px;
   border-radius: 4px;
@@ -636,9 +653,17 @@ h1 .count {
 }
 
 .book_cover img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.book_cover img.cover_img_loaded {
+  opacity: 1;
 }
 
 .cover_placeholder {
@@ -647,12 +672,22 @@ h1 .count {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  color: var(--primary);
   background: var(--border);
 }
 
 .cover_placeholder.large {
-  font-size: 48px;
+  color: var(--primary);
+}
+
+.cover_placeholder_icon {
+  width: 28px;
+  height: 28px;
+}
+
+.cover_placeholder.large .cover_placeholder_icon {
+  width: 48px;
+  height: 48px;
 }
 
 .book_info {
@@ -1174,6 +1209,7 @@ h1 .count {
 
 .detail_cover {
   flex-shrink: 0;
+  position: relative;
   width: 100px;
   height: 150px;
   border-radius: 6px;
@@ -1182,9 +1218,17 @@ h1 .count {
 }
 
 .detail_cover img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.detail_cover img.cover_img_loaded {
+  opacity: 1;
 }
 
 .detail_title_area h2 {
@@ -1328,6 +1372,14 @@ h1 .count {
 .export_library_name {
   color: var(--primary);
   font-weight: 700;
+}
+
+.export_library_link {
+  text-decoration: none;
+}
+
+.export_library_link:hover {
+  text-decoration: underline;
 }
 
 .export_section {

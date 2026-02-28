@@ -1,5 +1,13 @@
-const CACHE_NAME = "books-freedom-v2";
-const PRECACHE = ["/", "/manifest.json", "/icon-192.png", "/icon-512.png"];
+const CACHE_NAME = "books-freedom-v3";
+const OFFLINE_FALLBACK = "/offline.html";
+const PRECACHE = [
+  "/",
+  OFFLINE_FALLBACK,
+  "/manifest.json",
+  "/icon-192.png",
+  "/icon-512.png",
+  "/favicon.svg",
+];
 const CACHEABLE_DESTINATIONS = new Set(["document", "script", "style", "image", "font"]);
 
 function isSameOrigin(url) {
@@ -32,6 +40,10 @@ async function networkFirst(request) {
   } catch {
     const cached = await cache.match(request);
     if (cached) return cached;
+    if (request.mode === "navigate") {
+      const fallback = await cache.match(OFFLINE_FALLBACK);
+      if (fallback) return fallback;
+    }
     throw new Error("Network and cache unavailable");
   }
 }
@@ -59,11 +71,14 @@ self.addEventListener("install", (e) => {
 
 self.addEventListener("activate", (e) => {
   e.waitUntil(
-    caches
-      .keys()
-      .then((keys) =>
-        Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))),
-      ),
+    Promise.all([
+      caches
+        .keys()
+        .then((keys) =>
+          Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))),
+        ),
+      self.registration.navigationPreload?.enable?.(),
+    ]),
   );
   self.clients.claim();
 });
@@ -73,4 +88,10 @@ self.addEventListener("fetch", (e) => {
 
   const isDocument = e.request.mode === "navigate" || e.request.destination === "document";
   e.respondWith(isDocument ? networkFirst(e.request) : staleWhileRevalidate(e.request));
+});
+
+self.addEventListener("message", (e) => {
+  if (e.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });

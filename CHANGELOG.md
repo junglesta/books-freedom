@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.3
+
+- Completed full preflight routine: format, lint, test, build (all passing)
+- Refined Scan/Add layout behavior to remove dead vertical space and keep sections top-aligned across viewport sizes
+- Improved scanner stop/reset reliability on desktop by forcing clean scanner viewport remount
+- Made Export subtitle library name clickable to navigate directly to Library view
+- Hardened cover rendering with fallback candidates and persistent placeholder behavior when no real cover exists
+- Replaced emoji placeholders with the Library nav icon in lime accent for visual consistency
+
 ## 0.4.2
 
 - Removed top logo-heavy branding from app layout; added subtle text footer with version and project attribution links

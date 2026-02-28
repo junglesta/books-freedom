@@ -183,7 +183,7 @@
 <div class="export_page">
     <p class="export_subtitle">
         {getBooks().length} Books in
-        <span class="export_library_name">{getLibraryName()}</span>
+        <a class="export_library_name export_library_link" href="#/library">{getLibraryName()}</a>
     </p>
     <h2 class="export_heading">Export format:</h2>
 
