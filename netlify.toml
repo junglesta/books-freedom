@@ -1,0 +1,13 @@
+[build]
+  command = "pnpm build"
+  publish = "dist/webapp"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Permissions-Policy = "camera=(self)"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.2
+
+- Fixed Netlify publish target mismatch by restoring root `netlify.toml` with `publish = "dist/webapp"`
+- Rebuilt production bundle after version bump so generated app footer/title metadata align with `v0.5.x`
+- Re-ran preflight gates (format, lint, test, build) from workspace root with passing results
+
 ## 0.5.1
 
 - Synced `pnpm-lock.yaml` to workspace package layout to satisfy CI/Netlify `--frozen-lockfile` installs
