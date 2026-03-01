@@ -23,6 +23,7 @@
   let isbn13 = $state('');
   let isbn10 = $state('');
   let inputError = $state('');
+  let manualInfoOpen = $state(false);
 
   // ISBN-13 dash positions: 978-3-161484-10-0 → after digit 3, 4, 10, 12
   const ISBN13_DASHES = [3, 4, 10, 12];
@@ -209,7 +210,38 @@
   {/if}
 
   <div class="manual_section">
-    <p class="manual_label export_heading">Or enter ISBN manually</p>
+    <div class="scan_header manual_header">
+      <h3 class="export_heading">Or enter ISBN manually</h3>
+      <button
+        class="help_btn"
+        aria-label="ISBN format help"
+        onclick={() => (manualInfoOpen = !manualInfoOpen)}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="11" x2="12" y2="16" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
+        </svg>
+      </button>
+    </div>
+
+    {#if manualInfoOpen}
+      <details class="scan_info_accordion manual_info_accordion" open>
+        <summary>What is an ISBN?</summary>
+        <p>
+          ISBN means International Standard Book Number. It is a unique identifier for a specific
+          book edition, used by publishers, bookstores, and libraries to find, catalog, and track
+          books accurately.
+        </p>
+      </details>
+    {/if}
 
     <form class="manual_input" onsubmit={submitIsbn13}>
       <input

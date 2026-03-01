@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.4
+
+- Reworked splash UX to use the new `readme.svg` splash screen artwork
+- Added footer action buttons (`HELP` and `SHARE`) with larger outlined limegreen tap targets
+- `HELP` now opens splash help overlay and closes on click
+- `SHARE` now opens a dedicated splash overlay with centered QR code and closes on click
+- Removed splash version badge overlay from the splash screen
+- Added app meta title version binding (`Books Freedom v<version>`) from `package.json`
+- Updated local skill registry and preflight workflow wiring (`preflight` script + step list alignment)
+
 ## 0.4.3
 
 - Completed full preflight routine: format, lint, test, build (all passing)

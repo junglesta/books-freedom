@@ -68,6 +68,10 @@ body {
 .splash {
   position: fixed;
   inset: 0;
+  width: 100%;
+  appearance: none;
+  border: none;
+  padding: 0;
   background: var(--bg);
   user-select: none;
   display: flex;
@@ -76,7 +80,6 @@ body {
   justify-content: center;
   gap: 6px;
   z-index: 999;
-  animation: splash-fade 0.4s ease 1s forwards;
 }
 
 .splash::before {
@@ -88,18 +91,8 @@ body {
   filter: url(#dither);
 }
 
-.splash_version {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 8px 16px;
-  font-size: 16px;
-  text-align: center;
-  color: limegreen;
-  background: #000;
-  border-radius: 4px;
-  z-index: 2;
+.splash_startup {
+  animation: splash-fade 0.4s ease 1s forwards;
 }
 
 .splash_logo {
@@ -111,33 +104,26 @@ body {
   animation: splash-draw 0.8s ease forwards;
 }
 
-.splash_qr {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 2;
+.splash_share_content {
+  position: relative;
+  z-index: 1;
+  width: min(70vw, 320px);
+  height: min(70vw, 320px);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  padding: 8px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  justify-content: center;
+  padding: 14px;
   background: rgba(0, 0, 0, 0.75);
+  border: 1px solid var(--border);
+  border-radius: 14px;
 }
 
-.splash_qr img {
-  width: 96px;
-  height: 96px;
-  border-radius: 6px;
+.splash_share_content img {
+  width: 100%;
+  height: 100%;
+  display: block;
   background: #fff;
-}
-
-.splash_qr p {
-  margin: 0;
-  font-size: 11px;
-  color: var(--text-secondary);
-  line-height: 1;
+  border-radius: 10px;
 }
 
 @keyframes splash-draw {
@@ -160,16 +146,6 @@ body {
 .splash_popover {
   animation: splash-in 0.25s ease forwards;
   cursor: pointer;
-}
-
-@media (max-width: 640px) {
-  .splash_qr {
-    top: auto;
-    right: auto;
-    left: 50%;
-    bottom: 64px;
-    transform: translateX(-50%);
-  }
 }
 
 @keyframes splash-in {
@@ -223,6 +199,45 @@ body {
 .app_brand_footer a {
   color: var(--primary);
   text-decoration: none;
+}
+
+.footer_actions {
+  width: 100%;
+  margin-top: 10px;
+  padding-top: 2px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.footer_action_btn {
+  flex: 1;
+  min-height: 52px;
+  margin-top: 0;
+  padding: 14px 18px;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--primary);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  line-height: 1;
+}
+
+.footer_action_btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.footer_action_btn:hover {
+  background: rgba(212, 255, 0, 0.08);
 }
 
 /* ===== Nav ===== */
@@ -406,6 +421,24 @@ h1 .count {
   flex-direction: column;
   gap: 8px;
   margin-top: 24px;
+}
+
+.manual_header {
+  position: relative;
+  padding-right: 44px;
+  padding-bottom: 8px;
+}
+
+.manual_header .help_btn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(calc(-50% - 3px));
+  margin-top: 0;
+}
+
+.manual_info_accordion {
+  margin-top: 0;
 }
 
 .manual_label {

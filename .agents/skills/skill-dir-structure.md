@@ -1,11 +1,11 @@
 # Skills Directory Structure
 
-Skills live globally at `~/.claude/skills/` using the `<name>/SKILL.md` directory format.
+Skills live globally at `~/.agents/skills/` using the `<name>/SKILL.md` directory format.
 
 ## Source of truth
 
 ```
-~/.claude/skills/
+~/.agents/skills/
 ├── skill-dir-structure.md        ← this file
 ├── preflight/SKILL.md
 ├── css-conventions/SKILL.md
@@ -32,7 +32,7 @@ description: Short description shown in the /slash menu
 
 ## Discovery
 
-Claude Code automatically discovers skills from `~/.claude/skills/<name>/SKILL.md`.
+Claude Code automatically discovers skills from `~/.agents/skills/<name>/SKILL.md`.
 No symlinks or project-level setup needed — personal skills are available in all projects.
 
 ## Editing
