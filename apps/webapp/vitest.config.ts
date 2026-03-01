@@ -10,6 +10,6 @@ export default defineConfig({
     environment: 'jsdom',
     include: ['src/**/*.test.ts', 'src/**/*.test.svelte.ts'],
     globals: true,
-    setupFiles: ['src/client/test/setup.ts'],
+    setupFiles: ['src/test/setup.ts'],
   },
 });

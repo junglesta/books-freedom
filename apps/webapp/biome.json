@@ -26,6 +26,6 @@
     }
   },
   "files": {
-    "includes": ["src/**", "!src/**/*.svelte"]
+    "includes": ["src/**", "!src/**/*.svelte", "!src/public/library.json"]
   }
 }

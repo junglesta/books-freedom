@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.0
+
+- Migrated repository to workspace monorepo layout (`apps/webapp`, `apps/astro-site`, `packages/library-core`)
+- Added initial Astro `BOOK FREEDDOM CLIENT` list component scaffold with search/sort/details plus thumbnail service-worker caching
+- Introduced canonical drop-in dataset flow via `data/library.json` with sync/apply scripts (`data:sync`, `data:apply`, dummy dataset support)
+- Added webapp first-load seeding from `/library.json` for easier local bootstrap from drop-in data
+- Added local HTTPS/LAN development support with generated certs and `dev:webapp:https` workflow
+- Removed legacy Docker/container files and stale build/cache artifacts during cleanup; unified webapp build output to `dist/webapp`
+
 ## 0.4.9
 
 - Hid the compact library card when a title is expanded, so only the inline detail panel is shown for the selected book

@@ -1,0 +1,369 @@
+---
+import type { LibraryBook } from '@books-freedom/library-core';
+
+interface Props {
+  books?: LibraryBook[];
+  dataUrl?: string;
+  heading?: string;
+}
+
+const { books = [], dataUrl = '', heading = 'BOOK FREEDDOM CLIENT' } = Astro.props;
+const encodedBooks = encodeURIComponent(JSON.stringify(books));
+---
+
+<section class="bfc" data-bfc data-books={encodedBooks} data-data-url={dataUrl}>
+  <header class="bfc_header">
+    <h1>{heading}</h1>
+    <p class="bfc_subtitle">Drop JSON in <code>data/library.json</code> (workspace root) or pass <code>dataUrl</code>.</p>
+  </header>
+
+  <div class="bfc_controls">
+    <label class="bfc_control">
+      <span>Search</span>
+      <input type="search" data-bfc-search placeholder="title, author, isbn..." />
+    </label>
+    <label class="bfc_control">
+      <span>Sort</span>
+      <select data-bfc-sort>
+        <option value="title-asc">Title A-Z</option>
+        <option value="title-desc">Title Z-A</option>
+        <option value="author-asc">Author A-Z</option>
+        <option value="year-desc">Year Newest</option>
+        <option value="year-asc">Year Oldest</option>
+      </select>
+    </label>
+    <button type="button" class="bfc_download" data-bfc-download>
+      Download `library.json`
+    </button>
+  </div>
+
+  <p class="bfc_count" data-bfc-count>0 titles</p>
+  <div class="bfc_list" data-bfc-list></div>
+  <p class="bfc_empty" data-bfc-empty hidden>No books match your filters.</p>
+</section>
+
+<script is:inline>
+  const statusLabel = {
+    "to-read": "To Read",
+    reading: "Reading",
+    read: "Read",
+  };
+
+  const sorters = {
+    "title-asc": (a, b) => (a.title || "").localeCompare(b.title || ""),
+    "title-desc": (a, b) => (b.title || "").localeCompare(a.title || ""),
+    "author-asc": (a, b) => (a.authors?.[0] || "").localeCompare(b.authors?.[0] || ""),
+    "year-desc": (a, b) => (b.publishYear || 0) - (a.publishYear || 0),
+    "year-asc": (a, b) => (a.publishYear || 0) - (b.publishYear || 0),
+  };
+
+  function safeParseBooks(raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.filter(
+        (book) =>
+          book &&
+          typeof book === "object" &&
+          typeof book.id === "string" &&
+          typeof book.title === "string" &&
+          typeof book.isbn13 === "string" &&
+          Array.isArray(book.authors),
+      );
+    } catch {
+      return [];
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function coverUrl(book) {
+    if (book.coverUrl && book.coverUrl.startsWith("https://")) return book.coverUrl;
+    return `https://covers.openlibrary.org/b/isbn/${encodeURIComponent(book.isbn13)}-M.jpg?default=false`;
+  }
+
+  function statusChip(book) {
+    const status = book.status || "to-read";
+    const rating = Number.isFinite(book.rating) ? " " + "★".repeat(Math.max(0, Number(book.rating))) : "";
+    const year = book.publishYear ? ` ${book.publishYear}` : "";
+    return `${statusLabel[status] || "To Read"}${rating}${year}`;
+  }
+
+  function matchesQuery(book, query) {
+    if (!query) return true;
+    const haystack = [
+      book.title || "",
+      (book.authors || []).join(" "),
+      book.isbn13 || "",
+      book.publisher || "",
+      (book.tags || []).join(" "),
+    ]
+      .join(" ")
+      .toLowerCase();
+    return haystack.includes(query);
+  }
+
+  async function loadFromUrl(url) {
+    try {
+      const response = await fetch(url, { headers: { Accept: "application/json" } });
+      if (!response.ok) return [];
+      const payload = await response.json();
+      if (Array.isArray(payload)) return payload;
+      if (payload && Array.isArray(payload.books)) return payload.books;
+      return [];
+    } catch {
+      return [];
+    }
+  }
+
+  function mount(root) {
+    const searchInput = root.querySelector("[data-bfc-search]");
+    const sortInput = root.querySelector("[data-bfc-sort]");
+    const countNode = root.querySelector("[data-bfc-count]");
+    const listNode = root.querySelector("[data-bfc-list]");
+    const emptyNode = root.querySelector("[data-bfc-empty]");
+    const downloadButton = root.querySelector("[data-bfc-download]");
+
+    let books = safeParseBooks(decodeURIComponent(root.dataset.books || "[]"));
+    let query = "";
+    let sort = "title-asc";
+
+    async function hydrateFromUrlIfNeeded() {
+      const url = (root.dataset.dataUrl || "").trim();
+      if (books.length > 0 || !url) return;
+      books = await loadFromUrl(url);
+      render();
+    }
+
+    function render() {
+      const sorter = sorters[sort] || sorters["title-asc"];
+      const filtered = books
+        .filter((book) => matchesQuery(book, query))
+        .sort(sorter);
+
+      countNode.textContent = `${filtered.length} title${filtered.length === 1 ? "" : "s"}`;
+      emptyNode.hidden = filtered.length > 0;
+      listNode.innerHTML = filtered
+        .map((book) => {
+          const title = escapeHtml(book.title || "");
+          const authors = escapeHtml((book.authors || []).join(", "));
+          const publisher = book.publisher ? escapeHtml(book.publisher) : "";
+          const year = book.publishYear ? escapeHtml(book.publishYear) : "";
+          const pages = book.pageCount ? `${escapeHtml(book.pageCount)} pages` : "";
+          const notes = book.notes ? escapeHtml(book.notes) : "";
+          const tags = Array.isArray(book.tags) ? book.tags.map((tag) => escapeHtml(tag)).join(", ") : "";
+          const language = book.language ? escapeHtml(book.language) : "";
+          const isbn13 = escapeHtml(book.isbn13 || "");
+          const cover = escapeHtml(coverUrl(book));
+          const chip = escapeHtml(statusChip(book));
+
+          return `
+            <details class="bfc_item">
+              <summary class="bfc_summary">
+                <img class="bfc_cover" src="${cover}" alt="${title}" loading="lazy" referrerpolicy="no-referrer" />
+                <span class="bfc_main">
+                  <span class="bfc_title">${title}</span>
+                  <span class="bfc_authors">${authors}</span>
+                  <span class="bfc_chip">${chip}</span>
+                </span>
+              </summary>
+              <div class="bfc_detail">
+                ${publisher ? `<p><strong>Publisher:</strong> ${publisher}</p>` : ""}
+                ${year ? `<p><strong>Year:</strong> ${year}</p>` : ""}
+                ${pages ? `<p><strong>Pages:</strong> ${pages}</p>` : ""}
+                ${language ? `<p><strong>Language:</strong> ${language}</p>` : ""}
+                ${notes ? `<p><strong>Notes:</strong> ${notes}</p>` : ""}
+                ${tags ? `<p><strong>Tags:</strong> ${tags}</p>` : ""}
+                <p><strong>ISBN-13:</strong> ${isbn13}</p>
+              </div>
+            </details>
+          `;
+        })
+        .join("");
+    }
+
+    searchInput.addEventListener("input", (event) => {
+      query = event.target.value.trim().toLowerCase();
+      render();
+    });
+
+    sortInput.addEventListener("change", (event) => {
+      sort = event.target.value;
+      render();
+    });
+
+    downloadButton?.addEventListener("click", () => {
+      const payload = JSON.stringify({ version: 1, books }, null, 2);
+      const blob = new Blob([payload], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "library.json";
+      link.click();
+      URL.revokeObjectURL(url);
+    });
+
+    render();
+    hydrateFromUrlIfNeeded();
+  }
+
+  document.querySelectorAll("[data-bfc]").forEach((root) => mount(root));
+</script>
+
+<style>
+  .bfc {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 24px 16px 48px;
+    color: #f6f8f4;
+    background: radial-gradient(circle at top right, #243410 0%, #10120f 36%, #090a08 100%);
+    min-height: 100vh;
+    font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+  }
+
+  .bfc_header h1 {
+    margin: 0;
+    font-size: clamp(26px, 5vw, 38px);
+    color: #d4ff2a;
+  }
+
+  .bfc_subtitle {
+    margin: 8px 0 0;
+    color: #bbc4b3;
+    font-size: 14px;
+  }
+
+  .bfc_controls {
+    margin-top: 18px;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 1fr;
+  }
+
+  .bfc_control {
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    color: #b8c0b1;
+  }
+
+  .bfc_download {
+    min-height: 46px;
+    border-radius: 12px;
+    border: 1px solid #d4ff2a;
+    background: transparent;
+    color: #d4ff2a;
+    padding: 0 14px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .bfc_control input,
+  .bfc_control select {
+    min-height: 46px;
+    border-radius: 12px;
+    border: 1px solid #394133;
+    background: #10130f;
+    color: #f6f8f4;
+    padding: 0 12px;
+    font: inherit;
+  }
+
+  .bfc_count {
+    margin: 14px 0 10px;
+    font-size: 13px;
+    color: #d4ff2a;
+  }
+
+  .bfc_list {
+    display: grid;
+    gap: 10px;
+  }
+
+  .bfc_item {
+    border: 1px solid #2d3228;
+    border-radius: 14px;
+    background: #0f110e;
+    overflow: hidden;
+  }
+
+  .bfc_summary {
+    list-style: none;
+    cursor: pointer;
+    display: grid;
+    grid-template-columns: 66px 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 10px;
+  }
+
+  .bfc_summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .bfc_cover {
+    width: 66px;
+    height: 94px;
+    border-radius: 8px;
+    background: #2b3127;
+    object-fit: cover;
+  }
+
+  .bfc_main {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .bfc_title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #f6f8f4;
+  }
+
+  .bfc_authors {
+    font-size: 14px;
+    color: #c4ccc0;
+  }
+
+  .bfc_chip {
+    font-size: 13px;
+    color: #d4ff2a;
+  }
+
+  .bfc_detail {
+    border-top: 1px solid #252a21;
+    padding: 12px 14px 14px;
+    display: grid;
+    gap: 6px;
+    color: #d2d8ce;
+    font-size: 13px;
+  }
+
+  .bfc_detail p {
+    margin: 0;
+  }
+
+  .bfc_detail strong {
+    color: #f6f8f4;
+  }
+
+  .bfc_empty {
+    color: #b8c0b1;
+    font-size: 14px;
+  }
+
+  @media (min-width: 800px) {
+    .bfc_controls {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+</style>

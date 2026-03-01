@@ -1,30 +1,23 @@
 {
-  "name": "books-freedom",
-  "version": "0.4.9",
+  "name": "books-freedom-workspace",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "lint": "biome check src/",
-    "format": "biome format --write src/",
-    "preflight": "pnpm lint && pnpm test && pnpm build"
-  },
-  "dependencies": {
-    "html5-qrcode": "^2.3.8"
-  },
-  "devDependencies": {
-    "@biomejs/biome": "^2.4.4",
-    "@sveltejs/vite-plugin-svelte": "^6.2.4",
-    "@testing-library/svelte": "^5.3.1",
-    "@testing-library/user-event": "^14.6.1",
-    "jsdom": "^28.1.0",
-    "svelte": "^5.53.6",
-    "typescript": "^5.9.3",
-    "vite": "^6.4.1",
-    "vitest": "^4.0.18"
+    "certs:generate": "node scripts/generate-dev-certs.mjs",
+    "data:sync": "node scripts/sync-library-data.mjs",
+    "data:sync:dummy": "LIBRARY_SOURCE_FILE=data/library.dummy.json node scripts/sync-library-data.mjs",
+    "data:apply": "node scripts/apply-library-data.mjs",
+    "dev": "pnpm dev:webapp",
+    "dev:webapp": "pnpm data:sync && pnpm --filter @books-freedom/webapp dev",
+    "dev:webapp:https": "pnpm data:sync && pnpm --filter @books-freedom/webapp dev:https",
+    "dev:astro": "pnpm data:sync && pnpm --filter @books-freedom/astro-site dev",
+    "build": "pnpm build:webapp",
+    "build:webapp": "pnpm data:sync && pnpm --filter @books-freedom/webapp build",
+    "build:astro": "pnpm data:sync && pnpm --filter @books-freedom/astro-site build",
+    "test": "pnpm --filter @books-freedom/webapp test",
+    "lint": "pnpm -r lint",
+    "format": "pnpm --filter @books-freedom/webapp format",
+    "preflight": "pnpm --filter @books-freedom/webapp preflight"
   }
 }

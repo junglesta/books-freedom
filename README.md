@@ -1,7 +1,7 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/28542ff1-4d69-4518-abdc-5cb625f0befe/deploy-status)](https://app.netlify.com/projects/bookfreedom/deploys)
 
 
-<a href="https://bf.junglestar.org/">
+<a href="https://bf.junglestar.org">
   <img src="logo.svg" alt="Book Freedom" width="480">
 </a>
 
@@ -33,13 +33,73 @@ everything stays on your device in localStorage. nothing leaves the browser.
 
 ## STACK
 
-svelte 5 + vite. pure static SPA. local storage and ISBN lookup logic. dark mode only. deploy anywhere. 
+svelte 5 + vite + astro (workspace). pure static clients. local storage and ISBN lookup logic.
+
+## MONOREPO
+
+- `apps/webapp` → current Book's Freedom app
+- `apps/astro-site` → Astro SSG site with `BOOK FREEDDOM CLIENT`
+- `packages/library-core` → shared types + list/search/sort helpers
 
 ## RUN IT
 
 ```bash
 pnpm install
-pnpm dev
+pnpm dev:webapp
+pnpm dev:astro
+```
+
+## HTTPS DEV (LOCAL + LAN PHONE)
+
+Generate local certs (includes localhost + detected LAN IPv4 addresses):
+
+```bash
+pnpm certs:generate
+```
+
+Run webapp over HTTPS:
+
+```bash
+pnpm dev:webapp:https
+```
+
+Open:
+
+- `https://localhost:5173`
+- `https://<your-lan-ip>:5173` (phone on same Wi-Fi)
+
+Note: phone browsers may still require trusting the local cert before camera APIs behave as secure context.
+
+## ASTRO JSON INPUT
+
+Canonical drop-in files:
+
+- `data/library.json` (default dataset)
+- `data/library.dummy.json` (optional demo dataset)
+
+The workspace auto-syncs `data/library.json` to:
+
+- `apps/astro-site/src/data/library.json`
+- `apps/webapp/src/public/library.json`
+
+Run manually:
+
+```bash
+pnpm data:sync
+pnpm data:sync:dummy
+pnpm data:apply ./my-export.json
+```
+
+Note: Astro SSG cannot write back to repo files from the browser at runtime.  
+Use `data:apply` (or replace `data/library.json`) to persist edits into the drop-in folder.
+
+Supported shape (`data/library.json`):
+
+```json
+{
+  "version": 1,
+  "books": []
+}
 ```
 
 ## LICENSE

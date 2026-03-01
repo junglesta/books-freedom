@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "books": [
+    {
+      "id": "ffb86aae-96c6-47d4-95d6-5735258b9982",
+      "isbn13": "9780465097197",
+      "isbn10": "0465097197",
+      "title": "Interpretation of Cultures",
+      "authors": [
+        "Clifford Geertz"
+      ],
+      "publisher": "Basic Books",
+      "publishDate": "January 2000",
+      "publishYear": 2000,
+      "pageCount": 480,
+      "language": "eng",
+      "subjects": [
+        "Culturele antropologie",
+        "Culture",
+        "Ethnology",
+        "Ethnologie",
+        "Ethnolo",
+        "Mudanca Social",
+        "Kulturphilosophie",
+        "Kulturanthropologie",
+        "Antropologia cult social",
+        "Anthropologie"
+      ],
+      "coverUrl": "https://covers.openlibrary.org/b/id/299356-L.jpg",
+      "status": "read",
+      "dateAdded": "2026-02-25T18:38:42.229Z",
+      "source": "openlibrary",
+      "rating": 5,
+      "dateRead": "2026-02-26T00:54:36.169Z"
+    },
+    {
+      "id": "73459295-69da-4444-ac56-9896ee9dd1ae",
+      "isbn13": "9788807900822",
+      "isbn10": "8807900823",
+      "title": "Discorso della servitù volontaria",
+      "authors": [
+        "Etienne de La Boëtie",
+        "E. Donaggio"
+      ],
+      "publisher": "Feltrinelli",
+      "publishDate": "Feb 26, 2014",
+      "publishYear": 2014,
+      "pageCount": 128,
+      "language": "it",
+      "subjects": [
+        "Politics",
+        "Liberty",
+        "Early works to 1800",
+        "Political science",
+        "Despotism",
+        "Obedience",
+        "Political science, early works to 1800",
+        "Allegiance",
+        "Liberty.\u001e 0",
+        "Criticism and interpretation"
+      ],
+      "coverUrl": "https://covers.openlibrary.org/b/id/11193233-L.jpg",
+      "status": "to-read",
+      "dateAdded": "2026-02-25T20:03:46.118Z",
+      "source": "openlibrary",
+      "rating": 3
+    },
+    {
+      "id": "62429b27-a418-4361-add7-873c48a925b4",
+      "isbn13": "9789881806659",
+      "isbn10": "9881806658",
+      "title": "Bumbling through Borneo",
+      "authors": [
+        "Tom Schmidt"
+      ],
+      "publisher": "Kakibubu Media Limited",
+      "publishDate": "2009",
+      "publishYear": 2009,
+      "pageCount": 111,
+      "language": "eng",
+      "subjects": [
+        "Humor",
+        "Description and travel"
+      ],
+      "status": "read",
+      "dateAdded": "2026-02-25T20:05:19.187Z",
+      "source": "openlibrary",
+      "rating": 5,
+      "dateRead": "2026-02-26T00:54:16.498Z"
+    },
+    {
+      "id": "bbc3c20a-ddb5-4352-8ed7-8c2279b9a967",
+      "isbn13": "9780099908401",
+      "isbn10": "0099908409",
+      "title": "The Old Man and the Sea",
+      "authors": [
+        "Ernest Hemingway"
+      ],
+      "publisher": "Arrow Books",
+      "publishDate": "1993",
+      "publishYear": 1993,
+      "pageCount": 112,
+      "language": "eng",
+      "subjects": [
+        "American Sea stories",
+        "Male friendship",
+        "Fishers",
+        "Fiction",
+        "Ameriška književnost",
+        "American fiction",
+        "Ancianos",
+        "Open Library Staff Picks",
+        "Fishing stories",
+        "Pescadores"
+      ],
+      "coverUrl": "https://covers.openlibrary.org/b/id/12840558-L.jpg",
+      "status": "read",
+      "dateAdded": "2026-02-25T20:06:52.059Z",
+      "source": "openlibrary",
+      "rating": 5,
+      "dateRead": "2026-02-26T00:54:10.534Z"
+    }
+  ]
+}
