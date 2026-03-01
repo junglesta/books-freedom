@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.6
+
+- Increased footer branding/attribution text size by another 10% for better readability
+- Added app-managed cover image caching in the service worker for supported external cover hosts
+- Wired library drop to clear the dedicated cover cache (`CLEAR_COVER_CACHE`) so cached covers are purged with the library
+
 ## 0.4.5
 
 - Improved HELP splash behavior across aspect ratios by enabling full-screen vertical scrolling of `readme.svg` with hidden scrollbars

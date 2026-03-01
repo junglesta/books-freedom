@@ -144,6 +144,13 @@ export function updateBookInCollection(id: string, updates: Partial<Book>) {
   }
 }
 
+export function setBookCoverUrl(id: string, coverUrl: string) {
+  const current = books.find((b) => b.id === id);
+  if (!current || current.coverUrl === coverUrl) return;
+  const updated = updateBook(id, { coverUrl });
+  books = books.map((b) => (b.id === id ? updated : b));
+}
+
 export function removeBookFromCollection(id: string) {
   try {
     deleteBook(id);
@@ -159,6 +166,7 @@ export function clearLibraryCollection() {
   try {
     clearBooks();
     books = [];
+    navigator.serviceWorker?.controller?.postMessage({ type: "CLEAR_COVER_CACHE" });
     showToast("Library cleared.");
   } catch (e: unknown) {
     showToast(getErrorMessage(e, "Failed to clear library"));

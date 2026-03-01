@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Book } from '../lib/types';
-  import { updateBookInCollection, removeBookFromCollection } from '../lib/stores.svelte.ts';
+  import { updateBookInCollection, removeBookFromCollection, setBookCoverUrl } from '../lib/stores.svelte.ts';
   import { getCoverCandidates } from '../lib/cover';
 
   interface Props {
@@ -85,6 +85,10 @@
   }
 
   function handleCoverLoaded() {
+    const loadedUrl = coverCandidates[coverIndex];
+    if (loadedUrl && book.coverUrl !== loadedUrl) {
+      setBookCoverUrl(book.id, loadedUrl);
+    }
     coverLoaded = true;
   }
 </script>
