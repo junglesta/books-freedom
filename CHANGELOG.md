@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.1
+
+- Synced `pnpm-lock.yaml` to workspace package layout to satisfy CI/Netlify `--frozen-lockfile` installs
+- Verified monorepo webapp preflight gates (format, lint, test, build) all pass from workspace root
+
 ## 0.5.0
 
 - Migrated repository to workspace monorepo layout (`apps/webapp`, `apps/astro-site`, `packages/library-core`)
