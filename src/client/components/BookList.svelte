@@ -43,9 +43,10 @@
   <div class="book_list" class:compact>
     {#each books as book (book.id)}
       <div class="book_list_item" bind:this={rowRefs[book.id]}>
-        <BookCard {book} {compact} onclick={() => handleSelect(book)} />
         {#if selectedBook?.id === book.id}
           <BookDetail book={selectedBook} onClose={onCloseDetail} />
+        {:else}
+          <BookCard {book} {compact} onclick={() => handleSelect(book)} />
         {/if}
       </div>
     {/each}

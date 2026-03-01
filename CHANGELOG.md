@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.9
+
+- Hid the compact library card when a title is expanded, so only the inline detail panel is shown for the selected book
+- Kept lint/test/build preflight checks green after the library row rendering adjustment
+
 ## 0.4.8
 
 - Moved single-title details rendering inline under the selected library card row instead of using a detached bottom popover
