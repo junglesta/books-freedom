@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.8
+
+- Moved single-title details rendering inline under the selected library card row instead of using a detached bottom popover
+- Added guarded in-view scrolling when opening details so the expanded item stays visible in long lists
+- Updated book detail `Save` action to remain disabled/dimmed until a real field or star-rating change is made
+
 ## 0.4.7
 
 - Simplified cover loading flow: always show placeholder while image is loading

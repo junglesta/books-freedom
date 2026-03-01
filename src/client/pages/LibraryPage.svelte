@@ -1,8 +1,7 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import BookList from '../components/BookList.svelte';
-  import BookDetail from '../components/BookDetail.svelte';
-  import SearchBar from '../components/SearchBar.svelte';
+import { onMount } from 'svelte';
+import BookList from '../components/BookList.svelte';
+import SearchBar from '../components/SearchBar.svelte';
   import { getErrorMessage } from "../lib/error";
   import {
     getSupportedImportExtensionsLabel,
@@ -349,10 +348,12 @@
       <div class="spinner"></div>
     </div>
   {:else}
-    <BookList books={filteredBooks()} onSelect={(b) => (selectedBook = b)} compact={viewMode === 'list'} />
-  {/if}
-
-  {#if selectedBook}
-    <BookDetail book={selectedBook} onClose={() => (selectedBook = null)} />
+    <BookList
+      books={filteredBooks()}
+      selectedBook={selectedBook}
+      onSelect={(b) => (selectedBook = b)}
+      onCloseDetail={() => (selectedBook = null)}
+      compact={viewMode === 'list'}
+    />
   {/if}
 </div>

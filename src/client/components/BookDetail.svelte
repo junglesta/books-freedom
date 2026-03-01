@@ -39,6 +39,41 @@
     { value: 'read', label: 'Read' },
   ];
 
+  function normalizeText(value: string): string | undefined {
+    const trimmed = value.trim();
+    return trimmed ? trimmed : undefined;
+  }
+
+  function normalizeTags(value: string): string[] | undefined {
+    const tags = value
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean);
+    return tags.length > 0 ? tags : undefined;
+  }
+
+  function sameStringArray(a: string[] | undefined, b: string[] | undefined): boolean {
+    if (!a && !b) return true;
+    if (!a || !b) return false;
+    if (a.length !== b.length) return false;
+    return a.every((value, index) => value === b[index]);
+  }
+
+  const hasChanges = $derived.by(() => {
+    const nextRating = rating || undefined;
+    const nextLanguage = normalizeText(language);
+    const nextNotes = normalizeText(notes);
+    const nextTags = normalizeTags(tagsInput);
+
+    return (
+      status !== book.status ||
+      nextRating !== book.rating ||
+      nextLanguage !== book.language ||
+      nextNotes !== book.notes ||
+      !sameStringArray(nextTags, book.tags)
+    );
+  });
+
   function pickStatus(value: Book['status']) {
     status = value;
     statusOpen = false;
@@ -50,9 +85,9 @@
       await updateBookInCollection(book.id, {
         status,
         rating: rating || undefined,
-        language: language || undefined,
-        notes: notes || undefined,
-        tags: tagsInput ? tagsInput.split(',').map((t) => t.trim()).filter(Boolean) : undefined,
+        language: normalizeText(language),
+        notes: normalizeText(notes),
+        tags: normalizeTags(tagsInput),
         dateRead: status === 'read' && !book.dateRead ? new Date().toISOString() : book.dateRead,
       });
       onClose();
@@ -93,7 +128,8 @@
   }
 </script>
 
-<div class="detail_overlay" role="dialog" aria-label="Book details">
+<details class="detail_overlay detail_inline" open aria-label="Book details">
+  <summary class="detail_inline_summary">Book details</summary>
   <div class="detail_panel">
     <div class="detail_topbar">
       <button class="detail_close" onclick={onClose} aria-label="Close">&times;</button>
@@ -208,7 +244,7 @@
     </div>
 
     <div class="detail_actions">
-      <button class="btn btn_primary" onclick={save} disabled={saving}>
+      <button class="btn btn_primary" onclick={save} disabled={saving || !hasChanges}>
         {saving ? 'Saving...' : 'Save'}
       </button>
       <button class="btn btn_danger" onclick={remove}>Remove</button>
@@ -227,4 +263,4 @@
       </details>
     {/if}
   </div>
-</div>
+</details>

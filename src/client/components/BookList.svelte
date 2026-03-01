@@ -1,14 +1,32 @@
 <script lang="ts">
   import type { Book } from '../lib/types';
   import BookCard from './BookCard.svelte';
+  import BookDetail from './BookDetail.svelte';
 
   interface Props {
     books: Book[];
     onSelect: (book: Book) => void;
+    selectedBook: Book | null;
+    onCloseDetail: () => void;
     compact?: boolean;
   }
 
-  let { books, onSelect, compact = false }: Props = $props();
+  let { books, onSelect, selectedBook, onCloseDetail, compact = false }: Props = $props();
+
+  let rowRefs = $state<Record<string, HTMLDivElement | undefined>>({});
+
+  function handleSelect(book: Book) {
+    onSelect(book);
+    requestAnimationFrame(() => {
+      const row = rowRefs[book.id];
+      if (row && typeof row.scrollIntoView === "function") {
+        row.scrollIntoView({
+        block: "nearest",
+        behavior: "smooth",
+        });
+      }
+    });
+  }
 </script>
 
 {#if books.length === 0}
@@ -24,7 +42,12 @@
 {:else}
   <div class="book_list" class:compact>
     {#each books as book (book.id)}
-      <BookCard {book} {compact} onclick={() => onSelect(book)} />
+      <div class="book_list_item" bind:this={rowRefs[book.id]}>
+        <BookCard {book} {compact} onclick={() => handleSelect(book)} />
+        {#if selectedBook?.id === book.id}
+          <BookDetail book={selectedBook} onClose={onCloseDetail} />
+        {/if}
+      </div>
     {/each}
   </div>
 {/if}

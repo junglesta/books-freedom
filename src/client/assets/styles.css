@@ -869,6 +869,12 @@ h1 .count {
   gap: 2px;
 }
 
+.book_list_item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .book_card.compact {
   padding: 10px 14px;
 }
@@ -1251,23 +1257,37 @@ h1 .count {
 
 /* ===== Book Detail ===== */
 .detail_overlay {
-  position: fixed;
-  inset: 0;
-  background: var(--bg-overlay);
-  z-index: 200;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  margin-top: 12px;
+}
+
+.detail_inline {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+}
+
+.detail_inline_summary {
+  list-style: none;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  cursor: default;
+}
+
+.detail_inline_summary::-webkit-details-marker {
+  display: none;
 }
 
 .detail_panel {
   width: 100%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  background: var(--bg-card);
-  border-radius: var(--radius) var(--radius) 0 0;
-  padding: 24px 16px calc(16px + var(--safe-bottom));
+  max-width: 100%;
+  max-height: none;
+  overflow: visible;
+  background: transparent;
+  border-radius: 0;
+  padding: 14px;
   position: relative;
 }
 
