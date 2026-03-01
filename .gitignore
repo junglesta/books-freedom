@@ -1,6 +1,8 @@
 node_modules/
 dist/
-data/books.json
+.vite/
+apps/*/dist/
+apps/*/.astro/
 *.log
 .DS_Store
 certs/

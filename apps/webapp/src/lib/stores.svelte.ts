@@ -2,7 +2,11 @@ import { getErrorMessage } from "./error";
 import { lookupIsbn } from "./isbn-lookup";
 import { scanIsbnWithDeps } from "./scan";
 import { addBook, clearBooks, deleteBook, getAllBooks, getBookByIsbn, updateBook } from "./storage";
-import { LEGACY_LIBRARY_NAME_STORAGE_KEY, LIBRARY_NAME_STORAGE_KEY } from "./storage-keys";
+import {
+  COLLECTION_SEEDED_STORAGE_KEY,
+  LEGACY_LIBRARY_NAME_STORAGE_KEY,
+  LIBRARY_NAME_STORAGE_KEY,
+} from "./storage-keys";
 import type { Book, ScanResult } from "./types";
 
 // Book collection state
@@ -73,11 +77,94 @@ export function loadBooks() {
   error = null;
   try {
     books = getAllBooks();
+    if (books.length === 0) {
+      void seedBooksFromDropInJson();
+    }
   } catch (e: unknown) {
     error = getErrorMessage(e, "Failed to load books");
   } finally {
     loading = false;
   }
+}
+
+function normalizeSeedStatus(status: unknown): Book["status"] {
+  if (status === "to-read" || status === "reading" || status === "read") return status;
+  return "to-read";
+}
+
+function normalizeSeedSource(source: unknown): Book["source"] {
+  if (source === "openlibrary" || source === "googlebooks" || source === "manual") return source;
+  return "manual";
+}
+
+async function seedBooksFromDropInJson() {
+  if (typeof fetch !== "function") return;
+  if (localStorage.getItem(COLLECTION_SEEDED_STORAGE_KEY) === "1") return;
+
+  localStorage.setItem(COLLECTION_SEEDED_STORAGE_KEY, "1");
+
+  try {
+    const response = await fetch("/library.json", {
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+    });
+    if (!response.ok) return;
+
+    const payload = await response.json();
+    const candidates = parseSeedPayload(payload);
+    if (candidates.length === 0) return;
+
+    const existing = new Set(getAllBooks().map((book) => book.isbn13));
+
+    for (const book of candidates) {
+      if (!book.isbn13 || !book.title || !Array.isArray(book.authors)) continue;
+      if (existing.has(book.isbn13)) continue;
+
+      const saved = addBook({
+        isbn13: book.isbn13,
+        isbn10: book.isbn10,
+        title: book.title,
+        authors: book.authors,
+        publisher: book.publisher,
+        publishYear: book.publishYear,
+        pageCount: book.pageCount,
+        language: book.language,
+        coverUrl: book.coverUrl,
+        rating: book.rating,
+        notes: book.notes,
+        tags: book.tags,
+        dateRead: book.dateRead,
+        status: normalizeSeedStatus(book.status),
+        source: normalizeSeedSource((book as Partial<Book>).source),
+      });
+      existing.add(saved.isbn13);
+    }
+
+    books = getAllBooks();
+  } catch {
+    // Silent fallback: missing seed file should not block app startup.
+  }
+}
+
+function parseSeedPayload(input: unknown): Array<Partial<Book>> {
+  if (Array.isArray(input)) {
+    return input.filter(isSeedBook);
+  }
+  if (!input || typeof input !== "object") return [];
+  const maybeBooks = (input as { books?: unknown }).books;
+  if (!Array.isArray(maybeBooks)) return [];
+  return maybeBooks.filter(isSeedBook);
+}
+
+function isSeedBook(value: unknown): value is Partial<Book> {
+  if (!value || typeof value !== "object") return false;
+  const book = value as Partial<Book>;
+  return (
+    typeof book.isbn13 === "string" &&
+    typeof book.title === "string" &&
+    Array.isArray(book.authors) &&
+    book.authors.every((author) => typeof author === "string")
+  );
 }
 
 export function addBookToCollection(book: Partial<Book>) {

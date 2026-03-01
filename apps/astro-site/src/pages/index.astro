@@ -1,0 +1,25 @@
+---
+import { parseLibraryPayload } from '@books-freedom/library-core';
+import BookFreeddomClient from '../components/Astro/BookFreeddomClient.astro';
+import library from '../data/library.json';
+
+const books = parseLibraryPayload(library);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Books Freedom | Library</title>
+  </head>
+  <body>
+    <BookFreeddomClient books={books} />
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw-covers.js').catch(() => undefined);
+      }
+    </script>
+  </body>
+</html>

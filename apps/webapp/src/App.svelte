@@ -8,7 +8,7 @@
     import { getRoute, loadBooks } from "./lib/stores.svelte";
     import splashScreenUrl from "./assets/readme.svg";
     import splashQrUrl from "./assets/splash-qr.svg";
-    import { version } from "../../package.json";
+    import { version } from "../package.json";
 
     let splashDone = $state(false);
     let splashMode = $state<"startup" | "help" | "share">("startup");
