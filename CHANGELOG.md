@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.7
+
+- Simplified cover loading flow: always show placeholder while image is loading
+- Persist successful fallback cover URL back to `book.coverUrl` so future renders try the known-good source first
+- Aligned service-worker cache policy helpers/tests with runtime behavior for approved cross-origin cover hosts
+
 ## 0.4.6
 
 - Increased footer branding/attribution text size by another 10% for better readability
