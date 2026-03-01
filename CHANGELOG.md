@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.5
+
+- Improved HELP splash behavior across aspect ratios by enabling full-screen vertical scrolling of `readme.svg` with hidden scrollbars
+- Added visible top-right circular `X` close control for HELP and SHARE splash overlays
+- Updated canonical/share URL usage to `https://bf.junglestar.org/` in app metadata, share splash text, and README logo link
+- Refined splash close interactions to avoid accidental close while scrolling help content
+
 ## 0.4.4
 
 - Reworked splash UX to use the new `readme.svg` splash screen artwork
@@ -161,7 +168,7 @@
 - Export page: split subtitle and heading into separate elements
 - Netlify deploy config (netlify.toml)
 - README.md and LICENSE (CC BY-SA 4.0)
-- PWA updated: manifest, service worker, canonical URL (laser.junglestar.org)
+- PWA updated: manifest, service worker, canonical URL (bf.junglestar.org)
 - Dithered noise background on desktop (SVG feTurbulence filter)
 
 ## 0.1.0

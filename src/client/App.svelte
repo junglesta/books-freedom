@@ -36,17 +36,29 @@
             splashDone = true;
         }
     }
+
+    function maybeCloseHelpSplash(event: MouseEvent) {
+        const target = event.target as HTMLElement | null;
+        if (event.target === event.currentTarget || target?.closest(".splash_close")) {
+            maybeCloseSplash();
+        }
+    }
 </script>
 
 {#if !splashDone}
     {#if splashMode === "help"}
-        <button type="button" class="splash splash_popover" onclick={maybeCloseSplash} aria-label="Close splash screen">
-            <img class="splash_logo" src={splashScreenUrl} alt="Book's Freedom splash screen" />
+        <button type="button" class="splash splash_popover splash_help" onclick={maybeCloseHelpSplash} aria-label="Close splash screen">
+            <span class="splash_close" aria-hidden="true">×</span>
+            <div class="splash_help_scroll">
+                <img class="splash_help_image" src={splashScreenUrl} alt="Book's Freedom splash screen" />
+            </div>
         </button>
     {:else if splashMode === "share"}
         <button type="button" class="splash splash_popover" onclick={maybeCloseSplash} aria-label="Close share splash">
+            <span class="splash_close" aria-hidden="true">×</span>
             <div class="splash_share_content">
                 <img src={splashQrUrl} alt="QR code to share Book's Freedom" />
+                <p class="splash_share_url">https://bf.junglestar.org/</p>
             </div>
         </button>
     {:else}
