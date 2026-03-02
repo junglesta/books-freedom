@@ -10,7 +10,7 @@ importers:
 
   apps/astro-site:
     dependencies:
-      '@books-freedom/library-core':
+      '@bookbat/library-core':
         specifier: workspace:*
         version: link:../../packages/library-core
       astro:

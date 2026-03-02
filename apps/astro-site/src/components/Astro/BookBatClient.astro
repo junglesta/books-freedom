@@ -1,5 +1,5 @@
 ---
-import type { LibraryBook } from '@books-freedom/library-core';
+import type { LibraryBook } from '@bookbat/library-core';
 
 interface Props {
   books?: LibraryBook[];
@@ -7,7 +7,7 @@ interface Props {
   heading?: string;
 }
 
-const { books = [], dataUrl = '', heading = 'BOOK FREEDDOM CLIENT' } = Astro.props;
+const { books = [], dataUrl = '', heading = 'BOOK BAT CLIENT' } = Astro.props;
 const encodedBooks = encodeURIComponent(JSON.stringify(books));
 ---
 

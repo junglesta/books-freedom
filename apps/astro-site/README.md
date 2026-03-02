@@ -1,6 +1,6 @@
 # Astro Site
 
-Static site entry for the `BOOK FREEDDOM CLIENT` component.
+Static site entry for the `BOOK BAT CLIENT` component.
 
 ## Data source
 
@@ -26,6 +26,6 @@ Expected shape:
 ## Commands
 
 ```bash
-pnpm --filter @books-freedom/astro-site dev
-pnpm --filter @books-freedom/astro-site build
+pnpm --filter @bookbat/astro-site dev
+pnpm --filter @bookbat/astro-site build
 ```

@@ -37,8 +37,8 @@ svelte 5 + vite + astro (workspace). pure static clients. local storage and ISBN
 
 ## MONOREPO
 
-- `apps/webapp` → current Book's Freedom app
-- `apps/astro-site` → Astro SSG site with `BOOK FREEDDOM CLIENT`
+- `apps/webapp` → current BOOK BAT app
+- `apps/astro-site` → Astro SSG site with `BOOK BAT CLIENT`
 - `packages/library-core` → shared types + list/search/sort helpers
 
 ## RUN IT

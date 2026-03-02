@@ -9,6 +9,7 @@ import {
   saveCollection,
   updateBook,
 } from "./storage";
+import { COLLECTION_STORAGE_KEY, LEGACY_COLLECTION_STORAGE_KEY } from "./storage-keys";
 import type { Book, BookCollection } from "./types";
 
 const store: Record<string, string> = {};
@@ -41,7 +42,7 @@ function makeBook(overrides: Partial<Book> = {}): Book {
 }
 
 function seedCollection(books: Book[]) {
-  store["books-freedom"] = JSON.stringify({ version: 1, books });
+  store[COLLECTION_STORAGE_KEY] = JSON.stringify({ version: 1, books });
 }
 
 beforeEach(() => {
@@ -56,7 +57,7 @@ describe("loadCollection", () => {
   });
 
   it("returns empty collection on invalid JSON", () => {
-    store["books-freedom"] = "not-json{{{";
+    store[COLLECTION_STORAGE_KEY] = "not-json{{{";
     const col = loadCollection();
     expect(col).toEqual({ version: 1, books: [] });
   });
@@ -70,7 +71,7 @@ describe("loadCollection", () => {
   });
 
   it("migrates legacy collection without version", () => {
-    store["books-freedom"] = JSON.stringify({ books: [makeBook()] });
+    store[LEGACY_COLLECTION_STORAGE_KEY] = JSON.stringify({ books: [makeBook()] });
     const col = loadCollection();
     expect(col.version).toBe(1);
     expect(col.books).toHaveLength(1);
@@ -78,7 +79,7 @@ describe("loadCollection", () => {
   });
 
   it("drops malformed books during migration", () => {
-    store["books-freedom"] = JSON.stringify({
+    store[COLLECTION_STORAGE_KEY] = JSON.stringify({
       version: 1,
       books: [{ bad: "record" }, makeBook()],
     });
@@ -88,7 +89,7 @@ describe("loadCollection", () => {
   });
 
   it("resets unsupported versions to empty collection", () => {
-    store["books-freedom"] = JSON.stringify({
+    store[COLLECTION_STORAGE_KEY] = JSON.stringify({
       version: 999,
       books: [makeBook()],
     });
@@ -101,7 +102,10 @@ describe("saveCollection", () => {
   it("writes JSON to localStorage", () => {
     const col: BookCollection = { version: 1, books: [makeBook()] };
     saveCollection(col);
-    expect(localStorageMock.setItem).toHaveBeenCalledWith("books-freedom", JSON.stringify(col));
+    expect(localStorageMock.setItem).toHaveBeenCalledWith(
+      COLLECTION_STORAGE_KEY,
+      JSON.stringify(col),
+    );
   });
 });
 
@@ -157,7 +161,7 @@ describe("addBook", () => {
       status: "to-read",
       source: "manual",
     });
-    const stored = JSON.parse(store["books-freedom"]);
+    const stored = JSON.parse(store[COLLECTION_STORAGE_KEY]);
     expect(stored.books).toHaveLength(1);
   });
 

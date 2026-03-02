@@ -1,4 +1,4 @@
-import { COLLECTION_STORAGE_KEY } from "./storage-keys";
+import { COLLECTION_STORAGE_KEY, LEGACY_COLLECTION_STORAGE_KEY } from "./storage-keys";
 import type { Book, BookCollection } from "./types";
 
 const BOOK_STATUSES = new Set<Book["status"]>(["to-read", "reading", "read"]);
@@ -88,12 +88,18 @@ function migrateCollection(input: unknown): { collection: BookCollection; migrat
 
 export function loadCollection(): BookCollection {
   try {
-    const raw = localStorage.getItem(COLLECTION_STORAGE_KEY);
+    const rawCurrent = localStorage.getItem(COLLECTION_STORAGE_KEY);
+    const rawLegacy = localStorage.getItem(LEGACY_COLLECTION_STORAGE_KEY);
+    const usingLegacy = !rawCurrent && !!rawLegacy;
+    const raw = rawCurrent ?? rawLegacy;
     if (!raw) return emptyCollection();
     const parsed = JSON.parse(raw);
     const { collection, migrated } = migrateCollection(parsed);
-    if (migrated) {
+    if (usingLegacy || migrated) {
       saveCollection(collection);
+    }
+    if (usingLegacy) {
+      localStorage.removeItem(LEGACY_COLLECTION_STORAGE_KEY);
     }
     return collection;
   } catch {

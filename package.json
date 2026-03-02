@@ -1,6 +1,6 @@
 {
-  "name": "books-freedom-workspace",
-  "version": "0.7.0",
+  "name": "bookbat-workspace",
+  "version": "0.7.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,15 +9,15 @@
     "data:sync:dummy": "LIBRARY_SOURCE_FILE=data/library.dummy.json node scripts/sync-library-data.mjs",
     "data:apply": "node scripts/apply-library-data.mjs",
     "dev": "pnpm dev:webapp",
-    "dev:webapp": "pnpm data:sync && pnpm --filter @books-freedom/webapp dev",
-    "dev:webapp:https": "pnpm data:sync && pnpm --filter @books-freedom/webapp dev:https",
-    "dev:astro": "pnpm data:sync && pnpm --filter @books-freedom/astro-site dev",
+    "dev:webapp": "pnpm data:sync && pnpm --filter @bookbat/webapp dev",
+    "dev:webapp:https": "pnpm data:sync && pnpm --filter @bookbat/webapp dev:https",
+    "dev:astro": "pnpm data:sync && pnpm --filter @bookbat/astro-site dev",
     "build": "pnpm build:webapp",
-    "build:webapp": "pnpm data:sync && pnpm --filter @books-freedom/webapp build",
-    "build:astro": "pnpm data:sync && pnpm --filter @books-freedom/astro-site build",
-    "test": "pnpm --filter @books-freedom/webapp test",
+    "build:webapp": "pnpm data:sync && pnpm --filter @bookbat/webapp build",
+    "build:astro": "pnpm data:sync && pnpm --filter @bookbat/astro-site build",
+    "test": "pnpm --filter @bookbat/webapp test",
     "lint": "pnpm -r lint",
-    "format": "pnpm --filter @books-freedom/webapp format",
-    "preflight": "pnpm --filter @books-freedom/webapp preflight"
+    "format": "pnpm --filter @bookbat/webapp format",
+    "preflight": "pnpm --filter @bookbat/webapp preflight"
   }
 }

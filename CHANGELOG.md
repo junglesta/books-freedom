@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.1
+
+- Renamed workspace package identifiers from `@books-freedom/*` to `@bookbat/*` and updated related imports/scripts/docs
+- Renamed active localStorage/service-worker key namespaces to `bookbat*` while preserving migration from legacy `books-freedom*` keys
+- Updated README hero image to `apps/webapp/src/assets/startscreen.svg`
+
 ## 0.7.0
 
 - Updated app footer open-source repo link to `https://github.com/junglesta/bookbat`

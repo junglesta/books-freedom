@@ -9,6 +9,7 @@
     } from "../lib/export";
     import {
         LEGACY_SHEETS_URL_STORAGE_KEY,
+        LEGACY_SHEETS_URL_STORAGE_KEY_V0,
         SHEETS_URL_STORAGE_KEY,
     } from "../lib/storage-keys";
     import {
@@ -26,6 +27,12 @@
         if (legacy) {
             localStorage.setItem(SHEETS_URL_STORAGE_KEY, legacy);
             return legacy;
+        }
+
+        const legacyV0 = localStorage.getItem(LEGACY_SHEETS_URL_STORAGE_KEY_V0);
+        if (legacyV0) {
+            localStorage.setItem(SHEETS_URL_STORAGE_KEY, legacyV0);
+            return legacyV0;
         }
 
         return "";

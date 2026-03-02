@@ -5,9 +5,13 @@ import { addBook, clearBooks, deleteBook, getAllBooks, getBookByIsbn, updateBook
 import {
   COLLECTION_SEEDED_STORAGE_KEY,
   COLLECTION_STORAGE_KEY,
+  LEGACY_COLLECTION_SEEDED_STORAGE_KEY,
+  LEGACY_COLLECTION_STORAGE_KEY,
   LEGACY_LIBRARY_NAME_STORAGE_KEY,
+  LEGACY_LIBRARY_NAME_STORAGE_KEY_V0,
+  LEGACY_RELEASE_RESET_STORAGE_KEY,
   LIBRARY_NAME_STORAGE_KEY,
-  RELEASE_RESET_060_STORAGE_KEY,
+  RELEASE_RESET_STORAGE_KEY,
 } from "./storage-keys";
 import type { Book, ScanResult } from "./types";
 
@@ -29,6 +33,12 @@ function loadLibraryName(): string {
   if (legacy) {
     localStorage.setItem(LIBRARY_NAME_STORAGE_KEY, legacy);
     return legacy;
+  }
+
+  const legacyV0 = localStorage.getItem(LEGACY_LIBRARY_NAME_STORAGE_KEY_V0);
+  if (legacyV0) {
+    localStorage.setItem(LIBRARY_NAME_STORAGE_KEY, legacyV0);
+    return legacyV0;
   }
 
   return "Library";
@@ -88,11 +98,18 @@ export function loadBooks() {
 }
 
 function applyReleaseResetOnce() {
-  if (localStorage.getItem(RELEASE_RESET_060_STORAGE_KEY) === "1") return;
+  if (
+    localStorage.getItem(RELEASE_RESET_STORAGE_KEY) === "1" ||
+    localStorage.getItem(LEGACY_RELEASE_RESET_STORAGE_KEY) === "1"
+  ) {
+    return;
+  }
 
   localStorage.removeItem(COLLECTION_STORAGE_KEY);
+  localStorage.removeItem(LEGACY_COLLECTION_STORAGE_KEY);
   localStorage.removeItem(COLLECTION_SEEDED_STORAGE_KEY);
-  localStorage.setItem(RELEASE_RESET_060_STORAGE_KEY, "1");
+  localStorage.removeItem(LEGACY_COLLECTION_SEEDED_STORAGE_KEY);
+  localStorage.setItem(RELEASE_RESET_STORAGE_KEY, "1");
   navigator.serviceWorker?.controller?.postMessage({ type: "CLEAR_COVER_CACHE" });
 }
 

@@ -1,6 +1,6 @@
 {
-  "name": "@books-freedom/webapp",
-  "version": "0.7.0",
+  "name": "@bookbat/webapp",
+  "version": "0.7.1",
   "private": true,
   "type": "module",
   "scripts": {
