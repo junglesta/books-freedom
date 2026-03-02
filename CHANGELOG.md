@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.3
+
+- Fixed scanner helper overlay shape on mobile by replacing unstable library-drawn guide visuals with app-controlled viewfinder overlay rendering
+- Made scan box sizing responsive to real viewfinder dimensions so the helper frame keeps consistent proportions across devices
+- Re-ran preflight gates (format, lint, test, build) from workspace root with passing results
+
 ## 0.5.2
 
 - Fixed Netlify publish target mismatch by restoring root `netlify.toml` with `publish = "dist/webapp"`

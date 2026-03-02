@@ -447,11 +447,45 @@ h1 .count {
 }
 
 .scanner_view {
+  position: relative;
   width: 100%;
   border-radius: var(--radius);
   overflow: hidden;
   background: #000;
   min-height: 200px;
+}
+
+.scanner_view_scanning::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(88%, var(--scanner_box_width, 280px));
+  height: min(62%, var(--scanner_box_height, 140px));
+  transform: translate(-50%, -50%);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.scanner_view_scanning::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(88%, var(--scanner_box_width, 280px));
+  height: min(62%, var(--scanner_box_height, 140px));
+  transform: translate(-50%, -50%);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+  z-index: 2;
+}
+
+#scanner-view #qr-shaded-region,
+#scanner-view #qr-shaded-region * {
+  display: none;
 }
 
 .scanner_view_idle {

@@ -19,6 +19,7 @@
   let scannerError = $state('');
   let isScanning = $state(false);
   let scannerViewKey = $state(0);
+  let scannerBoxStyle = $state('');
 
   let isbn13 = $state('');
   let isbn10 = $state('');
@@ -114,6 +115,13 @@
     scannerRef.querySelectorAll('video, canvas').forEach(el => el.remove());
   }
 
+  function computeScannerBox(viewfinderWidth: number, viewfinderHeight: number) {
+    const width = Math.max(160, Math.min(Math.floor(viewfinderWidth * 0.88), 340));
+    const height = Math.max(90, Math.min(Math.floor(viewfinderHeight * 0.54), 180));
+    scannerBoxStyle = `--scanner_box_width: ${width}px; --scanner_box_height: ${height}px;`;
+    return { width, height };
+  }
+
   async function startScanner() {
     if (!scannerRef || isScanning) return;
     scannerError = '';
@@ -127,7 +135,8 @@
         { facingMode: 'environment' },
         {
           fps: 10,
-          qrbox: { width: 250, height: 150 },
+          qrbox: (viewfinderWidth: number, viewfinderHeight: number) =>
+            computeScannerBox(viewfinderWidth, viewfinderHeight),
           formatsToSupport: [
             Html5QrcodeSupportedFormats.EAN_13,
             Html5QrcodeSupportedFormats.EAN_8,
@@ -160,6 +169,7 @@
     }
     killVideoTracks();
     isScanning = false;
+    scannerBoxStyle = '';
     // Force a clean scanner viewport so the idle CTA always returns.
     scannerViewKey += 1;
   }
@@ -191,7 +201,12 @@
 
 <div class="scanner_container">
   {#key scannerViewKey}
-    <div id="scanner-view" bind:this={scannerRef} class={isScanning ? 'scanner_view' : 'scanner_view_idle'}>
+    <div
+      id="scanner-view"
+      bind:this={scannerRef}
+      style={isScanning ? scannerBoxStyle : ''}
+      class={isScanning ? 'scanner_view scanner_view_scanning' : 'scanner_view_idle'}
+    >
       {#if !isScanning}
         <button class="btn btn_primary scanner_start_btn" onclick={startScanner}>
           Open Camera Scanner
