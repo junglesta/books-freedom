@@ -1,4 +1,4 @@
-const CACHE_NAME = "books-freedom-v4";
+const CACHE_NAME = "books-freedom-v6";
 const COVER_CACHE_NAME = "books-freedom-covers-v1";
 const COVER_IMAGE_HOSTS = new Set([
   "covers.openlibrary.org",

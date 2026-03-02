@@ -78,7 +78,7 @@
         <button type="button" class="splash splash_popover" onclick={maybeCloseSplash} aria-label="Close share splash">
             <div class="splash_share_content">
                 <img src={splashQrUrl} alt="QR code to share BOOK BAT" />
-                <p class="splash_share_url">https://bat.junglestar.org/</p>
+                <p class="splash_share_url">https://bat.junglestar.org</p>
             </div>
         </button>
     {:else if startupSplashPersistent}
@@ -119,7 +119,7 @@
                 <span>
                     it's an
                     <a
-                        href="https://github.com/junglesta/books-freedom"
+                        href="https://github.com/junglesta/bookbat"
                         target="_blank"
                         rel="noreferrer noopener"
                         >open source</a

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.0
+
+- Updated app footer open-source repo link to `https://github.com/junglesta/bookbat`
+- Updated local git remote `origin` to the renamed `bookbat` repository URL
+- Removed unused legacy asset `apps/webapp/src/assets/header-logo.svg`
+
 ## 0.6.0
 
 - Rebranded in-app/PWA surfaces to `BOOK BAT` and made the footer brand clickable to reopen the startup splash

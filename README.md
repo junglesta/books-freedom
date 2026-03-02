@@ -2,7 +2,7 @@
 
 
 <a href="https://bat.junglestar.org">
-  <img src="logo.svg" alt="Book Freedom" width="480">
+  <img src="apps/webapp/src/assets/startscreen.svg" alt="BOOK BAT" width="480">
 </a>
 
 
