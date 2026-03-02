@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.4
+
+- Updated export filenames to include current library title count (for example `MyBooks-55.json`)
+- Reduced global app-shell vertical padding/height pressure so footer actions are visible on first paint across views without unnecessary scroll
+- Re-ran preflight gates (format, lint, test, build) from workspace root with passing results
+
 ## 0.5.3
 
 - Fixed scanner helper overlay shape on mobile by replacing unstable library-drawn guide visuals with app-controlled viewfinder overlay rendering

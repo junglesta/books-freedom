@@ -2,11 +2,12 @@ import { render, screen } from "@testing-library/svelte";
 import userEvent from "@testing-library/user-event";
 import ExportPage from "./ExportPage.svelte";
 
-const { getBooks, getLibraryName, showToast, getRawCollection } = vi.hoisted(() => ({
+const { getBooks, getLibraryName, showToast, getRawCollection, downloadBlob } = vi.hoisted(() => ({
   getBooks: vi.fn(),
   getLibraryName: vi.fn(),
   showToast: vi.fn(),
   getRawCollection: vi.fn(),
+  downloadBlob: vi.fn(),
 }));
 
 vi.mock("../lib/stores.svelte", () => ({
@@ -23,7 +24,7 @@ vi.mock("../lib/export", () => ({
   generateCsv: vi.fn(() => "csv"),
   generateGoodreadsCsv: vi.fn(() => "gr"),
   generateLibraryThingTsv: vi.fn(() => "lt"),
-  downloadBlob: vi.fn(),
+  downloadBlob,
 }));
 
 function makeBook() {
@@ -86,5 +87,26 @@ describe("ExportPage", () => {
       expect.objectContaining({ method: "POST" }),
     );
     expect(showToast).toHaveBeenCalledWith("Exported 1 books to Google Sheets!");
+  });
+
+  it("prefixes exported filename with YYMMDD and includes title count", async () => {
+    const user = userEvent.setup();
+    const books = Array.from({ length: 55 }, (_, i) => ({ ...makeBook(), id: `b${i}` }));
+    getBooks.mockReturnValue(books);
+    getRawCollection.mockReturnValue({ version: 1, books });
+    getLibraryName.mockReturnValue("MyBooks");
+    const now = new Date();
+    const expectedPrefix = `${String(now.getFullYear()).slice(-2)}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
+
+    render(ExportPage);
+    await user.click(screen.getByRole("button", { name: /^JSON Raw book data$/i }));
+
+    await vi.waitFor(() => {
+      expect(downloadBlob).toHaveBeenCalledWith(
+        expect.any(String),
+        `${expectedPrefix}-mybooks-55.json`,
+        "application/json",
+      );
+    });
   });
 });

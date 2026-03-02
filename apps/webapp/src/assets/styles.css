@@ -60,6 +60,8 @@ body {
 /* ===== App Shell ===== */
 .app {
   min-height: 100vh;
+  min-height: 100svh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
 }
@@ -216,11 +218,11 @@ body {
 
 .page {
   flex: 1;
-  min-height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 16px;
-  padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 16px);
+  padding: 12px;
+  padding-bottom: calc(var(--nav-height) + var(--safe-bottom) + 8px);
   max-width: 600px;
   margin: 0 auto;
   width: 100%;
@@ -231,8 +233,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding-top: 24px;
-  padding-bottom: 8px;
+  padding-top: 16px;
+  padding-bottom: 6px;
   text-align: center;
   color: var(--text-muted);
   letter-spacing: 0.08em;
@@ -260,7 +262,7 @@ body {
 
 .footer_actions {
   width: 100%;
-  margin-top: 10px;
+  margin-top: 8px;
   padding-top: 2px;
   display: flex;
   justify-content: center;

@@ -92,7 +92,29 @@
         },
     ];
 
-    function download(formatId: string, filename: string) {
+    function toFilenameBase(name: string): string {
+        const normalized = name.trim().toLowerCase().replace(/\s+/g, "-");
+        const safe = normalized
+            .replace(/[^a-z0-9._-]/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/^-|-$/g, "");
+        return safe || "library";
+    }
+
+    function getDatePrefix(date = new Date()): string {
+        const yy = String(date.getFullYear()).slice(-2);
+        const mm = String(date.getMonth() + 1).padStart(2, "0");
+        const dd = String(date.getDate()).padStart(2, "0");
+        return `${yy}${mm}${dd}`;
+    }
+
+    function buildExportFilename(ext: string, totalBooks: number): string {
+        const base = toFilenameBase(getLibraryName());
+        const datePrefix = getDatePrefix();
+        return `${datePrefix}-${base}-${totalBooks}.${ext}`;
+    }
+
+    function download(formatId: string, ext: string) {
         if (cardState[formatId] === 'busy') return;
         cardState[formatId] = 'busy';
 
@@ -124,6 +146,7 @@
                     return;
             }
 
+            const filename = buildExportFilename(ext, collection.books.length);
             downloadBlob(content, filename, mimeType);
             cardState[formatId] = 'done';
             setTimeout(() => { cardState[formatId] = 'idle'; }, 1200);
@@ -195,7 +218,7 @@
                     onclick={() =>
                         download(
                             fmt.id,
-                            `${getLibraryName().toLowerCase().replace(/\s+/g, "-")}.${fmt.ext}`,
+                            fmt.ext,
                         )}
                     disabled={getBooks().length === 0 || cardState[fmt.id] === 'busy'}
                 >
