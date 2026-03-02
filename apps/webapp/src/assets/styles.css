@@ -260,6 +260,14 @@ body {
   text-decoration: none;
 }
 
+.app_brand_footer .app_brand_name_link {
+  color: var(--text);
+}
+
+.app_brand_footer .app_brand_name_link:hover {
+  text-decoration: underline;
+}
+
 .footer_actions {
   width: 100%;
   margin-top: 8px;

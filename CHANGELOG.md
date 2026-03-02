@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.6.0
+
+- Rebranded in-app/PWA surfaces to `BOOK BAT` and made the footer brand clickable to reopen the startup splash
+- Introduced `startscreen.svg` startup flow while keeping `readme.svg` behind `HELP`; startup/help/share overlays now use persistent tap-to-close behavior without timer and removed the close-circle on help/share
+- Updated canonical/share URL usage in the webapp to `https://bat.junglestar.org/` and kept startup splash scrollable for larger artwork
+- Re-ran preflight gates (format, lint, test, build) from workspace root with passing results
+
+## 0.5.5
+
+- Prefixed export filenames with current date in `YYMMDD` format and kept `<library-name>-<title-count>` suffix (example: `261225-next-xmas-book-gifts-99.json`)
+- Tightened global page/app spacing and viewport sizing to reduce unnecessary first-paint scrolling and keep footer actions visible on mobile
+- Re-ran preflight gates (format, lint, test, build) from workspace root with passing results
+
 ## 0.5.4
 
 - Updated export filenames to include current library title count (for example `MyBooks-55.json`)
@@ -59,7 +72,7 @@
 
 - Improved HELP splash behavior across aspect ratios by enabling full-screen vertical scrolling of `readme.svg` with hidden scrollbars
 - Added visible top-right circular `X` close control for HELP and SHARE splash overlays
-- Updated canonical/share URL usage to `https://bf.junglestar.org/` in app metadata, share splash text, and README logo link
+- Updated canonical/share URL usage to `https://bat.junglestar.org/` in app metadata, share splash text, and README logo link
 - Refined splash close interactions to avoid accidental close while scrolling help content
 
 ## 0.4.4
@@ -223,7 +236,7 @@
 - Export page: split subtitle and heading into separate elements
 - Netlify deploy config (netlify.toml)
 - README.md and LICENSE (CC BY-SA 4.0)
-- PWA updated: manifest, service worker, canonical URL (bf.junglestar.org)
+- PWA updated: manifest, service worker, canonical URL (bat.junglestar.org)
 - Dithered noise background on desktop (SVG feTurbulence filter)
 
 ## 0.1.0

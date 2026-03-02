@@ -6,64 +6,92 @@
     import LibraryPage from "./pages/LibraryPage.svelte";
     import ExportPage from "./pages/ExportPage.svelte";
     import { getRoute, loadBooks } from "./lib/stores.svelte";
-    import splashScreenUrl from "./assets/readme.svg";
+    import splashHelpUrl from "./assets/readme.svg";
+    import splashStartUrl from "./assets/startscreen.svg";
     import splashQrUrl from "./assets/splash-qr.svg";
     import { version } from "../package.json";
 
     let splashDone = $state(false);
     let splashMode = $state<"startup" | "help" | "share">("startup");
+    let startupSplashTimer: ReturnType<typeof setTimeout> | null = null;
+    let startupSplashPersistent = $state(false);
+
+    function clearStartupSplashTimer() {
+        if (startupSplashTimer) {
+            clearTimeout(startupSplashTimer);
+            startupSplashTimer = null;
+        }
+    }
+
+    function openStartupSplash(persistent = false) {
+        clearStartupSplashTimer();
+        startupSplashPersistent = persistent;
+        splashMode = "startup";
+        splashDone = false;
+        if (!persistent) {
+            startupSplashTimer = setTimeout(() => {
+                splashDone = true;
+                startupSplashTimer = null;
+            }, 1400);
+        }
+    }
 
     onMount(() => {
-        document.title = `Books Freedom v${version}`;
+        document.title = `BOOK BAT v${version}`;
         loadBooks();
-        setTimeout(() => {
-            splashDone = true;
-        }, 1400);
+        openStartupSplash();
+        return () => clearStartupSplashTimer();
     });
 
     function openHelpSplash() {
+        clearStartupSplashTimer();
+        startupSplashPersistent = false;
         splashMode = "help";
         splashDone = false;
     }
 
     function openShareSplash() {
+        clearStartupSplashTimer();
+        startupSplashPersistent = false;
         splashMode = "share";
         splashDone = false;
     }
 
     function maybeCloseSplash() {
-        if (splashMode !== "startup") {
+        if (splashMode !== "startup" || startupSplashPersistent) {
+            clearStartupSplashTimer();
+            startupSplashPersistent = false;
             splashDone = true;
         }
     }
 
-    function maybeCloseHelpSplash(event: MouseEvent) {
-        const target = event.target as HTMLElement | null;
-        if (event.target === event.currentTarget || target?.closest(".splash_close")) {
-            maybeCloseSplash();
-        }
-    }
 </script>
 
 {#if !splashDone}
     {#if splashMode === "help"}
-        <button type="button" class="splash splash_popover splash_help" onclick={maybeCloseHelpSplash} aria-label="Close splash screen">
-            <span class="splash_close" aria-hidden="true">×</span>
+        <button type="button" class="splash splash_popover splash_help" onclick={maybeCloseSplash} aria-label="Close splash screen">
             <div class="splash_help_scroll">
-                <img class="splash_help_image" src={splashScreenUrl} alt="Book's Freedom splash screen" />
+                <img class="splash_help_image" src={splashHelpUrl} alt="BOOK BAT readme screen" />
             </div>
         </button>
     {:else if splashMode === "share"}
         <button type="button" class="splash splash_popover" onclick={maybeCloseSplash} aria-label="Close share splash">
-            <span class="splash_close" aria-hidden="true">×</span>
             <div class="splash_share_content">
-                <img src={splashQrUrl} alt="QR code to share Book's Freedom" />
-                <p class="splash_share_url">https://bf.junglestar.org/</p>
+                <img src={splashQrUrl} alt="QR code to share BOOK BAT" />
+                <p class="splash_share_url">https://bat.junglestar.org/</p>
+            </div>
+        </button>
+    {:else if startupSplashPersistent}
+        <button type="button" class="splash splash_popover splash_help splash_startup" onclick={maybeCloseSplash} aria-label="Close start screen">
+            <div class="splash_help_scroll">
+                <img class="splash_help_image" src={splashStartUrl} alt="BOOK BAT start screen" />
             </div>
         </button>
     {:else}
-        <div class="splash splash_startup">
-            <img class="splash_logo" src={splashScreenUrl} alt="Book's Freedom splash screen" />
+        <div class="splash splash_startup splash_help">
+            <div class="splash_help_scroll">
+                <img class="splash_help_image" src={splashStartUrl} alt="BOOK BAT start screen" />
+            </div>
         </div>
     {/if}
 {:else}
@@ -80,7 +108,12 @@
             {/if}
             <footer class="app_brand_footer">
                 <span>
-                    book's freedom
+                    <a href="#/" class="app_brand_name_link" onclick={(event) => {
+                        event.preventDefault();
+                        openStartupSplash(true);
+                    }}>
+                        BOOK BAT
+                    </a>
                     <span class="app_brand_version">v{version}</span>
                 </span>
                 <span>
