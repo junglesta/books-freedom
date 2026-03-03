@@ -122,6 +122,12 @@
     return { width, height };
   }
 
+  function isFirefoxBrowser(): boolean {
+    if (typeof navigator === 'undefined') return false;
+    const userAgent = navigator.userAgent.toLowerCase();
+    return userAgent.includes('firefox') || userAgent.includes('fxios');
+  }
+
   async function startScanner() {
     if (!scannerRef || isScanning) return;
     scannerError = '';
@@ -129,7 +135,10 @@
 
     try {
       const { Html5Qrcode, Html5QrcodeSupportedFormats } = await import('html5-qrcode');
-      scanner = new Html5Qrcode(scannerRef.id);
+      scanner = new Html5Qrcode(scannerRef.id, {
+        // Firefox can report BarcodeDetector support while decoding remains unreliable.
+        useBarCodeDetectorIfSupported: !isFirefoxBrowser(),
+      });
 
       await scanner.start(
         { facingMode: 'environment' },

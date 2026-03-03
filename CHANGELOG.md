@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.3
+
+- Added Firefox-specific scanner fallback by disabling native `BarcodeDetector` usage in `Scanner.svelte` when Firefox is detected
+- Updated webapp toolchain dependencies (`@biomejs/biome` and `vite`) and refreshed lockfile
+- Fixed `.app` viewport height fallback declarations using `@supports` blocks for `svh`/`dvh` to satisfy lint rules
+
 ## 0.7.2
 
 - Added BAOBAB Astro display component configuration defaults in `apps/astro-site/src/config/bookbat-client.config.ts` with toggles for header/footer, export feature/options, load placeholder, and unstyled mode

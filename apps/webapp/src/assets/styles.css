@@ -60,10 +60,20 @@ body {
 /* ===== App Shell ===== */
 .app {
   min-height: 100vh;
-  min-height: 100svh;
-  min-height: 100dvh;
   display: flex;
   flex-direction: column;
+}
+
+@supports (min-height: 100svh) {
+  .app {
+    min-height: 100svh;
+  }
+}
+
+@supports (min-height: 100dvh) {
+  .app {
+    min-height: 100dvh;
+  }
 }
 
 /* ===== Splash Screen ===== */
