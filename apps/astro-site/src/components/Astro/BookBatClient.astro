@@ -68,6 +68,10 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
             No books match your filters.
         </p>
     </section>
+    <section class="bfc_export_wrap">
+        <div class="bfc_export_slot" data-bfc-export-slot></div>
+    </section>
+
     <footer
         class="bfc_footer"
         data-bfc-footer
@@ -609,6 +613,8 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
         const countNode = root.querySelector("[data-bfc-count]");
         const listNode = root.querySelector("[data-bfc-list]");
         const emptyNode = root.querySelector("[data-bfc-empty]");
+        const exportWrapNode = root.querySelector(".bfc_export_wrap");
+        const exportSlotNode = root.querySelector("[data-bfc-export-slot]");
         const headerNode = root.querySelector("[data-bfc-header]");
         const footerNode = root.querySelector("[data-bfc-footer]");
         const libraryName = root.dataset.heading || "library";
@@ -724,7 +730,10 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
             const exportCardHtml = viewConfig.features.export.enabled
                 ? renderExportCard(viewConfig.features.export.options)
                 : "";
-            listNode.innerHTML = cardsHtml + exportCardHtml;
+            listNode.innerHTML = cardsHtml;
+            if (exportSlotNode) exportSlotNode.innerHTML = exportCardHtml;
+            if (exportWrapNode)
+                exportWrapNode.hidden = !Boolean(exportCardHtml);
 
             listNode.querySelectorAll("[data-bfc-cover]").forEach((img) => {
                 const coverWrap = img.closest(".bfc_cover_wrap");
@@ -1018,9 +1027,24 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
         line-height: 1.35;
     }
 
-    .bfc_export {
-        width: 100%;
+    .bfc_export_wrap {
+        margin-top: var(--padding);
+        padding: var(--padding);
+        border-radius: var(--radius);
+        background-color: var(--bg-body);
+    }
+
+    .bfc_export_slot {
         margin: 0;
+    }
+
+    .bfc_export_slot:empty {
+        display: none;
+    }
+
+    .bfc_export {
+        width: min(100%, 420px);
+        margin: 0 auto;
         display: block;
     }
 

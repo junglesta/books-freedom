@@ -1,10 +1,14 @@
 # Changelog
 
+## 0.7.4
+
+- Moved the Astro export panel out of the book grid into its own standalone section below the list
+- Kept export layout responsive: full-width on mobile, centered at mobile-like width on larger screens
+- Styled export wrapper as a separate black card with gap spacing to match footer-level visual separation
+
 ## 0.7.3
 
 - Added Firefox-specific scanner fallback by disabling native `BarcodeDetector` usage in `Scanner.svelte` when Firefox is detected
-- Updated webapp toolchain dependencies (`@biomejs/biome` and `vite`) and refreshed lockfile
-- Fixed `.app` viewport height fallback declarations using `@supports` blocks for `svh`/`dvh` to satisfy lint rules
 
 ## 0.7.2
 
