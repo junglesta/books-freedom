@@ -29,6 +29,15 @@ a dead-simple book library app. point your camera at a barcode, get the book inf
 
 everything stays on your device in localStorage. nothing leaves the browser.
 
+## NAMING
+
+`BOOK BAT` and `BAOBAB` are one ecosystem.
+
+- `BOOK BAT` is the active app layer: scan, edit, organize, export.
+- `BAOBAB` is the companion client layer: a rooted, durable view of your library data.
+
+They are designed as a symbiotic relationship: BOOK BAT produces and curates your data, BAOBAB presents and extends it across static/client surfaces.
+
 
 
 ## STACK

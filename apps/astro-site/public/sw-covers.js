@@ -1,9 +1,12 @@
-const CACHE_NAME = 'book-freeddom-thumb-cache-v1';
-const COVER_HOSTS = new Set(['covers.openlibrary.org']);
+const CACHE_NAME = "book-freedom-thumb-cache-v2";
+const COVER_HOSTS = new Set([
+  "covers.openlibrary.org",
+  "books.google.com",
+  "books.googleusercontent.com",
+]);
 
 function isThumbRequest(request) {
-  if (request.method !== 'GET') return false;
-  if (request.destination !== 'image') return false;
+  if (request.method !== "GET") return false;
   try {
     const url = new URL(request.url);
     return COVER_HOSTS.has(url.hostname);
@@ -12,15 +15,26 @@ function isThumbRequest(request) {
   }
 }
 
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
   event.waitUntil(self.skipWaiting());
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => key.startsWith("book-freedom-thumb-cache-") && key !== CACHE_NAME)
+            .map((key) => caches.delete(key)),
+        ),
+      )
+      .then(() => self.clients.claim()),
+  );
 });
 
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   if (!isThumbRequest(event.request)) return;
 
   event.respondWith(
@@ -29,7 +43,7 @@ self.addEventListener('fetch', (event) => {
       if (cached) return cached;
 
       const response = await fetch(event.request);
-      if (response.ok) {
+      if (response && (response.type === "opaque" || response.ok)) {
         cache.put(event.request, response.clone());
       }
       return response;

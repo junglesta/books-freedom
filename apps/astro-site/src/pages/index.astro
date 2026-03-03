@@ -1,25 +1,243 @@
 ---
-import { parseLibraryPayload } from '@bookbat/library-core';
-import BookBatClient from '../components/Astro/BookBatClient.astro';
-import library from '../data/library.json';
+import { parseLibraryPayload } from "@bookbat/library-core";
+import BookBatClient from "../components/Astro/BookBatClient.astro";
+import { defaultBookBatClientConfig } from "../config/bookbat-client.config";
+import library from "../data/library.json";
 
 const books = parseLibraryPayload(library);
+const bookBatClientConfig = {
+    ...defaultBookBatClientConfig,
+};
+const encodedPreviewDefaults = encodeURIComponent(
+    JSON.stringify(bookBatClientConfig),
+);
 ---
 
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <meta name="generator" content={Astro.generator} />
-    <title>BOOK BAT | Library</title>
-  </head>
-  <body>
-    <BookBatClient books={books} />
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw-covers.js').catch(() => undefined);
-      }
-    </script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="generator" content={Astro.generator} />
+    <title>BAOBAB | Library Display Astro Component</title>
+        <style>
+            body {
+                background-color: #ccff00;
+            }
+            .preview-panel {
+                max-width: 980px;
+                margin: 12px auto 8px;
+                padding: 12px 14px;
+                border: 1px solid #cfd5cb;
+                border-radius: 8px;
+                font-family:
+                    "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo,
+                    Monaco, Consolas, monospace;
+                color: #182118;
+                background: rgba(255, 255, 255, 0.75);
+            }
+
+            .preview-panel summary {
+                cursor: pointer;
+                font-weight: 600;
+            }
+
+            .preview-grid {
+                margin-top: 10px;
+                display: grid;
+                gap: 8px;
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            }
+
+            .preview-option {
+                display: flex;
+                gap: 8px;
+                align-items: center;
+                font-size: 14px;
+            }
+
+            .preview-note {
+                margin-top: 10px;
+                font-size: 12px;
+                color: #4a544a;
+            }
+        </style>
+    </head>
+    <body>
+        <details class="preview-panel" open>
+            <summary>Component Preview Controls (Page-Level)</summary>
+            <form
+                data-bfc-preview
+                data-bfc-preview-defaults={encodedPreviewDefaults}
+            >
+                <div class="preview-grid">
+                    <label class="preview-option">
+                        <input
+                            type="checkbox"
+                            name="showHeader"
+                            checked={bookBatClientConfig.showHeader}
+                        />
+                        <span>Show header</span>
+                    </label>
+                    <label class="preview-option">
+                        <input
+                            type="checkbox"
+                            name="showFooter"
+                            checked={bookBatClientConfig.showFooter}
+                        />
+                        <span>Show footer</span>
+                    </label>
+                    <label class="preview-option">
+                        <input
+                            type="checkbox"
+                            name="unstyled"
+                            checked={bookBatClientConfig.unstyled}
+                        />
+                        <span>Unstyled mode</span>
+                    </label>
+                    <label class="preview-option">
+                        <input
+                            type="checkbox"
+                            name="exportEnabled"
+                            checked={bookBatClientConfig.features.export
+                                .enabled}
+                        />
+                        <span>Export section enabled</span>
+                    </label>
+                    <label class="preview-option">
+                        <input
+                            type="checkbox"
+                            name="exportJson"
+                            checked={bookBatClientConfig.features.export.options
+                                .json}
+                        />
+                        <span>Export JSON</span>
+                    </label>
+                    <label class="preview-option">
+                        <input
+                            type="checkbox"
+                            name="exportCsv"
+                            checked={bookBatClientConfig.features.export.options
+                                .csv}
+                        />
+                        <span>Export CSV</span>
+                    </label>
+                    <label class="preview-option">
+                        <input
+                            type="checkbox"
+                            name="exportGoodreads"
+                            checked={bookBatClientConfig.features.export.options
+                                .goodreads}
+                        />
+                        <span>Export Goodreads</span>
+                    </label>
+                    <label class="preview-option">
+                        <input
+                            type="checkbox"
+                            name="exportLibraryThing"
+                            checked={bookBatClientConfig.features.export.options
+                                .librarything}
+                        />
+                        <span>Export LibraryThing</span>
+                    </label>
+                    <label class="preview-option">
+                        <input
+                            type="checkbox"
+                            name="loadEnabled"
+                            checked={bookBatClientConfig.features.load.enabled}
+                        />
+                        <span>Load feature enabled (placeholder)</span>
+                    </label>
+                </div>
+                <p class="preview-note">
+                    This panel is a simulator for runtime rendering states only.
+                    Real defaults live in
+                    <code
+                        >apps/astro-site/src/config/bookbat-client.config.ts</code
+                    > and are passed from
+                    <code>apps/astro-site/src/pages/index.astro</code> through
+                    <code
+                        >&lt;BookBatClient
+                        config=&#123;bookBatClientConfig&#125; /&gt;</code
+                    >. If you reuse this component in another Astro site, import
+                    <code>defaultBookBatClientConfig</code>, override only what
+                    you need, and pass
+                    <code>config</code>; omitted fields automatically fall back
+                    to built-in defaults (header/footer on, export on with all
+                    formats, load off, styled mode on).
+                </p>
+            </form>
+        </details>
+        <BookBatClient books={books} config={bookBatClientConfig} />
+        <script>
+            const previewForm = document.querySelector("[data-bfc-preview]");
+            const clientRoot = document.querySelector("[data-bfc]");
+
+            function checkboxState(form, name) {
+                const input = form?.querySelector(`input[name="${name}"]`);
+                return Boolean(input?.checked);
+            }
+
+            function pushPreviewConfig() {
+                if (!previewForm || !clientRoot) return;
+
+                clientRoot.dispatchEvent(
+                    new CustomEvent("bfc:config", {
+                        detail: {
+                            showHeader: checkboxState(
+                                previewForm,
+                                "showHeader",
+                            ),
+                            showFooter: checkboxState(
+                                previewForm,
+                                "showFooter",
+                            ),
+                            unstyled: checkboxState(previewForm, "unstyled"),
+                            features: {
+                                export: {
+                                    enabled: checkboxState(
+                                        previewForm,
+                                        "exportEnabled",
+                                    ),
+                                    options: {
+                                        json: checkboxState(
+                                            previewForm,
+                                            "exportJson",
+                                        ),
+                                        csv: checkboxState(
+                                            previewForm,
+                                            "exportCsv",
+                                        ),
+                                        goodreads: checkboxState(
+                                            previewForm,
+                                            "exportGoodreads",
+                                        ),
+                                        librarything: checkboxState(
+                                            previewForm,
+                                            "exportLibraryThing",
+                                        ),
+                                    },
+                                },
+                                load: {
+                                    enabled: checkboxState(
+                                        previewForm,
+                                        "loadEnabled",
+                                    ),
+                                },
+                            },
+                        },
+                    }),
+                );
+            }
+
+            previewForm?.addEventListener("change", pushPreviewConfig);
+            pushPreviewConfig();
+
+            if ("serviceWorker" in navigator) {
+                navigator.serviceWorker
+                    .register("/sw-covers.js")
+                    .catch(() => undefined);
+            }
+        </script>
+    </body>
 </html>

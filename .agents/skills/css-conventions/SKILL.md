@@ -37,3 +37,5 @@ Use `snake_case` class names to match existing codebase patterns.
 3. **Mobile-first responsive rules**
 4. **No `!important` unless unavoidable**
 5. **No SCSS/LESS; plain CSS only**
+6. **Prefer using or re-styling with `var()`**. Extract 'vars' from existing CSS when asked to refactor.
+7. **Use the least number of `var()s` possible**. Reduce them by expressing other `var()s` using `calc()` where possible.

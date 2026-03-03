@@ -1,178 +1,712 @@
 ---
-import type { LibraryBook } from '@bookbat/library-core';
+import type { LibraryBook } from "@bookbat/library-core";
+import {
+    resolveBookBatClientConfig,
+    type BookBatClientConfigOverride,
+} from "../../config/bookbat-client.config";
 
 interface Props {
-  books?: LibraryBook[];
-  dataUrl?: string;
-  heading?: string;
+    books?: LibraryBook[];
+    dataUrl?: string;
+    heading?: string;
+    config?: BookBatClientConfigOverride;
 }
 
-const { books = [], dataUrl = '', heading = 'BOOK BAT CLIENT' } = Astro.props;
+const {
+    books = [],
+    dataUrl = "",
+    heading = "BAOBAB",
+    config = {},
+} = Astro.props;
+const resolvedConfig = resolveBookBatClientConfig(config);
 const encodedBooks = encodeURIComponent(JSON.stringify(books));
+const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
 ---
 
-<section class="bfc" data-bfc data-books={encodedBooks} data-data-url={dataUrl}>
-  <header class="bfc_header">
-    <h1>{heading}</h1>
-    <p class="bfc_subtitle">Drop JSON in <code>data/library.json</code> (workspace root) or pass <code>dataUrl</code>.</p>
-  </header>
+<div
+    class="bfc"
+    data-bfc
+    data-books={encodedBooks}
+    data-data-url={dataUrl}
+    data-heading={heading}
+    data-config={encodedConfig}
+>
+    <section class="bfc_body">
+        <header
+            class="bfc_header"
+            data-bfc-header
+            hidden={!resolvedConfig.showHeader}
+        >
+            <h1>{heading}</h1>
+        </header>
+        <hr />
 
-  <div class="bfc_controls">
-    <label class="bfc_control">
-      <span>Search</span>
-      <input type="search" data-bfc-search placeholder="title, author, isbn..." />
-    </label>
-    <label class="bfc_control">
-      <span>Sort</span>
-      <select data-bfc-sort>
-        <option value="title-asc">Title A-Z</option>
-        <option value="title-desc">Title Z-A</option>
-        <option value="author-asc">Author A-Z</option>
-        <option value="year-desc">Year Newest</option>
-        <option value="year-asc">Year Oldest</option>
-      </select>
-    </label>
-    <button type="button" class="bfc_download" data-bfc-download>
-      Download `library.json`
-    </button>
-  </div>
+        <div class="bfc_controls">
+            <label class="bfc_control bfc_control--search">
+                <span>Search</span>
+                <input
+                    type="search"
+                    data-bfc-search
+                    placeholder="title, author, isbn..."
+                />
+            </label>
+            <label class="bfc_control">
+                <span>Sort</span>
+                <select data-bfc-sort>
+                    <option value="title-asc">Title A-Z</option>
+                    <option value="title-desc">Title Z-A</option>
+                    <option value="author-asc">Author A-Z</option>
+                    <option value="year-desc">Year Newest</option>
+                    <option value="year-asc">Year Oldest</option>
+                </select>
+            </label>
+        </div>
 
-  <p class="bfc_count" data-bfc-count>0 titles</p>
-  <div class="bfc_list" data-bfc-list></div>
-  <p class="bfc_empty" data-bfc-empty hidden>No books match your filters.</p>
-</section>
+        <p class="bfc_count" data-bfc-count>0 titles</p>
+        <div class="bfc_list" data-bfc-list></div>
+        <p class="bfc_empty" data-bfc-empty hidden>
+            No books match your filters.
+        </p>
+    </section>
+    <footer
+        class="bfc_footer"
+        data-bfc-footer
+        hidden={!resolvedConfig.showFooter}
+    >
+        <span class="bfc_footer_intro">
+            <a
+                class="bfc_link"
+                href="https://bat.junglestar.org"
+                target="_blank"
+                rel="noreferrer noopener">BOOK BAT App</a
+            >
+            · Drop JSON in <code>data/library.json</code> (workspace root) or pass
+            <code>dataUrl</code>.
+        </span>
+        <span>
+            <a
+                class="bfc_link"
+                href="https://github.com/junglesta/bookbat"
+                target="_blank"
+                rel="noreferrer noopener">Book Bat Client</a
+            >
+        </span>
+        <span>
+            Licensed under
+            <a
+                class="bfc_link"
+                href="https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+                target="_blank"
+                rel="noreferrer noopener">CC BY-SA 4.0</a
+            >
+        </span>
+    </footer>
+</div>
 
 <script is:inline>
-  const statusLabel = {
-    "to-read": "To Read",
-    reading: "Reading",
-    read: "Read",
-  };
+    const statusLabel = {
+        "to-read": "To Read",
+        reading: "Reading",
+        read: "Read",
+    };
 
-  const sorters = {
-    "title-asc": (a, b) => (a.title || "").localeCompare(b.title || ""),
-    "title-desc": (a, b) => (b.title || "").localeCompare(a.title || ""),
-    "author-asc": (a, b) => (a.authors?.[0] || "").localeCompare(b.authors?.[0] || ""),
-    "year-desc": (a, b) => (b.publishYear || 0) - (a.publishYear || 0),
-    "year-asc": (a, b) => (a.publishYear || 0) - (b.publishYear || 0),
-  };
+    const sorters = {
+        "title-asc": (a, b) => (a.title || "").localeCompare(b.title || ""),
+        "title-desc": (a, b) => (b.title || "").localeCompare(a.title || ""),
+        "author-asc": (a, b) =>
+            (a.authors?.[0] || "").localeCompare(b.authors?.[0] || ""),
+        "year-desc": (a, b) => (b.publishYear || 0) - (a.publishYear || 0),
+        "year-asc": (a, b) => (a.publishYear || 0) - (b.publishYear || 0),
+    };
+    const FORMULA_PREFIX_RE = /^[\t\r\n ]*[=+\-@]/;
+    const PREFETCH_LIMIT = 120;
+    const prefetchedCoverUrls = new Set();
+    const defaultClientConfig = {
+        showHeader: true,
+        showFooter: true,
+        unstyled: false,
+        features: {
+            export: {
+                enabled: true,
+                options: {
+                    json: true,
+                    csv: true,
+                    goodreads: true,
+                    librarything: true,
+                },
+            },
+            load: {
+                enabled: false,
+            },
+        },
+    };
+    const exportFormats = {
+        json: { label: "JSON", ext: "json", mimeType: "application/json" },
+        csv: { label: "CSV", ext: "csv", mimeType: "text/csv" },
+        goodreads: { label: "Goodreads", ext: "csv", mimeType: "text/csv" },
+        librarything: {
+            label: "LibraryThing",
+            ext: "tsv",
+            mimeType: "text/tab-separated-values",
+        },
+    };
+    const exportOptionMeta = {
+        json: {
+            buttonLabel: "JSON",
+            description: "Raw book data",
+            help: [
+                "Downloads your full library as a .json file.",
+                "Best format for backup and re-import.",
+                "Includes all metadata, notes, and tags.",
+            ],
+        },
+        csv: {
+            buttonLabel: "CSV",
+            description: "Spreadsheet format",
+            help: [
+                "Compatible with Excel, Google Sheets, and Numbers.",
+                "Includes detailed columns for library management.",
+                "Authors and tags are exported in delimited form.",
+            ],
+        },
+        goodreads: {
+            buttonLabel: "Goodreads",
+            description: "Goodreads CSV",
+            help: [
+                "Formatted for Goodreads import workflow.",
+                "Status is mapped to Goodreads shelves.",
+                "Dates and ISBN fields follow Goodreads expectations.",
+            ],
+        },
+        librarything: {
+            buttonLabel: "LibraryThing",
+            description: "LibraryThing TSV",
+            help: [
+                "Exports a tab-separated .tsv file.",
+                "Designed for LibraryThing import mapping.",
+                "Includes title, author, ISBN, rating, tags, and review fields.",
+            ],
+        },
+    };
 
-  function safeParseBooks(raw) {
-    try {
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed)) return [];
-      return parsed.filter(
-        (book) =>
-          book &&
-          typeof book === "object" &&
-          typeof book.id === "string" &&
-          typeof book.title === "string" &&
-          typeof book.isbn13 === "string" &&
-          Array.isArray(book.authors),
-      );
-    } catch {
-      return [];
+    function safeParseClientConfig(raw) {
+        try {
+            const parsed = JSON.parse(raw || "{}");
+            const rawFeatures = parsed?.features || {};
+            const rawExport = rawFeatures.export || {};
+            const rawOptions = rawExport.options || {};
+            const rawLoad = rawFeatures.load || {};
+            return {
+                showHeader:
+                    parsed?.showHeader ?? defaultClientConfig.showHeader,
+                showFooter:
+                    parsed?.showFooter ?? defaultClientConfig.showFooter,
+                unstyled: parsed?.unstyled ?? defaultClientConfig.unstyled,
+                features: {
+                    export: {
+                        enabled:
+                            rawExport.enabled ??
+                            defaultClientConfig.features.export.enabled,
+                        options: {
+                            json:
+                                rawOptions.json ??
+                                defaultClientConfig.features.export.options
+                                    .json,
+                            csv:
+                                rawOptions.csv ??
+                                defaultClientConfig.features.export.options.csv,
+                            goodreads:
+                                rawOptions.goodreads ??
+                                defaultClientConfig.features.export.options
+                                    .goodreads,
+                            librarything:
+                                rawOptions.librarything ??
+                                defaultClientConfig.features.export.options
+                                    .librarything,
+                        },
+                    },
+                    load: {
+                        enabled:
+                            rawLoad.enabled ??
+                            defaultClientConfig.features.load.enabled,
+                    },
+                },
+            };
+        } catch {
+            return defaultClientConfig;
+        }
     }
-  }
 
-  function escapeHtml(value) {
-    return String(value)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
-  function coverUrl(book) {
-    if (book.coverUrl && book.coverUrl.startsWith("https://")) return book.coverUrl;
-    return `https://covers.openlibrary.org/b/isbn/${encodeURIComponent(book.isbn13)}-M.jpg?default=false`;
-  }
-
-  function statusChip(book) {
-    const status = book.status || "to-read";
-    const rating = Number.isFinite(book.rating) ? " " + "★".repeat(Math.max(0, Number(book.rating))) : "";
-    const year = book.publishYear ? ` ${book.publishYear}` : "";
-    return `${statusLabel[status] || "To Read"}${rating}${year}`;
-  }
-
-  function matchesQuery(book, query) {
-    if (!query) return true;
-    const haystack = [
-      book.title || "",
-      (book.authors || []).join(" "),
-      book.isbn13 || "",
-      book.publisher || "",
-      (book.tags || []).join(" "),
-    ]
-      .join(" ")
-      .toLowerCase();
-    return haystack.includes(query);
-  }
-
-  async function loadFromUrl(url) {
-    try {
-      const response = await fetch(url, { headers: { Accept: "application/json" } });
-      if (!response.ok) return [];
-      const payload = await response.json();
-      if (Array.isArray(payload)) return payload;
-      if (payload && Array.isArray(payload.books)) return payload.books;
-      return [];
-    } catch {
-      return [];
-    }
-  }
-
-  function mount(root) {
-    const searchInput = root.querySelector("[data-bfc-search]");
-    const sortInput = root.querySelector("[data-bfc-sort]");
-    const countNode = root.querySelector("[data-bfc-count]");
-    const listNode = root.querySelector("[data-bfc-list]");
-    const emptyNode = root.querySelector("[data-bfc-empty]");
-    const downloadButton = root.querySelector("[data-bfc-download]");
-
-    let books = safeParseBooks(decodeURIComponent(root.dataset.books || "[]"));
-    let query = "";
-    let sort = "title-asc";
-
-    async function hydrateFromUrlIfNeeded() {
-      const url = (root.dataset.dataUrl || "").trim();
-      if (books.length > 0 || !url) return;
-      books = await loadFromUrl(url);
-      render();
+    function mergeClientConfig(baseConfig, patchConfig = {}) {
+        return safeParseClientConfig(
+            JSON.stringify({
+                ...baseConfig,
+                ...patchConfig,
+                features: {
+                    ...baseConfig.features,
+                    ...patchConfig.features,
+                    export: {
+                        ...baseConfig.features.export,
+                        ...patchConfig.features?.export,
+                        options: {
+                            ...baseConfig.features.export.options,
+                            ...patchConfig.features?.export?.options,
+                        },
+                    },
+                    load: {
+                        ...baseConfig.features.load,
+                        ...patchConfig.features?.load,
+                    },
+                },
+            }),
+        );
     }
 
-    function render() {
-      const sorter = sorters[sort] || sorters["title-asc"];
-      const filtered = books
-        .filter((book) => matchesQuery(book, query))
-        .sort(sorter);
+    function safeParseBooks(raw) {
+        try {
+            const parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed)) return [];
+            return parsed.filter(
+                (book) =>
+                    book &&
+                    typeof book === "object" &&
+                    typeof book.id === "string" &&
+                    typeof book.title === "string" &&
+                    typeof book.isbn13 === "string" &&
+                    Array.isArray(book.authors),
+            );
+        } catch {
+            return [];
+        }
+    }
 
-      countNode.textContent = `${filtered.length} title${filtered.length === 1 ? "" : "s"}`;
-      emptyNode.hidden = filtered.length > 0;
-      listNode.innerHTML = filtered
-        .map((book) => {
-          const title = escapeHtml(book.title || "");
-          const authors = escapeHtml((book.authors || []).join(", "));
-          const publisher = book.publisher ? escapeHtml(book.publisher) : "";
-          const year = book.publishYear ? escapeHtml(book.publishYear) : "";
-          const pages = book.pageCount ? `${escapeHtml(book.pageCount)} pages` : "";
-          const notes = book.notes ? escapeHtml(book.notes) : "";
-          const tags = Array.isArray(book.tags) ? book.tags.map((tag) => escapeHtml(tag)).join(", ") : "";
-          const language = book.language ? escapeHtml(book.language) : "";
-          const isbn13 = escapeHtml(book.isbn13 || "");
-          const cover = escapeHtml(coverUrl(book));
-          const chip = escapeHtml(statusChip(book));
+    function escapeHtml(value) {
+        return String(value)
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
 
-          return `
+    function coverUrl(book) {
+        if (book.coverUrl && book.coverUrl.startsWith("https://"))
+            return book.coverUrl;
+        return `https://covers.openlibrary.org/b/isbn/${encodeURIComponent(book.isbn13)}-M.jpg?default=false`;
+    }
+
+    function statusChip(book) {
+        const status = book.status || "to-read";
+        const rating = Number.isFinite(book.rating)
+            ? " " + "★".repeat(Math.max(0, Number(book.rating)))
+            : "";
+        const year = book.publishYear ? ` ${book.publishYear}` : "";
+        return `${statusLabel[status] || "To Read"}${rating}${year}`;
+    }
+
+    function matchesQuery(book, query) {
+        if (!query) return true;
+        const haystack = [
+            book.title || "",
+            (book.authors || []).join(" "),
+            book.isbn13 || "",
+            book.publisher || "",
+            (book.tags || []).join(" "),
+        ]
+            .join(" ")
+            .toLowerCase();
+        return haystack.includes(query);
+    }
+
+    async function loadFromUrl(url) {
+        try {
+            const response = await fetch(url, {
+                headers: { Accept: "application/json" },
+            });
+            if (!response.ok) return [];
+            const payload = await response.json();
+            if (Array.isArray(payload)) return payload;
+            if (payload && Array.isArray(payload.books)) return payload.books;
+            return [];
+        } catch {
+            return [];
+        }
+    }
+
+    function sanitizeSpreadsheetValue(value) {
+        const safe = String(value ?? "");
+        if (FORMULA_PREFIX_RE.test(safe)) return `'${safe}`;
+        return safe;
+    }
+
+    function escapeCsv(value) {
+        const safe = String(value ?? "");
+        if (safe.includes(",") || safe.includes('"') || safe.includes("\n")) {
+            return `"${safe.replace(/"/g, '""')}"`;
+        }
+        return safe;
+    }
+
+    function formatGoodreadsDate(isoDate) {
+        if (!isoDate) return "";
+        const parsed = new Date(isoDate);
+        if (Number.isNaN(parsed.getTime())) return "";
+        const yyyy = parsed.getFullYear();
+        const mm = String(parsed.getMonth() + 1).padStart(2, "0");
+        const dd = String(parsed.getDate()).padStart(2, "0");
+        return `${yyyy}/${mm}/${dd}`;
+    }
+
+    function generateCsv(booksToExport) {
+        const headers = [
+            "Title",
+            "Authors",
+            "ISBN-13",
+            "ISBN-10",
+            "Publisher",
+            "Publish Date",
+            "Year",
+            "Pages",
+            "Language",
+            "Status",
+            "Rating",
+            "Date Added",
+            "Date Read",
+            "Tags",
+            "Notes",
+        ];
+
+        const rows = booksToExport.map((book) => [
+            escapeCsv(sanitizeSpreadsheetValue(book.title)),
+            escapeCsv(
+                sanitizeSpreadsheetValue((book.authors || []).join("; ")),
+            ),
+            book.isbn13 || "",
+            book.isbn10 || "",
+            escapeCsv(sanitizeSpreadsheetValue(book.publisher || "")),
+            escapeCsv(sanitizeSpreadsheetValue(book.publishDate || "")),
+            book.publishYear?.toString() || "",
+            book.pageCount?.toString() || "",
+            sanitizeSpreadsheetValue(book.language || ""),
+            book.status || "to-read",
+            book.rating?.toString() || "",
+            book.dateAdded || "",
+            book.dateRead || "",
+            escapeCsv(sanitizeSpreadsheetValue((book.tags || []).join("; "))),
+            escapeCsv(sanitizeSpreadsheetValue(book.notes || "")),
+        ]);
+
+        return [headers.join(","), ...rows.map((row) => row.join(","))].join(
+            "\n",
+        );
+    }
+
+    function generateGoodreadsCsv(booksToExport) {
+        const headers = [
+            "Title",
+            "Author",
+            "ISBN",
+            "ISBN13",
+            "My Rating",
+            "Number of Pages",
+            "Year Published",
+            "Date Read",
+            "Date Added",
+            "Exclusive Shelf",
+            "My Review",
+        ];
+        const shelfMap = {
+            "to-read": "to-read",
+            reading: "currently-reading",
+            read: "read",
+        };
+
+        const rows = booksToExport.map((book) => [
+            escapeCsv(sanitizeSpreadsheetValue(book.title)),
+            escapeCsv(sanitizeSpreadsheetValue((book.authors || [])[0] || "")),
+            `="${book.isbn10 || ""}"`,
+            `="${book.isbn13 || ""}"`,
+            book.rating?.toString() || "0",
+            book.pageCount?.toString() || "",
+            book.publishYear?.toString() || "",
+            book.dateRead ? formatGoodreadsDate(book.dateRead) : "",
+            formatGoodreadsDate(book.dateAdded),
+            shelfMap[book.status || "to-read"] || "to-read",
+            escapeCsv(sanitizeSpreadsheetValue(book.notes || "")),
+        ]);
+
+        return [headers.join(","), ...rows.map((row) => row.join(","))].join(
+            "\n",
+        );
+    }
+
+    function generateLibraryThingTsv(booksToExport) {
+        const headers = [
+            "Title",
+            "Author (First, Last)",
+            "Date",
+            "ISBN",
+            "Rating",
+            "Tags",
+            "Review",
+            "Page Count",
+            "Publication",
+            "Date Read",
+        ];
+
+        const rows = booksToExport.map((book) => [
+            sanitizeSpreadsheetValue(book.title),
+            sanitizeSpreadsheetValue((book.authors || [])[0] || ""),
+            book.dateAdded ? String(book.dateAdded).split("T")[0] : "",
+            book.isbn13 || "",
+            book.rating?.toString() || "",
+            sanitizeSpreadsheetValue((book.tags || []).join(", ")),
+            sanitizeSpreadsheetValue(book.notes || ""),
+            book.pageCount?.toString() || "",
+            sanitizeSpreadsheetValue(book.publisher || ""),
+            book.dateRead ? String(book.dateRead).split("T")[0] : "",
+        ]);
+
+        return [headers.join("\t"), ...rows.map((row) => row.join("\t"))].join(
+            "\n",
+        );
+    }
+
+    function toFilenameBase(value) {
+        const normalized = String(value || "")
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, "-");
+        const safe = normalized
+            .replace(/[^a-z0-9._-]/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/^-|-$/g, "");
+        return safe || "library";
+    }
+
+    function getDatePrefix(date = new Date()) {
+        const yy = String(date.getFullYear()).slice(-2);
+        const mm = String(date.getMonth() + 1).padStart(2, "0");
+        const dd = String(date.getDate()).padStart(2, "0");
+        return `${yy}${mm}${dd}`;
+    }
+
+    function buildExportFilename(baseName, ext, totalBooks) {
+        return `${getDatePrefix()}-${toFilenameBase(baseName)}-${totalBooks}.${ext}`;
+    }
+
+    function downloadBlob(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(url);
+    }
+
+    function buildExportContent(formatId, booksToExport) {
+        switch (formatId) {
+            case "json":
+                return JSON.stringify(
+                    { version: 1, books: booksToExport },
+                    null,
+                    2,
+                );
+            case "csv":
+                return generateCsv(booksToExport);
+            case "goodreads":
+                return generateGoodreadsCsv(booksToExport);
+            case "librarything":
+                return generateLibraryThingTsv(booksToExport);
+            default:
+                return "";
+        }
+    }
+
+    function renderExportOption(formatId, optionMeta) {
+        const helpItems = optionMeta.help
+            .map((line) => `<li>${escapeHtml(line)}</li>`)
+            .join("");
+        const label = escapeHtml(optionMeta.buttonLabel);
+        const description = escapeHtml(optionMeta.description);
+        const ariaLabel = escapeHtml(
+            `Help for ${optionMeta.buttonLabel} export`,
+        );
+
+        return `
+          <div class="bfc_export_item">
+            <div class="bfc_export_row">
+              <button type="button" class="bfc_export_btn" data-bfc-export-format="${formatId}">
+                <span class="bfc_export_btn_label">${label}</span>
+                <span class="bfc_export_desc">${description}</span>
+              </button>
+              <button type="button" class="bfc_help_btn" data-bfc-export-help-toggle="${formatId}" aria-label="${ariaLabel}" aria-expanded="false">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              </button>
+            </div>
+            <div class="bfc_help_panel" data-bfc-export-help="${formatId}" hidden>
+              <ul>${helpItems}</ul>
+            </div>
+          </div>
+        `;
+    }
+
+    function renderExportCard(exportOptions) {
+        const enabledOptions = Object.entries(exportOptions)
+            .filter(([, enabled]) => Boolean(enabled))
+            .map(([formatId]) => formatId)
+            .filter((formatId) => exportOptionMeta[formatId]);
+        if (!enabledOptions.length) return "";
+        const exportItems = enabledOptions
+            .map((formatId) =>
+                renderExportOption(formatId, exportOptionMeta[formatId]),
+            )
+            .join("");
+
+        return `
+          <article class="bfc_item bfc_item--export bfc_export" data-bfc-export>
+            <div class="bfc_export_panel">
+              <p class="bfc_export_heading">Export format:</p>
+              ${exportItems}
+              <p class="bfc_export_status" data-bfc-export-status aria-live="polite"></p>
+            </div>
+          </article>
+        `;
+    }
+
+    function prewarmCoverCache(nextBooks) {
+        if (typeof window === "undefined") return;
+
+        const schedule = window.requestIdleCallback
+            ? (fn) => window.requestIdleCallback(fn, { timeout: 1200 })
+            : (fn) => window.setTimeout(fn, 16);
+
+        schedule(() => {
+            nextBooks
+                .map((book) => coverUrl(book))
+                .slice(0, PREFETCH_LIMIT)
+                .forEach((url) => {
+                    if (!url || prefetchedCoverUrls.has(url)) return;
+                    prefetchedCoverUrls.add(url);
+
+                    // Warm both browser cache and service worker cover cache.
+                    const img = new Image();
+                    img.decoding = "async";
+                    img.referrerPolicy = "no-referrer";
+                    img.src = url;
+                });
+        });
+    }
+
+    function mount(root) {
+        const searchInput = root.querySelector("[data-bfc-search]");
+        const sortInput = root.querySelector("[data-bfc-sort]");
+        const countNode = root.querySelector("[data-bfc-count]");
+        const listNode = root.querySelector("[data-bfc-list]");
+        const emptyNode = root.querySelector("[data-bfc-empty]");
+        const headerNode = root.querySelector("[data-bfc-header]");
+        const footerNode = root.querySelector("[data-bfc-footer]");
+        const libraryName = root.dataset.heading || "library";
+        let viewConfig = safeParseClientConfig(
+            decodeURIComponent(root.dataset.config || "{}"),
+        );
+
+        let books = safeParseBooks(
+            decodeURIComponent(root.dataset.books || "[]"),
+        );
+        let query = "";
+        let sort = "title-asc";
+
+        function applyViewConfig() {
+            if (headerNode) {
+                const hideHeader = !viewConfig.showHeader;
+                headerNode.hidden = hideHeader;
+                headerNode.classList.toggle("bfc_is_hidden", hideHeader);
+            }
+            if (footerNode) {
+                const hideFooter = !viewConfig.showFooter;
+                footerNode.hidden = hideFooter;
+                footerNode.classList.toggle("bfc_is_hidden", hideFooter);
+            }
+
+            const styleNode = document.querySelector("[data-bfc-style]");
+            if (styleNode instanceof HTMLStyleElement) {
+                styleNode.media = viewConfig.unstyled ? "not all" : "all";
+            }
+        }
+
+        async function hydrateFromUrlIfNeeded() {
+            const url = (root.dataset.dataUrl || "").trim();
+            if (books.length > 0 || !url) return;
+            books = await loadFromUrl(url);
+            prewarmCoverCache(books);
+            render();
+        }
+
+        function render() {
+            const sorter = sorters[sort] || sorters["title-asc"];
+            const filtered = books
+                .filter((book) => matchesQuery(book, query))
+                .sort(sorter);
+
+            countNode.textContent = `${filtered.length} title${filtered.length === 1 ? "" : "s"}`;
+            emptyNode.hidden = filtered.length > 0;
+            const cardsHtml = filtered
+                .map((book) => {
+                    const title = escapeHtml(book.title || "");
+                    const authors = escapeHtml((book.authors || []).join(", "));
+                    const publisher = book.publisher
+                        ? escapeHtml(book.publisher)
+                        : "";
+                    const year = book.publishYear
+                        ? escapeHtml(book.publishYear)
+                        : "";
+                    const pages = book.pageCount
+                        ? `${escapeHtml(book.pageCount)} pages`
+                        : "";
+                    const notes = book.notes ? escapeHtml(book.notes) : "";
+                    const tags = Array.isArray(book.tags)
+                        ? book.tags.map((tag) => escapeHtml(tag)).join(", ")
+                        : "";
+                    const language = book.language
+                        ? escapeHtml(book.language)
+                        : "";
+                    const isbn13 = escapeHtml(book.isbn13 || "");
+                    const cover = escapeHtml(coverUrl(book));
+                    const chip = escapeHtml(statusChip(book));
+
+                    return `
             <details class="bfc_item">
               <summary class="bfc_summary">
-                <img class="bfc_cover" src="${cover}" alt="${title}" loading="lazy" referrerpolicy="no-referrer" />
-                <span class="bfc_main">
+                <div class="bfc_cover_wrap">
+                  <div class="bfc_cover_placeholder" data-bfc-cover-placeholder aria-hidden="true">
+                    <svg
+                      class="bfc_cover_placeholder_icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                  </div>
+                  <img class="bfc_cover_img" data-bfc-cover src="${cover}" alt="${title}" loading="lazy" referrerpolicy="no-referrer" />
+                </div>
+                <div class="bfc_main">
                   <span class="bfc_title">${title}</span>
-                  <span class="bfc_authors">${authors}</span>
-                  <span class="bfc_chip">${chip}</span>
-                </span>
+                  <div class="bfc_meta">
+                    <span class="bfc_authors">${authors}</span>
+                    <span class="bfc_chip">${chip}</span>
+                  </div>
+                </div>
               </summary>
               <div class="bfc_detail">
                 ${publisher ? `<p><strong>Publisher:</strong> ${publisher}</p>` : ""}
@@ -185,185 +719,653 @@ const encodedBooks = encodeURIComponent(JSON.stringify(books));
               </div>
             </details>
           `;
-        })
-        .join("");
+                })
+                .join("");
+            const exportCardHtml = viewConfig.features.export.enabled
+                ? renderExportCard(viewConfig.features.export.options)
+                : "";
+            listNode.innerHTML = cardsHtml + exportCardHtml;
+
+            listNode.querySelectorAll("[data-bfc-cover]").forEach((img) => {
+                const coverWrap = img.closest(".bfc_cover_wrap");
+                if (!coverWrap) return;
+                const coverPlaceholder = coverWrap.querySelector(
+                    "[data-bfc-cover-placeholder]",
+                );
+
+                const markLoaded = () => {
+                    coverWrap.classList.add("bfc_cover_loaded");
+                    coverWrap.classList.remove("bfc_cover_failed");
+                    img.classList.add("bfc_cover_img_loaded");
+                    coverPlaceholder?.classList.add(
+                        "bfc_cover_placeholder_hidden",
+                    );
+                };
+
+                const markFailed = () => {
+                    coverWrap.classList.add("bfc_cover_failed");
+                    img.classList.remove("bfc_cover_img_loaded");
+                    coverPlaceholder?.classList.remove(
+                        "bfc_cover_placeholder_hidden",
+                    );
+                };
+
+                if (img.complete) {
+                    if (img.naturalWidth > 0) {
+                        markLoaded();
+                    } else {
+                        markFailed();
+                    }
+                    return;
+                }
+
+                img.addEventListener("load", markLoaded, { once: true });
+                img.addEventListener("error", markFailed, { once: true });
+            });
+
+            bindExportInteractions();
+        }
+
+        searchInput.addEventListener("input", (event) => {
+            query = event.target.value.trim().toLowerCase();
+            render();
+        });
+
+        sortInput.addEventListener("change", (event) => {
+            sort = event.target.value;
+            render();
+        });
+
+        root.addEventListener("bfc:config", (event) => {
+            const patch =
+                event?.detail && typeof event.detail === "object"
+                    ? event.detail
+                    : {};
+            viewConfig = mergeClientConfig(viewConfig, patch);
+            applyViewConfig();
+            render();
+        });
+
+        function bindExportInteractions() {
+            const exportRoot = root.querySelector("[data-bfc-export]");
+            if (!exportRoot) return;
+
+            const exportButtons = exportRoot.querySelectorAll(
+                "[data-bfc-export-format]",
+            );
+            const exportHelpToggles = exportRoot.querySelectorAll(
+                "[data-bfc-export-help-toggle]",
+            );
+            const exportHelpPanels = exportRoot.querySelectorAll(
+                "[data-bfc-export-help]",
+            );
+            const exportStatusNode = exportRoot.querySelector(
+                "[data-bfc-export-status]",
+            );
+
+            exportButtons.forEach((button) => {
+                button.addEventListener("click", () => {
+                    const formatId = button.dataset.bfcExportFormat || "";
+                    const format = exportFormats[formatId];
+                    if (!format) return;
+
+                    if (!books.length) {
+                        if (exportStatusNode)
+                            exportStatusNode.textContent =
+                                "No books to export.";
+                        return;
+                    }
+
+                    const content = buildExportContent(formatId, books);
+                    if (!content) return;
+
+                    const filename = buildExportFilename(
+                        libraryName,
+                        format.ext,
+                        books.length,
+                    );
+                    downloadBlob(content, filename, format.mimeType);
+
+                    if (exportStatusNode) {
+                        exportStatusNode.textContent = `Exported ${format.label} (${books.length} books).`;
+                    }
+                });
+            });
+
+            function closeAllExportHelp(exceptId = "") {
+                exportHelpPanels.forEach((panel) => {
+                    const panelId = panel.dataset.bfcExportHelp || "";
+                    const shouldHide = !exceptId || panelId !== exceptId;
+                    if (shouldHide) panel.hidden = true;
+                });
+
+                exportHelpToggles.forEach((toggle) => {
+                    const toggleId = toggle.dataset.bfcExportHelpToggle || "";
+                    const isOpen = exceptId && toggleId === exceptId;
+                    toggle.setAttribute(
+                        "aria-expanded",
+                        isOpen ? "true" : "false",
+                    );
+                });
+            }
+
+            exportHelpToggles.forEach((toggle) => {
+                toggle.addEventListener("click", () => {
+                    const targetId = toggle.dataset.bfcExportHelpToggle || "";
+                    if (!targetId) return;
+
+                    const targetPanel = exportRoot.querySelector(
+                        `[data-bfc-export-help="${targetId}"]`,
+                    );
+                    if (!targetPanel) return;
+
+                    const isOpening = targetPanel.hidden;
+                    closeAllExportHelp(isOpening ? targetId : "");
+                    targetPanel.hidden = !isOpening;
+                });
+            });
+        }
+
+        applyViewConfig();
+        prewarmCoverCache(books);
+        render();
+        hydrateFromUrlIfNeeded();
     }
 
-    searchInput.addEventListener("input", (event) => {
-      query = event.target.value.trim().toLowerCase();
-      render();
-    });
-
-    sortInput.addEventListener("change", (event) => {
-      sort = event.target.value;
-      render();
-    });
-
-    downloadButton?.addEventListener("click", () => {
-      const payload = JSON.stringify({ version: 1, books }, null, 2);
-      const blob = new Blob([payload], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = "library.json";
-      link.click();
-      URL.revokeObjectURL(url);
-    });
-
-    render();
-    hydrateFromUrlIfNeeded();
-  }
-
-  document.querySelectorAll("[data-bfc]").forEach((root) => mount(root));
+    document.querySelectorAll("[data-bfc]").forEach((root) => mount(root));
 </script>
 
-<style>
-  .bfc {
-    max-width: 940px;
-    margin: 0 auto;
-    padding: 24px 16px 48px;
-    color: #f6f8f4;
-    background: radial-gradient(circle at top right, #243410 0%, #10120f 36%, #090a08 100%);
-    min-height: 100vh;
-    font-family: "IBM Plex Mono", "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
-  }
-
-  .bfc_header h1 {
-    margin: 0;
-    font-size: clamp(26px, 5vw, 38px);
-    color: #d4ff2a;
-  }
-
-  .bfc_subtitle {
-    margin: 8px 0 0;
-    color: #bbc4b3;
-    font-size: 14px;
-  }
-
-  .bfc_controls {
-    margin-top: 18px;
-    display: grid;
-    gap: 10px;
-    grid-template-columns: 1fr;
-  }
-
-  .bfc_control {
-    display: grid;
-    gap: 6px;
-    font-size: 12px;
-    color: #b8c0b1;
-  }
-
-  .bfc_download {
-    min-height: 46px;
-    border-radius: 12px;
-    border: 1px solid #d4ff2a;
-    background: transparent;
-    color: #d4ff2a;
-    padding: 0 14px;
-    font: inherit;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  .bfc_control input,
-  .bfc_control select {
-    min-height: 46px;
-    border-radius: 12px;
-    border: 1px solid #394133;
-    background: #10130f;
-    color: #f6f8f4;
-    padding: 0 12px;
-    font: inherit;
-  }
-
-  .bfc_count {
-    margin: 14px 0 10px;
-    font-size: 13px;
-    color: #d4ff2a;
-  }
-
-  .bfc_list {
-    display: grid;
-    gap: 10px;
-  }
-
-  .bfc_item {
-    border: 1px solid #2d3228;
-    border-radius: 14px;
-    background: #0f110e;
-    overflow: hidden;
-  }
-
-  .bfc_summary {
-    list-style: none;
-    cursor: pointer;
-    display: grid;
-    grid-template-columns: 66px 1fr;
-    gap: 12px;
-    align-items: center;
-    padding: 10px;
-  }
-
-  .bfc_summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .bfc_cover {
-    width: 66px;
-    height: 94px;
-    border-radius: 8px;
-    background: #2b3127;
-    object-fit: cover;
-  }
-
-  .bfc_main {
-    display: grid;
-    gap: 4px;
-    min-width: 0;
-  }
-
-  .bfc_title {
-    font-size: 17px;
-    font-weight: 700;
-    color: #f6f8f4;
-  }
-
-  .bfc_authors {
-    font-size: 14px;
-    color: #c4ccc0;
-  }
-
-  .bfc_chip {
-    font-size: 13px;
-    color: #d4ff2a;
-  }
-
-  .bfc_detail {
-    border-top: 1px solid #252a21;
-    padding: 12px 14px 14px;
-    display: grid;
-    gap: 6px;
-    color: #d2d8ce;
-    font-size: 13px;
-  }
-
-  .bfc_detail p {
-    margin: 0;
-  }
-
-  .bfc_detail strong {
-    color: #f6f8f4;
-  }
-
-  .bfc_empty {
-    color: #b8c0b1;
-    font-size: 14px;
-  }
-
-  @media (min-width: 800px) {
-    .bfc_controls {
-      grid-template-columns: 2fr 1fr;
+<style
+    is:global
+    is:inline
+    data-bfc-style
+    media={resolvedConfig.unstyled ? "not all" : "all"}
+>
+    .bfc_header[hidden],
+    .bfc_footer[hidden],
+    .bfc_is_hidden {
+        display: none !important;
     }
-  }
+
+    /* ── Design tokens ───────────────────────────────────────────── */
+    .bfc {
+        --accent: #d4ff2a;
+        --text: #f6f8f4;
+        --text-muted: #bbc4b3;
+        --text-dim: #c4ccc0;
+        --black: oklch(
+            4% 0.012 135
+        ); /* single dark base — L only varies below */
+        --bg-body: var(--black);
+        --bg-card: oklch(from var(--black) calc(l + 0.03) c h);
+        --bg-input: oklch(from var(--black) calc(l + 0.04) c h);
+        --bg-cover: oklch(from var(--black) calc(l + 0.16) c h);
+        --border-sub: oklch(from var(--black) calc(l + 0.12) c h);
+        --border-card: oklch(from var(--black) calc(l + 0.17) c h);
+        --border-input: oklch(from var(--black) calc(l + 0.24) c h);
+        --border-link: oklch(from var(--black) calc(l + 0.32) c h);
+        --cover-h: clamp(140px, 18vw, 200px);
+        --radius: 8px;
+        --gap: 16px;
+        --padding: 16px; /* base padding unit — all others derived via calc() */
+        --font:
+            "IBM Plex Mono", "SFMono-Regular", Menlo, Monaco, Consolas,
+            monospace;
+        --fs-xs: 14px; /* labels, chip, authors, repo link */
+        --fs-sm: 15px; /* count, detail body              */
+        --fs-md: 16px; /* subtitle, empty state           */
+        --fs-lg: 17px; /* (scale step — available)        */
+        --fs-xl: clamp(18px, 2vw, 24px); /* card title      */
+        --fs-hero: clamp(26px, 5vw, 38px); /* page h1        */
+
+        /* ── Root layout ─────────────────────────────────────────────── */
+        max-width: 2560px;
+        margin-inline: auto;
+        padding-inline: var(--padding);
+        padding-block: 24px 48px;
+        min-height: 100dvh;
+        color: var(--text);
+        font-family: var(--font);
+    }
+
+    .bfc_body {
+        background: radial-gradient(
+            circle at top right,
+            #243410 0%,
+            var(--bg-card) 36%,
+            var(--bg-body) 100%
+        );
+        padding: var(--padding);
+        border-radius: var(--radius);
+    }
+
+    /* ── Header ──────────────────────────────────────────────────── */
+    .bfc_header h1 {
+        margin-block: 0;
+        font-size: var(--fs-hero);
+        color: var(--accent);
+        text-wrap: balance;
+    }
+
+    .bfc_subtitle {
+        margin-block: 8px 0;
+        font-size: var(--fs-md);
+        color: var(--text-muted);
+    }
+
+    .bfc_link {
+        font-size: var(--fs-xs);
+        color: var(--text);
+        text-decoration: none;
+        border-block-end: 1px solid var(--border-link);
+    }
+    .bfc_link:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+    }
+
+    .bfc_footer {
+        margin-block-start: var(--padding);
+        padding: var(--padding);
+        border-block-start: 1px solid var(--border-sub);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        column-gap: 14px;
+        row-gap: 8px;
+        font-size: var(--fs-xs);
+        color: var(--text-muted);
+        background-color: black;
+        border-radius: var(--radius);
+    }
+
+    .bfc_footer_intro {
+        flex-basis: 100%;
+    }
+
+    /* ── Controls ────────────────────────────────────────────────── */
+    .bfc_controls {
+        margin-block-start: 18px;
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 1fr;
+    }
+
+    .bfc_control {
+        display: grid;
+        gap: 6px;
+        font-size: var(--fs-xs);
+        color: var(--text-muted);
+    }
+    .bfc_control.bfc_control--search > span {
+        color: var(--accent);
+    }
+
+    :is(.bfc_control input, .bfc_control select) {
+        min-block-size: 46px;
+        padding-inline: calc(var(--padding) - 4px);
+        border: 1px solid var(--border-input);
+        border-radius: var(--radius);
+        background: var(--bg-input);
+        color: var(--text);
+        font: inherit;
+    }
+
+    .bfc_control select,
+    .bfc_control select option {
+        font-size: var(--fs-md);
+        line-height: 1.35;
+    }
+
+    .bfc_export {
+        width: 100%;
+        margin: 0;
+        display: block;
+    }
+
+    .bfc_item--export {
+        padding: var(--padding);
+        border: 1px solid var(--accent);
+        border-radius: var(--radius);
+    }
+
+    .bfc_export_panel {
+        margin: 0;
+        width: 100%;
+        border: 0;
+        background: transparent;
+        display: grid;
+        gap: 12px;
+    }
+
+    .bfc_export_heading {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .bfc_export_item {
+        display: grid;
+        gap: 8px;
+    }
+
+    .bfc_export_row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
+        align-items: stretch;
+    }
+
+    .bfc_export_btn {
+        flex: 1;
+        min-height: 80px;
+        padding: 20px 16px;
+        border: 1px solid var(--border-card);
+        border-radius: var(--radius);
+        background: var(--bg-card);
+        color: var(--text);
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 4px;
+    }
+
+    .bfc_export_btn:hover {
+        border-color: var(--accent);
+        box-shadow: 0 8px 18px
+            color-mix(in oklch, var(--accent), transparent 88%);
+    }
+
+    .bfc_export_btn:focus-visible {
+        border-color: var(--accent);
+    }
+
+    .bfc_export_btn_label {
+        font-size: 28px;
+        font-weight: 600;
+        color: var(--accent);
+        letter-spacing: 0.01em;
+    }
+
+    .bfc_export_desc {
+        font-size: 15px;
+        color: var(--text-muted);
+    }
+
+    .bfc_help_btn {
+        width: 40px;
+        height: 40px;
+        margin-top: var(--padding);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 0;
+        border-radius: var(--radius);
+        background: transparent;
+        color: var(--accent);
+        cursor: pointer;
+    }
+
+    .bfc_help_btn:hover,
+    .bfc_help_btn[aria-expanded="true"] {
+        color: var(--accent);
+        background: color-mix(in oklch, var(--accent), transparent 92%);
+    }
+
+    .bfc_help_btn svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .bfc_help_panel {
+        margin-top: var(--padding);
+        padding: var(--padding);
+        background: var(--bg-card);
+        border: 1px solid var(--border-card);
+        border-left: 3px solid var(--accent);
+        border-radius: 6px;
+    }
+
+    .bfc_help_panel ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .bfc_help_panel li {
+        font-size: 13px;
+        color: var(--text-muted);
+        line-height: 1.5;
+        padding-left: 16px;
+        position: relative;
+    }
+
+    .bfc_help_panel li::before {
+        content: "›";
+        position: absolute;
+        left: 0;
+        color: var(--accent);
+        font-weight: 700;
+    }
+
+    .bfc_export_status {
+        margin: 2px 0 0;
+        min-height: 1.2em;
+        font-size: var(--fs-xs);
+        color: var(--accent);
+    }
+
+    /* ── Count / empty state ─────────────────────────────────────── */
+    .bfc_count {
+        margin-block: 14px 10px;
+        font-size: var(--fs-sm);
+        color: var(--accent);
+    }
+
+    .bfc_empty {
+        font-size: var(--fs-md);
+        color: var(--text-muted);
+    }
+
+    /* ── Bento grid — 1 → 2 → 3 → 4 → 5 cols ───────────────────── */
+    .bfc_list {
+        display: grid;
+        gap: var(--gap);
+        grid-template-columns: 1fr;
+        align-items: start;
+    }
+
+    /* ── Card ────────────────────────────────────────────────────── */
+    .bfc_item {
+        border: 1px solid var(--border-card);
+        border-radius: var(--radius);
+        background: var(--bg-card);
+        overflow: hidden;
+    }
+
+    /*
+   * .bfc_summary is a plain flex column.
+   * The cover image is a fixed-height banner at the top;
+   * text content flows below it naturally.
+   */
+    .bfc_summary {
+        list-style: none;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+    }
+    .bfc_summary::marker {
+        display: none;
+    }
+    .bfc_summary::-webkit-details-marker {
+        display: none;
+    }
+
+    /* Cover area defaults to book ratio 1:1.5 so image can fill cleanly */
+    .bfc_cover_wrap {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 2 / 3;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: var(--bg-cover);
+    }
+
+    .bfc_cover_placeholder {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent);
+        background: var(--bg-cover);
+        transition: opacity 0.2s ease;
+    }
+
+    .bfc_cover_placeholder_hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .bfc_cover_placeholder_icon {
+        width: 44px;
+        height: 44px;
+    }
+
+    .bfc_cover_img {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+    .bfc_cover_img_loaded {
+        opacity: 1;
+    }
+
+    .bfc_cover_wrap.bfc_cover_loaded .bfc_cover_img {
+        opacity: 1;
+    }
+
+    .bfc_cover_wrap.bfc_cover_loaded .bfc_cover_placeholder {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .bfc_cover_wrap.bfc_cover_failed .bfc_cover_img {
+        display: none;
+    }
+
+    /* Text content — sits below the cover, never overlaid */
+    .bfc_main {
+        padding-inline: var(--padding);
+        padding-block: calc(var(--padding) - 2px) var(--padding);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .bfc_title {
+        font-size: var(--fs-xl);
+        font-weight: 600;
+        color: var(--text);
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        text-wrap: balance;
+    }
+
+    /* Authors + chip on one line, visually grouped as metadata */
+    .bfc_meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        column-gap: 10px;
+        row-gap: 4px;
+    }
+
+    .bfc_authors {
+        font-size: var(--fs-xs);
+        color: var(--text-dim);
+    }
+
+    .bfc_chip {
+        font-size: var(--fs-xs);
+        color: var(--accent);
+    }
+
+    /* ── Expanded detail panel ───────────────────────────────────── */
+    .bfc_detail {
+        border-block-start: 1px solid var(--border-sub);
+        padding-inline: var(--padding);
+        padding-block: calc(var(--padding) - 4px) var(--padding);
+        display: grid;
+        gap: 6px;
+        font-size: var(--fs-sm);
+        color: var(--text-dim);
+    }
+    .bfc_detail p {
+        margin: 0;
+    }
+    .bfc_detail strong {
+        color: var(--text);
+    }
+
+    hr {
+        border-color: var(--accent);
+    }
+
+    /* ── Responsive breakpoints ──────────────────────────────────── */
+    @media (min-width: 375px) {
+        .bfc_list {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (min-width: 768px) {
+        .bfc_controls {
+            grid-template-columns: 2fr 1fr;
+        }
+        .bfc_list {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .bfc_list {
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-flow: row dense;
+            grid-auto-rows: minmax(160px, auto);
+        }
+
+        /* Start bento behavior only when there is enough screen real estate. */
+        .bfc_item:not(.bfc_item--export):nth-child(5n + 1) {
+            grid-row: span 2;
+        }
+    }
+
+    @media (min-width: 1800px) {
+        .bfc_list {
+            grid-template-columns: repeat(5, 1fr);
+            grid-auto-rows: minmax(180px, auto);
+        }
+
+        .bfc_item:not(.bfc_item--export):nth-child(6n + 1) {
+            grid-row: span 2;
+        }
+    }
 </style>

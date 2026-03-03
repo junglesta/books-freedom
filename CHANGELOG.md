@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.7.2
+
+- Added BAOBAB Astro display component configuration defaults in `apps/astro-site/src/config/bookbat-client.config.ts` with toggles for header/footer, export feature/options, load placeholder, and unstyled mode
+- Added page-level preview controls in `apps/astro-site/src/pages/index.astro` to simulate component rendering states from the frontend while keeping source-of-truth config in the page
+- Refined Astro display structure and presentation: updated index title, moved footer outside the inner body section, and moved background rendering from `.bfc` to `.bfc_body`
+- Re-ran preflight gates from workspace root (`pnpm format`, `pnpm lint`, `pnpm test`, `pnpm build`) with passing results
+
 ## 0.7.1
 
 - Renamed workspace package identifiers from `@books-freedom/*` to `@bookbat/*` and updated related imports/scripts/docs
