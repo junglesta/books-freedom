@@ -86,21 +86,30 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
         hidden={!resolvedConfig.showFooter}
     >
         <span class="bfc_footer_intro">
+            <strong class="bfc_footer_brand">BAOBAB</strong> is the static browse/share layer, an Astro
+            component designed to hold/display/share any of those nice JSONs
+            tossed out by BOOKBATs.
+        </span>
+        <span>
             <a
-                class="bfc_link"
+                class="bfc_link bfc_footer_brand"
                 href="https://bat.junglestar.org"
                 target="_blank"
-                rel="noreferrer noopener">BOOK BAT App</a
+                rel="noreferrer noopener">BOOK BAT</a
             >
-            · Drop JSON in <code>data/library.json</code> (workspace root) or pass
+            is the active app layer (scan, edit, organize, export).
+        </span>
+        <span>
+            Drop JSON in <code>data/library.json</code> (workspace root) or pass
             <code>dataUrl</code>.
         </span>
         <span>
+            Open source:
             <a
                 class="bfc_link"
                 href="https://github.com/junglesta/bookbat"
                 target="_blank"
-                rel="noreferrer noopener">Book Bat Client</a
+                rel="noreferrer noopener">github.com/junglesta/bookbat</a
             >
         </span>
         <span>
@@ -1017,6 +1026,11 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
 
     .bfc_footer_intro {
         flex-basis: 100%;
+    }
+
+    .bfc_footer_brand {
+        font-size: 1.8em;
+        line-height: 1;
     }
 
     /* ── Controls ────────────────────────────────────────────────── */

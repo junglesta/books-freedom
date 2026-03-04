@@ -150,21 +150,17 @@ const encodedPreviewDefaults = encodeURIComponent(
                     </label>
                 </div>
                 <p class="preview-note">
-                    This panel is a simulator for runtime rendering states only.
-                    Real defaults live in
+                    Think of this panel like light switches for demo only. The
+                    real default settings live in
                     <code
                         >apps/astro-site/src/config/bookbat-client.config.ts</code
-                    > and are passed from
-                    <code>apps/astro-site/src/pages/index.astro</code> through
-                    <code
-                        >&lt;BookBatClient
-                        config=&#123;bookBatClientConfig&#125; /&gt;</code
-                    >. If you reuse this component in another Astro site, import
-                    <code>defaultBookBatClientConfig</code>, override only what
-                    you need, and pass
-                    <code>config</code>; omitted fields automatically fall back
-                    to built-in defaults (header/footer on, export on with all
-                    formats, load off, styled mode on).
+                    >. This page sends those settings to
+                    <code>&lt;BookBatClient /&gt;</code>. In another Astro site,
+                    start from
+                    <code>defaultBookBatClientConfig</code>, change only what
+                    you want, and pass it as
+                    <code>config</code>. Anything you skip keeps the default
+                    value.
                 </p>
             </form>
         </details>

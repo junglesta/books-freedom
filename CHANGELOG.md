@@ -4,6 +4,7 @@
 
 - Added per-status totals directly to all Library filter tabs (`All`, `To Read`, `Reading`, `Read`)
 - Simplified tab count display by removing square brackets from labels (`All 56` style)
+- Removed malformed tracked filename `Icon\r` that caused broken/404 row behavior in GitHub repo view; added ignore protection for Finder `Icon*` artifacts
 
 ## 0.8.0
 

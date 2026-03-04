@@ -52,9 +52,6 @@ technically :
 
 
 
-
-
-
 ## STACK
 
 svelte 5 + vite + astro (workspace). pure static clients. local storage and ISBN lookup logic.

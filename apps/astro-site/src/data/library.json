@@ -6,9 +6,7 @@
       "isbn13": "9780465097197",
       "isbn10": "0465097197",
       "title": "Interpretation of Cultures",
-      "authors": [
-        "Clifford Geertz"
-      ],
+      "authors": ["Clifford Geertz"],
       "publisher": "Basic Books",
       "publishDate": "January 2000",
       "publishYear": 2000,
@@ -38,10 +36,7 @@
       "isbn13": "9788807900822",
       "isbn10": "8807900823",
       "title": "Discorso della servitù volontaria",
-      "authors": [
-        "Etienne de La Boëtie",
-        "E. Donaggio"
-      ],
+      "authors": ["Etienne de La Boëtie", "E. Donaggio"],
       "publisher": "Feltrinelli",
       "publishDate": "Feb 26, 2014",
       "publishYear": 2014,
@@ -66,36 +61,11 @@
       "rating": 3
     },
     {
-      "id": "62429b27-a418-4361-add7-873c48a925b4",
-      "isbn13": "9789881806659",
-      "isbn10": "9881806658",
-      "title": "Bumbling through Borneo",
-      "authors": [
-        "Tom Schmidt"
-      ],
-      "publisher": "Kakibubu Media Limited",
-      "publishDate": "2009",
-      "publishYear": 2009,
-      "pageCount": 111,
-      "language": "eng",
-      "subjects": [
-        "Humor",
-        "Description and travel"
-      ],
-      "status": "read",
-      "dateAdded": "2026-02-25T20:05:19.187Z",
-      "source": "openlibrary",
-      "rating": 5,
-      "dateRead": "2026-02-26T00:54:16.498Z"
-    },
-    {
       "id": "bbc3c20a-ddb5-4352-8ed7-8c2279b9a967",
       "isbn13": "9780099908401",
       "isbn10": "0099908409",
       "title": "The Old Man and the Sea",
-      "authors": [
-        "Ernest Hemingway"
-      ],
+      "authors": ["Ernest Hemingway"],
       "publisher": "Arrow Books",
       "publishDate": "1993",
       "publishYear": 1993,
@@ -124,9 +94,7 @@
       "id": "ec5e3e05-c4ac-4df1-affa-4a7ffee3e729",
       "isbn13": "9781905379422",
       "title": "Farang",
-      "authors": [
-        "Iain Corness"
-      ],
+      "authors": ["Iain Corness"],
       "publisher": "Maverick House",
       "publishDate": "2007",
       "publishYear": 2007,
@@ -179,38 +147,18 @@
       "isbn13": "9780816025183",
       "isbn10": "0816025185",
       "title": "Survival",
-      "authors": [
-        "Xavier Maniguet"
-      ],
+      "authors": ["Xavier Maniguet"],
       "publisher": "Facts on File",
       "publishDate": "1994",
       "publishYear": 1994,
       "pageCount": 454,
       "language": "eng",
-      "subjects": [
-        "Wilderness survival"
-      ],
+      "subjects": ["Wilderness survival"],
       "coverUrl": "https://covers.openlibrary.org/b/id/614065-L.jpg",
       "status": "reading",
       "dateAdded": "2026-02-25T20:08:58.475Z",
       "source": "openlibrary",
       "rating": 4
-    },
-    {
-      "id": "076c3076-bf9f-4091-8390-8e59a1e1eb41",
-      "isbn13": "9780850319927",
-      "isbn10": "0850319927",
-      "title": "Post Office",
-      "authors": [
-        "Charles Bukowski"
-      ],
-      "publishDate": "1988",
-      "publishYear": 1988,
-      "pageCount": 160,
-      "language": "en",
-      "status": "to-read",
-      "dateAdded": "2026-02-26T15:03:33.552Z",
-      "source": "googlebooks"
     },
     {
       "id": "580283e8-0b21-4663-9a1f-b5f8eb3cee16",
@@ -246,9 +194,7 @@
       "isbn13": "9780207188183",
       "isbn10": "0207188181",
       "title": "Us mob",
-      "authors": [
-        "Mudrooroo"
-      ],
+      "authors": ["Mudrooroo"],
       "publisher": "Angus & Robertson",
       "publishDate": "1995",
       "publishYear": 1995,
@@ -271,9 +217,7 @@
       "isbn13": "9780868405469",
       "isbn10": "0868405469",
       "title": "Contemporary Melbourne architecture",
-      "authors": [
-        "Joe Rollo"
-      ],
+      "authors": ["Joe Rollo"],
       "publisher": "UNSW Press",
       "publishDate": "1999",
       "publishYear": 1999,

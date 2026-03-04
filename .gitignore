@@ -6,7 +6,8 @@ apps/*/.astro/
 *.log
 .DS_Store
 certs/
-Icon
+# macOS Finder metadata artifacts (can include invalid CR suffix variants)
+Icon*
 
 # Local Netlify folder
 .netlify
