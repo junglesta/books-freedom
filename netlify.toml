@@ -1,6 +1,7 @@
 [build]
-  command = "pnpm build"
+  command = "pnpm build:webapp"
   publish = "dist/webapp"
+  ignore = "bash scripts/netlify-ignore-webapp.sh"
 
 [[headers]]
   for = "/*"

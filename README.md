@@ -62,6 +62,31 @@ svelte 5 + vite + astro (workspace). pure static clients. local storage and ISBN
 - `apps/astro-site` → Astro SSG site with `BOOK BAT CLIENT`
 - `packages/library-core` → shared types + list/search/sort helpers
 
+## NETLIFY (2 SITES, 1 REPO)
+
+Use two separate Netlify sites connected to the same repo/branch:
+
+1. `bat.junglestar.org` (BOOKBAT webapp)
+2. `baobab.junglestar.org` (BAOBAB Astro)
+
+### BOOKBAT site settings
+
+- Base directory: repo root
+- Build command: `pnpm build:webapp`
+- Publish directory: `dist/webapp`
+- Config file: root `netlify.toml`
+- Deploy gating: `scripts/netlify-ignore-webapp.sh`
+
+### BAOBAB site settings
+
+- Base directory: `apps/astro-site`
+- Build command: `pnpm -C ../.. build:astro`
+- Publish directory: `dist`
+- Config file: `apps/astro-site/netlify.toml`
+- Deploy gating: `scripts/netlify-ignore-astro.sh`
+
+Result: webapp-only changes skip BAOBAB deploy, and Astro-only changes skip BOOKBAT deploy.
+
 ## RUN IT
 
 ```bash

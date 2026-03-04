@@ -1,0 +1,9 @@
+[build]
+  command = "pnpm -C ../.. build:astro"
+  publish = "dist"
+  ignore = "bash ../../scripts/netlify-ignore-astro.sh"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Permissions-Policy = "camera=(self)"
