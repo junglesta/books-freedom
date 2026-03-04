@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.3
+
+- Polished BAOBAB Astro footer copy and structure: clearer two-line BAOBAB description, simplified BOOKBAT description, and improved section grouping
+- Added version tags next to both footer brand names (`BAOBAB` and `BOOK BAT`) and removed redundant standalone version row
+- Added footer divider styling/placement refinements and kept attribution, open-source, and license links consistent
+- Moved BAOBAB-specific `data/library.json` usage guidance into the BAOBAB section for clearer ownership
+- Ran full preflight gates from workspace root with passing results: `pnpm format`, `pnpm lint`, `pnpm test`, `pnpm build`
+
 ## 0.8.1
 
 - Added per-status totals directly to all Library filter tabs (`All`, `To Read`, `Reading`, `Read`)

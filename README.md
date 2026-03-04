@@ -32,9 +32,9 @@ BOOKBAT flies around with you:
 
 - up the Shelves
 - into Town Center Libraries, 
-- Aat Street Book Fairs. 
+- at Street Book Fairs. 
 - teachers use BOOKBAT to put together Courses. 
-- friends use to quickly meno some titles they plan to AudioRead!
+- friends use it to quickly memo titles they plan to AudioRead!
 
 BAOBAB keeps the booklists, for storage and **sharing is caring!**:
 

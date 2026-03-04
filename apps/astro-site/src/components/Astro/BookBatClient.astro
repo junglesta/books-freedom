@@ -4,6 +4,8 @@ import {
     resolveBookBatClientConfig,
     type BookBatClientConfigOverride,
 } from "../../config/bookbat-client.config";
+import { version as baobabVersion } from "../../../package.json";
+import { version as bookbatVersion } from "../../../../webapp/package.json";
 
 interface Props {
     books?: LibraryBook[];
@@ -85,23 +87,45 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
         data-bfc-footer
         hidden={!resolvedConfig.showFooter}
     >
+        <span class="bfc_footer_brand_row">
+            <a
+                class="bfc_link bfc_footer_brand"
+                href="https://baobab.junglestar.org/"
+                target="_blank"
+                rel="noreferrer noopener">BAOBAB</a
+            >
+            <span class="bfc_footer_brand_version">v{baobabVersion}</span>
+        </span>
+        <span class="bfc_footer_intro"> BAOBAB is the Astro component. </span>
         <span class="bfc_footer_intro">
-            <strong class="bfc_footer_brand">BAOBAB</strong> is the static browse/share layer, an Astro
-            component designed to hold/display/share any of those nice JSONs
-            tossed out by BOOKBATs.
+            It's designed to work as a static block to display booklists.
         </span>
         <span>
+            Drop JSON in <code>data/library.json</code> (workspace root) or pass
+            <code>dataUrl</code>.
+        </span>
+        <span class="bfc_footer_brand_row">
             <a
                 class="bfc_link bfc_footer_brand"
                 href="https://bat.junglestar.org"
                 target="_blank"
                 rel="noreferrer noopener">BOOK BAT</a
             >
-            is the active app layer (scan, edit, organize, export).
+            <span class="bfc_footer_brand_version">v{bookbatVersion}</span>
         </span>
+        <span class="bfc_footer_intro"> BOOKBAT is the webapp. </span>
+        <span class="bfc_footer_intro">
+            Scan. Edit. Sort. Merge. Import. Export.
+        </span>
+        <hr class="bfc_footer_divider" />
         <span>
-            Drop JSON in <code>data/library.json</code> (workspace root) or pass
-            <code>dataUrl</code>.
+            Both Webapp and Astro component by
+            <a
+                class="bfc_link"
+                href="https://junglestar.org"
+                target="_blank"
+                rel="noreferrer noopener">junglestar.org</a
+            >.
         </span>
         <span>
             Open source:
@@ -651,7 +675,8 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
 
         function syncSortDirectionControl() {
             if (!sortDirectionInput) return;
-            sortDirectionInput.textContent = sortDirection === "asc" ? "↑" : "↓";
+            sortDirectionInput.textContent =
+                sortDirection === "asc" ? "↑" : "↓";
         }
 
         function applyViewConfig() {
@@ -972,6 +997,11 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
         font-family: var(--font);
     }
 
+    .bfc,
+    .bfc * {
+        box-sizing: border-box;
+    }
+
     .bfc_body {
         background: radial-gradient(
             circle at top right,
@@ -1010,27 +1040,50 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
 
     .bfc_footer {
         margin-block-start: var(--padding);
-        padding: var(--padding);
+        padding: calc(var(--padding) + 4px) calc(var(--padding) + 2px);
         border-block-start: 1px solid var(--border-sub);
         display: flex;
         flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        column-gap: 14px;
-        row-gap: 8px;
+        align-items: flex-start;
+        justify-content: flex-start;
+        column-gap: 18px;
+        row-gap: 12px;
         font-size: var(--fs-xs);
         color: var(--text-muted);
         background-color: black;
         border-radius: var(--radius);
     }
 
+    .bfc_footer_brand_row,
     .bfc_footer_intro {
         flex-basis: 100%;
     }
 
+    .bfc_footer span {
+        line-height: 1.45;
+    }
+
+    .bfc_footer_divider {
+        flex-basis: 100%;
+        border: 0;
+        border-top: 1px solid #6d6d6d;
+        margin: 2px 0 0;
+    }
+
     .bfc_footer_brand {
         font-size: 1.8em;
-        line-height: 1;
+        line-height: 1.05;
+        font-weight: 400;
+        letter-spacing: 0.02em;
+        display: inline-block;
+        margin-inline-end: 6px;
+    }
+
+    .bfc_footer_brand_version {
+        font-size: 0.95em;
+        letter-spacing: 0.02em;
+        color: var(--text-muted);
+        vertical-align: baseline;
     }
 
     /* ── Controls ────────────────────────────────────────────────── */
@@ -1183,7 +1236,7 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
     .bfc_help_btn {
         width: 40px;
         height: 40px;
-        margin-top: var(--padding);
+        margin-top: 0;
         display: inline-flex;
         align-items: center;
         justify-content: center;
