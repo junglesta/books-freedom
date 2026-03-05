@@ -27,6 +27,10 @@ const {
   showToast: vi.fn(),
 }));
 
+const { lookupIsbn } = vi.hoisted(() => ({
+  lookupIsbn: vi.fn(),
+}));
+
 vi.mock("../lib/stores.svelte.ts", () => ({
   getBooks,
   isLoading,
@@ -38,6 +42,10 @@ vi.mock("../lib/stores.svelte.ts", () => ({
   clearLibraryCollection,
   importBooksToCollection,
   showToast,
+}));
+
+vi.mock("../lib/isbn-lookup", () => ({
+  lookupIsbn,
 }));
 
 function makeBook(overrides: Partial<Book> = {}): Book {
@@ -63,6 +71,7 @@ describe("LibraryPage", () => {
     removeBookFromCollection.mockResolvedValue(undefined);
     clearLibraryCollection.mockImplementation(() => {});
     importBooksToCollection.mockReturnValue({ total: 0, added: 0, skipped: 0, failed: 0 });
+    lookupIsbn.mockResolvedValue(null);
   });
 
   it("loads books on mount and opens detail when selecting a book", async () => {
@@ -87,6 +96,22 @@ describe("LibraryPage", () => {
       "book-1",
       expect.objectContaining({ status: "read" }),
     );
+  });
+
+  it("backfills synopsis in background when missing", async () => {
+    const user = userEvent.setup();
+    lookupIsbn.mockResolvedValue(makeBook({ synopsis: "Recovered synopsis." }));
+    render(LibraryPage);
+
+    await user.click(screen.getByRole("button", { name: /Pride and Prejudice/i }));
+
+    await vi.waitFor(() => {
+      expect(updateBookInCollection).toHaveBeenCalledWith(
+        "book-1",
+        { synopsis: "Recovered synopsis." },
+        { silent: true },
+      );
+    });
   });
 
   it("removes a book after confirmation", async () => {

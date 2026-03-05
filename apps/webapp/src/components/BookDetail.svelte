@@ -2,6 +2,7 @@
   import type { Book } from '../lib/types';
   import { updateBookInCollection, removeBookFromCollection, setBookCoverUrl } from '../lib/stores.svelte.ts';
   import { getCoverCandidates } from '../lib/cover';
+  import { lookupIsbn } from '../lib/isbn-lookup';
 
   interface Props {
     book: Book;
@@ -19,6 +20,8 @@
   let notes = $state('');
   let tagsInput = $state('');
   let saving = $state(false);
+  let backfillingSynopsis = $state(false);
+  let synopsisBackfillAttemptedBookId = $state<string | null>(null);
   let statusOpen = $state(false);
   let removeConfirmOpen = $state(false);
 
@@ -31,6 +34,14 @@
     coverCandidates = getCoverCandidates(book);
     coverIndex = 0;
     coverLoaded = false;
+  });
+
+  $effect(() => {
+    if (book.synopsis) return;
+    if (backfillingSynopsis) return;
+    if (synopsisBackfillAttemptedBookId === book.id) return;
+    synopsisBackfillAttemptedBookId = book.id;
+    void backfillSynopsis(book.id, book.isbn13);
   });
 
   const statusOptions: { value: Book['status']; label: string }[] = [
@@ -93,6 +104,20 @@
       onClose();
     } finally {
       saving = false;
+    }
+  }
+
+  async function backfillSynopsis(bookId: string, isbn13: string) {
+    backfillingSynopsis = true;
+    try {
+      const lookedUp = await lookupIsbn(isbn13);
+      const synopsis = lookedUp?.synopsis?.trim();
+      if (!synopsis) return;
+      await updateBookInCollection(bookId, { synopsis }, { silent: true });
+    } catch {
+      // ignore background enrichment failures
+    } finally {
+      backfillingSynopsis = false;
     }
   }
 
@@ -194,6 +219,9 @@
           <p class="detail_pages">{book.pageCount} pages</p>
         {/if}
         <p class="detail_isbn">ISBN: {book.isbn13}</p>
+        {#if book.synopsis}
+          <p>{book.synopsis}</p>
+        {/if}
       </div>
     </div>
 

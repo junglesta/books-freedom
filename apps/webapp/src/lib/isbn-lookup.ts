@@ -17,6 +17,22 @@ function asStringArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
 }
 
+function normalizeSynopsis(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const synopsis = value.trim();
+  return synopsis ? synopsis : undefined;
+}
+
+function extractOpenLibraryDescription(value: unknown): string | undefined {
+  const direct = normalizeSynopsis(value);
+  if (direct) return direct;
+  if (typeof value === "object" && value !== null) {
+    const nested = normalizeSynopsis(asRecord(value).value);
+    if (nested) return nested;
+  }
+  return undefined;
+}
+
 async function fetchJson(url: string): Promise<JsonRecord | null> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), LOOKUP_TIMEOUT_MS);
@@ -45,12 +61,22 @@ export async function lookupIsbn(isbn: string): Promise<Book | null> {
       const gbLang = await tryGoogleBooksLanguage(cleaned);
       if (gbLang) olResult.language = gbLang;
     }
+    if (!olResult.synopsis) {
+      const searchSynopsis = await tryOpenLibrarySynopsisBySearch(olResult.title, olResult.authors);
+      if (searchSynopsis) olResult.synopsis = searchSynopsis;
+    }
     return olResult;
   }
 
   // Fallback to Google Books
   const gbResult = await tryGoogleBooks(cleaned, normalizedIsbn13);
-  if (gbResult) return gbResult;
+  if (gbResult) {
+    if (!gbResult.synopsis) {
+      const searchSynopsis = await tryOpenLibrarySynopsisBySearch(gbResult.title, gbResult.authors);
+      if (searchSynopsis) gbResult.synopsis = searchSynopsis;
+    }
+    return gbResult;
+  }
 
   return null;
 }
@@ -87,13 +113,18 @@ async function tryOpenLibrary(isbn: string, normalizedIsbn13: string): Promise<B
 
   // Extract subjects from works
   let subjects: string[] | undefined;
+  let synopsis: string | undefined;
   const works = Array.isArray(data.works) ? data.works : [];
   const workKey = asString(asRecord(works[0]).key);
   if (workKey) {
     const worksData = await fetchJson(`https://openlibrary.org${workKey}.json`);
     if (worksData) {
       subjects = asStringArray(worksData.subjects).slice(0, 10);
+      synopsis = extractOpenLibraryDescription(worksData.description);
     }
+  }
+  if (!synopsis) {
+    synopsis = extractOpenLibraryDescription(data.description);
   }
 
   return {
@@ -110,6 +141,7 @@ async function tryOpenLibrary(isbn: string, normalizedIsbn13: string): Promise<B
       asRecord(Array.isArray(data.languages) ? data.languages[0] : undefined).key,
     )?.replace("/languages/", ""),
     subjects,
+    synopsis,
     coverUrl,
     status: "to-read",
     dateAdded: "",
@@ -154,6 +186,7 @@ async function tryGoogleBooks(isbn: string, normalizedIsbn13: string): Promise<B
     pageCount: typeof vol.pageCount === "number" ? vol.pageCount : undefined,
     language: asString(vol.language),
     subjects: asStringArray(vol.categories).slice(0, 10),
+    synopsis: normalizeSynopsis(vol.description),
     coverUrl: thumb?.replace("http:", "https:"),
     status: "to-read",
     dateAdded: "",
@@ -167,6 +200,35 @@ async function tryGoogleBooksLanguage(isbn: string): Promise<string | null> {
   const items = Array.isArray(data.items) ? data.items : [];
   const language = asString(asRecord(asRecord(items[0]).volumeInfo).language);
   return language || null;
+}
+
+async function tryOpenLibrarySynopsisBySearch(
+  title: string,
+  authors: string[],
+): Promise<string | undefined> {
+  const cleanTitle = title.trim();
+  if (!cleanTitle) return undefined;
+
+  const params = new URLSearchParams({
+    title: cleanTitle,
+    limit: "1",
+  });
+  const firstAuthor = authors.find((author) => author.trim().length > 0);
+  if (firstAuthor) {
+    params.set("author", firstAuthor.trim());
+  }
+
+  const searchData = await fetchJson(`https://openlibrary.org/search.json?${params.toString()}`);
+  if (!searchData) return undefined;
+
+  const docs = Array.isArray(searchData.docs) ? searchData.docs : [];
+  const workKey = asString(asRecord(docs[0]).key);
+  if (!workKey || !workKey.startsWith("/works/")) return undefined;
+
+  const worksData = await fetchJson(`https://openlibrary.org${workKey}.json`);
+  if (!worksData) return undefined;
+
+  return extractOpenLibraryDescription(worksData.description);
 }
 
 function extractYear(dateStr: string): number | undefined {

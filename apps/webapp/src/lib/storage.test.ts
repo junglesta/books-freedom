@@ -195,6 +195,12 @@ describe("updateBook", () => {
       "Invalid status",
     );
   });
+
+  it("updates synopsis", () => {
+    seedCollection([makeBook()]);
+    const updated = updateBook("book-1", { synopsis: "New synopsis" });
+    expect(updated.synopsis).toBe("New synopsis");
+  });
 });
 
 describe("deleteBook", () => {

@@ -10,6 +10,7 @@ export interface Book {
   pageCount?: number;
   language?: string;
   subjects?: string[];
+  synopsis?: string;
   coverUrl?: string;
   rating?: number;
   status: "to-read" | "reading" | "read";

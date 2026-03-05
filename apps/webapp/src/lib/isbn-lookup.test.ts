@@ -112,6 +112,92 @@ describe("lookupIsbn", () => {
     expect(book?.subjects).toEqual(["Fiction", "Classic"]);
   });
 
+  it("extracts synopsis from Open Library work description", async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (url.includes("openlibrary.org/isbn/")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              title: "Test Book",
+              authors: [{ key: "/authors/OL123A" }],
+              works: [{ key: "/works/OL123W" }],
+            }),
+        });
+      }
+      if (url.includes("openlibrary.org/authors/")) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ name: "Author" }),
+        });
+      }
+      if (url.includes("openlibrary.org/works/")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              description: { value: "A classic synopsis from Open Library." },
+            }),
+        });
+      }
+      return Promise.resolve({ ok: false });
+    });
+
+    const book = await lookupIsbn("9780141439518");
+    expect(book?.synopsis).toBe("A classic synopsis from Open Library.");
+  });
+
+  it("fills synopsis from Open Library search when missing from ISBN lookup", async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (url.includes("openlibrary.org/isbn/")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              title: "Search Me",
+              authors: [{ key: "/authors/OL123A" }],
+              works: [],
+            }),
+        });
+      }
+      if (url.includes("openlibrary.org/authors/")) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ name: "Author Name" }),
+        });
+      }
+      if (url.includes("openlibrary.org/search.json")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              docs: [{ key: "/works/OL999W" }],
+            }),
+        });
+      }
+      if (url.includes("openlibrary.org/works/OL999W.json")) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ description: "Synopsis via search fallback." }),
+        });
+      }
+      if (url.includes("googleapis.com/books/")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              items: [{ volumeInfo: { language: "en" } }],
+            }),
+        });
+      }
+      return Promise.resolve({ ok: false });
+    });
+
+    const book = await lookupIsbn("9780141439518");
+    expect(book?.source).toBe("openlibrary");
+    expect(book?.synopsis).toBe("Synopsis via search fallback.");
+  });
+
   it("extracts publish year from date string", async () => {
     mockOpenLibrary({ publish_date: "March 15, 2020" });
     const book = await lookupIsbn("9780141439518");
@@ -150,6 +236,59 @@ describe("lookupIsbn", () => {
 
     const book = await lookupIsbn("9780141439518");
     expect(book?.coverUrl).toBe("https://books.google.test/cover.jpg");
+  });
+
+  it("extracts synopsis from Google Books when falling back", async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (url.includes("openlibrary.org/")) {
+        return Promise.resolve({ ok: false });
+      }
+      if (url.includes("googleapis.com/books/")) {
+        return mockGoogleBooks({
+          description: "Google Books synopsis.",
+        });
+      }
+      return Promise.resolve({ ok: false });
+    });
+
+    const book = await lookupIsbn("9780141439518");
+    expect(book?.source).toBe("googlebooks");
+    expect(book?.synopsis).toBe("Google Books synopsis.");
+  });
+
+  it("fills Google Books synopsis from Open Library search when missing", async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (url.includes("openlibrary.org/isbn/")) {
+        return Promise.resolve({ ok: false });
+      }
+      if (url.includes("googleapis.com/books/")) {
+        return mockGoogleBooks({
+          title: "GB Search Me",
+          authors: ["GB Author"],
+          description: "",
+        });
+      }
+      if (url.includes("openlibrary.org/search.json")) {
+        return Promise.resolve({
+          ok: true,
+          json: () =>
+            Promise.resolve({
+              docs: [{ key: "/works/OL777W" }],
+            }),
+        });
+      }
+      if (url.includes("openlibrary.org/works/OL777W.json")) {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ description: { value: "GB synopsis via OL search." } }),
+        });
+      }
+      return Promise.resolve({ ok: false });
+    });
+
+    const book = await lookupIsbn("9780141439518");
+    expect(book?.source).toBe("googlebooks");
+    expect(book?.synopsis).toBe("GB synopsis via OL search.");
   });
 
   it("returns null when both APIs fail", async () => {

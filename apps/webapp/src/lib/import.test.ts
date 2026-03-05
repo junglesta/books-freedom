@@ -70,6 +70,21 @@ describe("parseImportedBooks", () => {
     expect(books[0].coverUrl).toBe("https://covers.openlibrary.org/b/id/12345-L.jpg");
   });
 
+  it("preserves synopsis from JSON import", () => {
+    const books = parseImportedBooks(
+      JSON.stringify([
+        {
+          isbn13: "9780141439518",
+          title: "Pride and Prejudice",
+          authors: ["Jane Austen"],
+          synopsis: "A quick synopsis.",
+        },
+      ]),
+      "books.json",
+    );
+    expect(books[0].synopsis).toBe("A quick synopsis.");
+  });
+
   it("derives coverUrl from Open Library cover id fields", () => {
     const books = parseImportedBooks(
       JSON.stringify([

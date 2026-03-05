@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.8.4
+
+- Added API-driven book synopsis support to the webapp `Book` model and detail view rendering
+- Added synopsis extraction during ISBN lookup from Open Library and Google Books descriptions
+- Added background synopsis backfill for existing library items when opening Book Details (silent save, no toast noise)
+- Improved synopsis coverage with a clean Open Library search fallback (`title + author` -> work description) when ISBN lookups return no description
+- Added tests for synopsis extraction/backfill paths and re-ran preflight gates (`pnpm format`, `pnpm lint`, `pnpm test`, `pnpm build`) with passing results
+
 ## 0.1.1 (Astro / BAOBAB)
 
 - Polished BAOBAB Astro footer copy and structure: clearer BAOBAB/BOOKBAT wording, improved line grouping, and cleaner section flow

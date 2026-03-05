@@ -165,14 +165,26 @@ export function importBooksToCollection(imported: Partial<Book>[]): ImportBooksS
   return { total: imported.length, added, skipped, failed };
 }
 
-export function updateBookInCollection(id: string, updates: Partial<Book>) {
+export interface UpdateBookInCollectionOptions {
+  silent?: boolean;
+}
+
+export function updateBookInCollection(
+  id: string,
+  updates: Partial<Book>,
+  options: UpdateBookInCollectionOptions = {},
+) {
   try {
     const updated = updateBook(id, updates);
     books = books.map((b) => (b.id === id ? updated : b));
-    showToast("Book updated!");
+    if (!options.silent) {
+      showToast("Book updated!");
+    }
     return updated;
   } catch (e: unknown) {
-    showToast(getErrorMessage(e, "Failed to update book"));
+    if (!options.silent) {
+      showToast(getErrorMessage(e, "Failed to update book"));
+    }
     throw e;
   }
 }

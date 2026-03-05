@@ -129,6 +129,7 @@ function normalizeImportedBook(input: unknown): Partial<Book> | null {
     publishYear: asOptionalNumber(raw.publishYear || raw.Year),
     pageCount: asOptionalNumber(raw.pageCount || raw.Pages),
     language: asString(raw.language) || asString(raw.Language),
+    synopsis: asString(raw.synopsis) || asString(raw.Synopsis) || asString(raw.description),
     status: parseStatus(raw.status || raw.Status),
     rating: asOptionalNumber(raw.rating || raw.Rating),
     notes: asString(raw.notes) || asString(raw.Notes),
