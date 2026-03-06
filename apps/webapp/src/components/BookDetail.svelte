@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import type { Book } from '../lib/types';
   import { showToast, updateBookInCollection, removeBookFromCollection, setBookCoverUrl } from '../lib/stores.svelte.ts';
   import { getCoverCandidates } from '../lib/cover';
@@ -28,8 +29,10 @@
   let copiedBookTextTimer: ReturnType<typeof setTimeout> | null = null;
   let backfillingSynopsis = $state(false);
   let synopsisBackfillAttemptedBookId = $state<string | null>(null);
+  let synopsisExpanded = $state(false);
   let statusOpen = $state(false);
   let removeConfirmOpen = $state(false);
+  let removeConfirmEl = $state<HTMLElement | null>(null);
 
   $effect(() => {
     status = book.status;
@@ -40,6 +43,7 @@
     coverCandidates = getCoverCandidates(book);
     coverIndex = 0;
     coverLoaded = false;
+    synopsisExpanded = false;
   });
 
   $effect(() => {
@@ -48,6 +52,15 @@
     if (synopsisBackfillAttemptedBookId === book.id) return;
     synopsisBackfillAttemptedBookId = book.id;
     void backfillSynopsis(book.id, book.isbn13);
+  });
+
+  $effect(() => {
+    if (!removeConfirmOpen) return;
+    void tick().then(() => {
+      if (typeof removeConfirmEl?.scrollIntoView === 'function') {
+        removeConfirmEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    });
   });
 
   const statusOptions: { value: Book['status']; label: string }[] = [
@@ -268,9 +281,19 @@
           <p class="detail_pages">{book.pageCount} pages</p>
         {/if}
         <p class="detail_isbn">ISBN: {book.isbn13}</p>
-        {#if book.synopsis}
-          <p class="detail_synopsis">{book.synopsis}</p>
-        {/if}
+        <details class="detail_synopsis_block" bind:open={synopsisExpanded}>
+          <summary class="detail_synopsis_toggle">
+            <span>Synopsis</span>
+            <span>{synopsisExpanded ? 'Show less' : 'Read more'}</span>
+          </summary>
+          <div
+            class="detail_synopsis"
+            class:detail_synopsis_loading={!book.synopsis}
+            class:detail_synopsis_expanded={synopsisExpanded}
+          >
+            {book.synopsis || 'Fetching synopsis...'}
+          </div>
+        </details>
       </div>
     </div>
 
@@ -320,6 +343,24 @@
       </label>
     </div>
 
+    {#if removeConfirmOpen}
+      <details
+        bind:this={removeConfirmEl}
+        class="rband_confirm rband_confirm_inline detail_remove_confirm"
+        open
+        aria-label="Remove book confirmation"
+      >
+        <summary class="rband_confirm_summary">Remove Book</summary>
+        <div class="rband_confirm_copy">
+          <p>Remove "{book.title}" from your library? This cannot be undone.</p>
+        </div>
+        <div class="rband_confirm_actions">
+          <button class="btn btn_ghost" onclick={cancelRemove}>Cancel</button>
+          <button class="btn btn_danger" onclick={confirmRemove}>Delete</button>
+        </div>
+      </details>
+    {/if}
+
     <div class="detail_actions" class:detail_actions_four={canNativeShare}>
       {#if canNativeShare}
         <ActionButton
@@ -348,18 +389,5 @@
         {saving ? 'Saving...' : 'Save'}
       </button>
     </div>
-
-    {#if removeConfirmOpen}
-      <details class="rband_confirm rband_confirm_inline" open aria-label="Remove book confirmation">
-        <summary class="rband_confirm_summary">Remove Book</summary>
-        <div class="rband_confirm_copy">
-          <p>Remove "{book.title}" from your library? This cannot be undone.</p>
-        </div>
-        <div class="rband_confirm_actions">
-          <button class="btn btn_ghost" onclick={cancelRemove}>Cancel</button>
-          <button class="btn btn_danger" onclick={confirmRemove}>Delete</button>
-        </div>
-      </details>
-    {/if}
   </div>
 </details>

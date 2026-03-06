@@ -78,7 +78,13 @@ describe("LibraryPage", () => {
     });
     removeBookFromCollection.mockResolvedValue(undefined);
     clearLibraryCollection.mockImplementation(() => {});
-    importBooksToCollection.mockReturnValue({ total: 0, added: 0, skipped: 0, failed: 0 });
+    importBooksToCollection.mockReturnValue({
+      total: 0,
+      added: 0,
+      merged: 0,
+      skipped: 0,
+      failed: 0,
+    });
     lookupIsbn.mockResolvedValue(null);
   });
 

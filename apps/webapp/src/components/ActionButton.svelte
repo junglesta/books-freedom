@@ -10,7 +10,6 @@
     disabled?: boolean;
     hideIcon?: boolean;
     compact?: boolean;
-    iconOnly?: boolean;
     ariaLabel?: string;
     onclick?: (event: MouseEvent) => void;
   }
@@ -23,7 +22,6 @@
     disabled = false,
     hideIcon = false,
     compact = false,
-    iconOnly = false,
     ariaLabel,
     onclick,
   }: Props = $props();
@@ -31,7 +29,7 @@
 
 <button
   {type}
-  class={`action_button ${compact ? 'action_button_compact' : ''} ${iconOnly ? 'action_button_icon_only' : ''} ${buttonClass}`.trim()}
+  class={`action_button ${compact ? 'action_button_compact' : ''} ${buttonClass}`.trim()}
   {disabled}
   aria-label={ariaLabel ?? labelLines.join(' ')}
   {onclick}
@@ -62,21 +60,15 @@
       </span>
     {/if}
 
-    {#if !iconOnly}
-      <span class="action_button_label">
-        {#each labelLines as line}
-          <span>{line}</span>
-        {/each}
-      </span>
-    {/if}
+    <span class="action_button_label">
+      {#each labelLines as line}
+        <span>{line}</span>
+      {/each}
+    </span>
   </span>
 </button>
 
 <style>
-  .action_button {
-    width: 100%;
-  }
-
   .action_button_inner {
     width: 100%;
     display: grid;
@@ -89,19 +81,9 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .action_button_icon_only .action_button_inner {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
-
   .action_button_compact .action_button_inner {
     grid-template-columns: 34px minmax(0, 1fr);
     gap: 8px;
-  }
-
-  .action_button_compact.action_button_icon_only .action_button_inner {
-    grid-template-columns: 1fr;
-    gap: 0;
   }
 
   .action_button_icon_wrap {

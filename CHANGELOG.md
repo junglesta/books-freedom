@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.8
+
+- Added real import merge behavior for duplicate ISBNs: new books append, missing metadata can be filled in, and personal fields are preserved instead of overwritten
+- Added Library import merge help UI, plus multiple Library/Export control bar alignment fixes for help and sort actions on narrow layouts
+- Refined Book Details UX with a three-line synopsis accordion to avoid layout jump, cleaner remove-confirm spacing, and safer in-view confirmation behavior
+
 ## 0.8.7
 
 - Extracted reusable UI primitives for BOOKBAT action buttons and splash overlays, so footer, detail, export, and splash interactions now share single-source component structure

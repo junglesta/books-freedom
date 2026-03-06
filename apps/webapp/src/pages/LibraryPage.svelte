@@ -35,6 +35,7 @@ import SearchBar from '../components/SearchBar.svelte';
   let dropConfirmOpen = $state(false);
   let importFeedbackError = $state("");
   let libraryNameInfoOpen = $state(false);
+  let importMergeInfoOpen = $state(false);
 
   const selectedBook = $derived.by(() =>
     selectedBookId ? getBooks().find((book) => book.id === selectedBookId) || null : null
@@ -184,11 +185,11 @@ import SearchBar from '../components/SearchBar.svelte';
       const summary = importBooksToCollection(importedBooks);
       if (summary.total === 0) {
         showToast("No valid books found in file.");
-      } else if (summary.added === 0) {
-        showToast("No new books imported (duplicates or invalid rows).");
+      } else if (summary.added === 0 && summary.merged === 0) {
+        showToast("No new or updated books imported.");
       } else {
         showToast(
-          `Imported ${summary.added} book${summary.added === 1 ? "" : "s"} (${summary.skipped} skipped${summary.failed > 0 ? `, ${summary.failed} failed` : ""}).`,
+          `Imported ${summary.added} new, merged ${summary.merged} (${summary.skipped} skipped${summary.failed > 0 ? `, ${summary.failed} failed` : ""}).`,
         );
       }
     } catch (error: unknown) {
@@ -235,6 +236,24 @@ import SearchBar from '../components/SearchBar.svelte';
       </button>
       <button class="view_toggle view_toggle_text" onclick={openImportPicker} aria-label="Import books">
         Import
+      </button>
+      <button
+        class="help_btn library_import_info_btn"
+        aria-label="Import merge info"
+        onclick={() => (importMergeInfoOpen = !importMergeInfoOpen)}
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="11" x2="12" y2="16" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
+        </svg>
       </button>
       <input
         bind:this={importInputRef}
@@ -321,6 +340,15 @@ import SearchBar from '../components/SearchBar.svelte';
     <details class="rband_note rband_note_error" open>
       <summary class="rband_note_summary">Import Error</summary>
       <p>{importFeedbackError}</p>
+    </details>
+  {/if}
+
+  {#if importMergeInfoOpen}
+    <details class="rband_note" open>
+      <summary class="rband_note_summary">Import Merge</summary>
+      <p>Import appends new books and merges duplicate ISBNs into existing books.</p>
+      <p>Personal fields are not overwritten: status, rating, notes, tags, and date read stay as they are.</p>
+      <p>Missing metadata can be filled in from the imported file: authors when currently unknown, publisher, publish date, year, pages, language, subjects, synopsis, cover, and ISBN-10.</p>
     </details>
   {/if}
 

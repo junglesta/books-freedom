@@ -128,41 +128,113 @@ export function addBookToCollection(book: Partial<Book>) {
 export interface ImportBooksSummary {
   total: number;
   added: number;
+  merged: number;
   skipped: number;
   failed: number;
 }
 
+function isBlankString(value: string | undefined): boolean {
+  return value === undefined || value.trim() === "";
+}
+
+function isMeaningfulStringArray(value: string[] | undefined): value is string[] {
+  return Array.isArray(value) && value.length > 0;
+}
+
+function hasPlaceholderAuthors(authors: string[]): boolean {
+  return authors.length === 1 && authors[0] === "Unknown Author";
+}
+
+function buildImportedBookMergeUpdates(
+  existing: Book,
+  candidate: Partial<Book>,
+): Partial<Book> | null {
+  const updates: Partial<Book> = {};
+
+  if (isBlankString(existing.isbn10) && !isBlankString(candidate.isbn10)) {
+    updates.isbn10 = candidate.isbn10;
+  }
+  if (isBlankString(existing.publisher) && !isBlankString(candidate.publisher)) {
+    updates.publisher = candidate.publisher;
+  }
+  if (isBlankString(existing.publishDate) && !isBlankString(candidate.publishDate)) {
+    updates.publishDate = candidate.publishDate;
+  }
+  if (existing.publishYear === undefined && candidate.publishYear !== undefined) {
+    updates.publishYear = candidate.publishYear;
+  }
+  if (existing.pageCount === undefined && candidate.pageCount !== undefined) {
+    updates.pageCount = candidate.pageCount;
+  }
+  if (isBlankString(existing.language) && !isBlankString(candidate.language)) {
+    updates.language = candidate.language;
+  }
+  if (!isMeaningfulStringArray(existing.subjects) && isMeaningfulStringArray(candidate.subjects)) {
+    updates.subjects = candidate.subjects;
+  }
+  if (isBlankString(existing.synopsis) && !isBlankString(candidate.synopsis)) {
+    updates.synopsis = candidate.synopsis;
+  }
+  if (isBlankString(existing.coverUrl) && !isBlankString(candidate.coverUrl)) {
+    updates.coverUrl = candidate.coverUrl;
+  }
+  if (hasPlaceholderAuthors(existing.authors) && isMeaningfulStringArray(candidate.authors)) {
+    updates.authors = candidate.authors;
+  }
+
+  return Object.keys(updates).length > 0 ? updates : null;
+}
+
 export function importBooksToCollection(imported: Partial<Book>[]): ImportBooksSummary {
-  const existingIsbns = new Set(books.map((b) => b.isbn13));
-  const addedBooks: Book[] = [];
+  const booksByIsbn = new Map(books.map((book) => [book.isbn13, book] as const));
+  const nextBooks = [...books];
   let added = 0;
+  let merged = 0;
   let skipped = 0;
   let failed = 0;
 
   for (const candidate of imported) {
-    if (typeof candidate.isbn13 !== "string" || existingIsbns.has(candidate.isbn13)) {
+    if (typeof candidate.isbn13 !== "string") {
       skipped++;
       continue;
     }
+
+    const existing = booksByIsbn.get(candidate.isbn13);
+
     try {
+      if (existing) {
+        const updates = buildImportedBookMergeUpdates(existing, candidate);
+        if (!updates) {
+          skipped++;
+          continue;
+        }
+
+        const updated = updateBook(existing.id, updates);
+        const index = nextBooks.findIndex((book) => book.id === existing.id);
+        if (index !== -1) {
+          nextBooks[index] = updated;
+        }
+        booksByIsbn.set(updated.isbn13, updated);
+        merged++;
+        continue;
+      }
+
       const saved = addBook({
         ...candidate,
         status: candidate.status || "to-read",
         source: candidate.source || "manual",
       });
-      existingIsbns.add(saved.isbn13);
-      addedBooks.push(saved);
+      booksByIsbn.set(saved.isbn13, saved);
+      nextBooks.push(saved);
       added++;
     } catch {
       failed++;
     }
   }
 
-  if (addedBooks.length > 0) {
-    books = [...books, ...addedBooks];
-  }
+  books = nextBooks;
 
-  return { total: imported.length, added, skipped, failed };
+  return { total: imported.length, added, merged, skipped, failed };
 }
 
 export interface UpdateBookInCollectionOptions {

@@ -1,132 +1,117 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/28542ff1-4d69-4518-abdc-5cb625f0befe/deploy-status)](https://app.netlify.com/projects/bookfreedom/deploys)
 
-
 <a href="https://bat.junglestar.org">
   <img src="apps/webapp/src/assets/startscreen.svg" alt="BOOK BAT" width="480">
 </a>
 
+> no account. no cloud. no tracking. scan it. shelve it. own your data.
 
->  no account. no cloud. no tracking. | scan it. shelve it. own your data.
+## What This Repo Is
 
-## WHY
+This monorepo contains two related clients:
 
-because your reading list shouldn't live on some corpo platform that sells your habits, goes down randomly, or gets acqui-hired into oblivion.
+- `BOOK BAT`: the active Svelte app for scanning, organizing, annotating, importing, exporting, and sharing your library
+- `BAOBAB`: the Astro static site/client layer for presenting and publishing library data
 
-your books, your list, your rules.
+The repo is fully client-side. No hosted app database. No user accounts. `BOOK BAT` stores your library in browser `localStorage`.
 
-## HOW
+## What BOOK BAT Does
 
-- scan ISBN barcodes with your camera or type them in
-- auto-fetches title, author, cover, and metadata
-- organize with status (to read / reading / read), ratings, notes, tags
-- search, filter, sort your whole library
-- export anywhere: JSON, CSV, Goodreads, LibraryThing, Google Sheets
-- import and merge automatically: JSON, CSV, Goodreads, LibraryThing
-- works offline as a PWA — install it and it's feels a native app
+- scan ISBN barcodes with camera or type ISBN manually
+- fetch title, authors, publisher, cover, and other metadata
+- backfill synopsis from book APIs when available
+- organize books with status, rating, notes, tags, and language
+- search, filter, and sort your library
+- copy or share single-book info from the detail view
+- export library data as JSON, CSV, Goodreads CSV, LibraryThing TSV, or Google Sheets webhook payload
+- import library files and merge duplicate ISBNs safely
+- work offline as a PWA
 
-## WHAT
+## Import Merge Rules
 
-`BOOK BAT` and `BAOBAB` are one ecosystem. a symbiotic relationship.
+Imports do not replace your whole library.
 
-BOOKBAT flies around with you:
+When you import a file:
 
-- up the Shelves
-- into Town Center Libraries, 
-- at Street Book Fairs. 
-- teachers use BOOKBAT to put together Courses. 
-- friends use it to quickly memo titles they plan to AudioRead!
+- new ISBNs are appended as new books
+- duplicate ISBNs are merged into the existing book
+- personal fields are preserved and are not overwritten:
+  - status
+  - rating
+  - notes
+  - tags
+  - date read
+- missing metadata can be filled from the imported file:
+  - authors when the current author is just `Unknown Author`
+  - ISBN-10
+  - publisher
+  - publish date
+  - publish year
+  - page count
+  - language
+  - subjects
+  - synopsis
+  - cover URL
 
-BAOBAB keeps the booklists, for storage and **sharing is caring!**:
+## Repo Structure
 
-- presents 
-- browse
-- share interesting read on your blog
-- extends it across static/client surfaces
-- demo
- 
-technically :
- 
-- `BOOK BAT` is the active app layer: scan, edit, organize, export. a dead-simple book library app. point your camera at a barcode, get the book info, done. everything stays on your device in localStorage. nothing leaves the browser.
+- `apps/webapp` -> `BOOK BAT` Svelte 5 + Vite app
+- `apps/astro-site` -> `BAOBAB` Astro site
+- `data/library.json` -> canonical library dataset used for sync into app/site data
 
-- `BAOBAB` is the component client layer bulit on Astro cos we no need extra JS: a rooted, statically rendered, durable view of your library data.
+## Stack
 
+- Svelte 5
+- Vite
+- Astro
+- Vitest
+- Biome
+- `html5-qrcode`
 
+## Run Locally
 
-## STACK
-
-svelte 5 + vite + astro (workspace). pure static clients. local storage and ISBN lookup logic.
-
-## MONOREPO
-
-- `apps/webapp` → current BOOK BAT app
-- `apps/astro-site` → Astro SSG site with `BOOK BAT CLIENT`
-- `packages/library-core` → shared types + list/search/sort helpers
-
-## NETLIFY (2 SITES, 1 REPO)
-
-Use two separate Netlify sites connected to the same repo/branch:
-
-1. `bat.junglestar.org` (BOOKBAT webapp)
-2. `baobab.junglestar.org` (BAOBAB Astro)
-
-### BOOKBAT site settings
-
-- Base directory: repo root
-- Build command: `pnpm build:webapp`
-- Publish directory: `dist/webapp`
-- Config file: root `netlify.toml`
-- Deploy gating: `scripts/netlify-ignore-webapp.sh`
-
-### BAOBAB site settings
-
-- Base directory: `apps/astro-site`
-- Build command: `pnpm -C ../.. build:astro`
-- Publish directory: `dist`
-- Config file: `apps/astro-site/netlify.toml`
-- Deploy gating: `scripts/netlify-ignore-astro.sh`
-
-Result: webapp-only changes skip BAOBAB deploy, and Astro-only changes skip BOOKBAT deploy.
-
-## RUN IT
+Install dependencies:
 
 ```bash
 pnpm install
+```
+
+Run `BOOK BAT`:
+
+```bash
 pnpm dev:webapp
+```
+
+Run `BAOBAB`:
+
+```bash
 pnpm dev:astro
 ```
 
-## HTTPS DEV (LOCAL + LAN PHONE)
+## HTTPS Dev For Camera Testing
 
-Generate local certs (includes localhost + detected LAN IPv4 addresses):
+Generate local certificates:
 
 ```bash
 pnpm certs:generate
 ```
 
-Run webapp over HTTPS:
+Run the webapp over HTTPS:
 
 ```bash
 pnpm dev:webapp:https
 ```
 
-Open:
+Then open:
 
 - `https://localhost:5173`
-- `https://<your-lan-ip>:5173` (phone on same Wi-Fi)
+- `https://<your-lan-ip>:5173`
 
-Note: phone browsers may still require trusting the local cert before camera APIs behave as secure context.
+Phone browsers may still require trusting the local certificate before camera APIs behave as a secure context.
 
-## ASTRO JSON INPUT
+## Data Sync
 
-Canonical drop-in files:
-
-- `data/library.json` (default dataset)
-- `data/library.dummy.json` (optional demo dataset)
-
-The workspace auto-syncs `data/library.json` to:
-
-- `apps/astro-site/src/data/library.json`
-- `apps/webapp/src/public/library.json`
+The workspace syncs `data/library.json` into both apps.
 
 Run manually:
 
@@ -136,10 +121,12 @@ pnpm data:sync:dummy
 pnpm data:apply ./my-export.json
 ```
 
-Note: Astro SSG cannot write back to repo files from the browser at runtime.  
-Use `data:apply` (or replace `data/library.json`) to persist edits into the drop-in folder.
+Sync targets:
 
-Supported shape (`data/library.json`):
+- `apps/webapp/src/public/library.json`
+- `apps/astro-site/src/data/library.json`
+
+Expected shape:
 
 ```json
 {
@@ -148,11 +135,67 @@ Supported shape (`data/library.json`):
 }
 ```
 
-## LICENSE
+## Build
 
-[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.en) — share it, remix it, just keep it open.
+Build `BOOK BAT`:
 
+```bash
+pnpm build:webapp
+```
 
-## COMMERCIAL
+Build `BAOBAB`:
 
-want to use our SDK or build something commercial? hit us up at **info@junglestar.org**
+```bash
+pnpm build:astro
+```
+
+## Quality Gates
+
+```bash
+pnpm format
+pnpm lint
+pnpm test
+pnpm build
+```
+
+For release preflight:
+
+```bash
+pnpm preflight
+```
+
+## Netlify
+
+Two Netlify sites are connected to this repo:
+
+1. `bat.junglestar.org` for `BOOK BAT`
+2. `baobab.junglestar.org` for `BAOBAB`
+
+### BOOK BAT
+
+- Base directory: repo root
+- Build command: `pnpm build:webapp`
+- Publish directory: `dist/webapp`
+- Config file: `netlify.toml`
+- Ignore/build gating: `scripts/netlify-ignore-webapp.sh`
+
+### BAOBAB
+
+- Base directory: `apps/astro-site`
+- Build command: `pnpm -C ../.. build:astro`
+- Publish directory: `dist`
+- Config file: `apps/astro-site/netlify.toml`
+- Ignore/build gating: `scripts/netlify-ignore-astro.sh`
+
+## Product URLs
+
+- `BOOK BAT`: [https://bat.junglestar.org](https://bat.junglestar.org)
+- `BAOBAB`: [https://baobab.junglestar.org](https://baobab.junglestar.org)
+
+## License
+
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/deed.en)
+
+## Commercial
+
+For SDK or commercial use, contact **info@junglestar.org**.
