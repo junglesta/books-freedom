@@ -4,6 +4,7 @@
   import { getCoverCandidates } from '../lib/cover';
   import { lookupIsbn } from '../lib/isbn-lookup';
   import { generateBookText } from '../lib/export';
+  import ActionButton from './ActionButton.svelte';
 
   interface Props {
     book: Book;
@@ -321,62 +322,27 @@
 
     <div class="detail_actions" class:detail_actions_four={canNativeShare}>
       {#if canNativeShare}
-        <button class="btn btn_secondary" onclick={shareBook} disabled={sharingBook}>
-          <span class="detail_action_button_inner">
-            {#if !sharingBook}
-              <span class="detail_action_icon_wrap">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                  <circle cx="18" cy="5.5" r="2" stroke-width="2" />
-                  <circle cx="6" cy="12" r="2" stroke-width="2" />
-                  <circle cx="18" cy="18.5" r="2" stroke-width="2" />
-                  <path d="M8 11l8-4" stroke-width="2" />
-                  <path d="M8 13l8 4" stroke-width="2" />
-                </svg>
-              </span>
-            {/if}
-            <span class="detail_action_label">
-              {#if sharingBook}
-                <span>LET'S</span>
-                <span>DO</span>
-                <span>IT</span>
-              {:else}
-                <span>Share</span>
-                <span>Book</span>
-              {/if}
-            </span>
-          </span>
-        </button>
+        <ActionButton
+          buttonClass="btn btn_secondary"
+          icon="share"
+          labelLines={sharingBook ? ["LET'S", 'DO', 'IT'] : ['Share', 'Book']}
+          hideIcon={sharingBook}
+          onclick={shareBook}
+          disabled={sharingBook}
+        />
       {/if}
-      <button
-        class="btn btn_secondary"
-        class:detail_action_copy_success={copiedBookText}
+      <ActionButton
+        buttonClass={`btn btn_secondary ${copiedBookText ? 'detail_action_copy_success' : ''}`}
+        icon="copy"
+        labelLines={copyingBookText
+          ? ['Copying...']
+          : copiedBookText
+            ? ['COPIED', 'TO YOUR', 'CLIPBOARD']
+            : ['Copy', 'Book', 'Info']}
+        hideIcon={copyingBookText || copiedBookText}
         onclick={copyBookText}
         disabled={copyingBookText}
-      >
-        <span class="detail_action_button_inner">
-          {#if !copyingBookText && !copiedBookText}
-            <span class="detail_action_icon_wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                <rect x="9" y="9" width="11" height="11" rx="2" stroke-width="2" />
-                <path d="M6 15H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1" stroke-width="2" />
-              </svg>
-            </span>
-          {/if}
-          <span class="detail_action_label">
-            {#if copyingBookText}
-              <span>Copying...</span>
-            {:else if copiedBookText}
-              <span>COPIED</span>
-              <span>TO YOUR</span>
-              <span>CLIPBOARD</span>
-            {:else}
-              <span>Copy</span>
-              <span>Book</span>
-              <span>Info</span>
-            {/if}
-          </span>
-        </span>
-      </button>
+      />
       <button class="btn btn_danger" onclick={remove}>Remove</button>
       <button class="btn btn_primary" onclick={save} disabled={saving || !hasChanges}>
         {saving ? 'Saving...' : 'Save'}

@@ -82,63 +82,9 @@ button {
   }
 }
 
-/* ===== Splash Screen ===== */
-.splash {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  appearance: none;
-  border: none;
-  padding: 0;
-  background: var(--bg);
-  user-select: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  z-index: 999;
-}
-
-.splash::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(180deg, #0a0a0a 0%, #0a0a0a 25%, #d4ff00 100%);
-  filter: url(#dither);
-}
-
-.splash_startup {
-  animation: splash-fade 0.4s ease 1s forwards;
-}
-
-.splash_logo {
-  position: relative;
-  z-index: 1;
-  min-width: 100%;
-  min-height: 100%;
-  object-fit: cover;
-  animation: splash-draw 0.8s ease forwards;
-}
-
-.splash_help {
-  align-items: stretch;
-  justify-content: flex-start;
-}
-
-.splash_help_scroll {
+.splash_media_scroll {
   width: 100%;
   height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.splash_help_scroll::-webkit-scrollbar {
-  display: none;
 }
 
 .splash_help_image {
@@ -147,12 +93,11 @@ button {
   height: auto;
 }
 
-/* Startup splash must always fill viewport regardless image ratio */
-.splash_startup .splash_help_scroll {
+.splash_media_scroll_fill {
   overflow: hidden;
 }
 
-.splash_startup .splash_help_image {
+.splash_media_scroll_fill .splash_help_image {
   width: 100%;
   height: 100%;
   min-height: 100%;
@@ -189,10 +134,12 @@ button {
   margin: 0;
   padding: 8px 6px;
   text-align: center;
-  font-size: 18px;
+  font-size: clamp(11px, 3.2vw, 15px);
   line-height: 1.25;
   color: var(--primary);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 @keyframes splash-draw {
@@ -204,17 +151,6 @@ button {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-@keyframes splash-fade {
-  to {
-    opacity: 0;
-  }
-}
-
-.splash_popover {
-  animation: splash-in 0.25s ease forwards;
-  cursor: pointer;
 }
 
 .splash_close {
@@ -233,15 +169,6 @@ button {
   background: rgba(0, 0, 0, 0.75);
   font-size: 28px;
   line-height: 1;
-}
-
-@keyframes splash-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 .page {
@@ -314,10 +241,6 @@ button {
   padding: 14px 18px;
   border: 1px solid var(--primary);
   border-radius: var(--radius-sm);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
   background: transparent;
   color: var(--primary);
   cursor: pointer;
@@ -326,11 +249,6 @@ button {
   font-weight: 600;
   font-family: inherit;
   line-height: 1;
-}
-
-.footer_action_btn svg {
-  width: 20px;
-  height: 20px;
 }
 
 .footer_action_btn:hover {
@@ -1547,55 +1465,8 @@ h1 .count {
   flex: initial;
 }
 
-.detail_actions .btn svg {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  color: var(--primary);
-  stroke-width: 1.8;
-}
-
 .detail_actions .btn_secondary {
   color: var(--primary);
-}
-
-.detail_action_button_inner {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 44px minmax(0, 1fr);
-  align-items: center;
-  gap: 6px;
-}
-
-.detail_action_icon_wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.detail_action_label {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  text-align: left;
-  line-height: 1.05;
-}
-
-.detail_action_label span {
-  display: block;
-}
-
-@media (min-width: 640px) {
-  .detail_action_label {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0 0.35em;
-  }
-
-  .detail_action_label span {
-    display: inline;
-  }
 }
 
 .detail_action_copy_success {
@@ -1696,11 +1567,6 @@ h1 .count {
   border-radius: 50%;
   color: var(--primary);
   cursor: pointer;
-}
-
-.help_btn svg {
-  width: 22px;
-  height: 22px;
 }
 
 .help_panel {

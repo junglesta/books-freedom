@@ -1,7 +1,9 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import Nav from "./components/Nav.svelte";
+    import SplashScreen from "./components/SplashScreen.svelte";
     import Toast from "./components/Toast.svelte";
+    import ActionButton from "./components/ActionButton.svelte";
     import ScanPage from "./pages/ScanPage.svelte";
     import LibraryPage from "./pages/LibraryPage.svelte";
     import ExportPage from "./pages/ExportPage.svelte";
@@ -69,30 +71,30 @@
 
 {#if !splashDone}
     {#if splashMode === "help"}
-        <button type="button" class="splash splash_popover splash_help" onclick={maybeCloseSplash} aria-label="Close splash screen">
-            <div class="splash_help_scroll">
+        <SplashScreen onclick={maybeCloseSplash} ariaLabel="Close splash screen">
+            <div class="splash_media_scroll">
                 <img class="splash_help_image" src={splashHelpUrl} alt="BOOK BAT readme screen" />
             </div>
-        </button>
+        </SplashScreen>
     {:else if splashMode === "share"}
-        <button type="button" class="splash splash_popover" onclick={maybeCloseSplash} aria-label="Close share splash">
+        <SplashScreen onclick={maybeCloseSplash} ariaLabel="Close share splash" layout="centered">
             <div class="splash_share_content">
                 <img src={splashQrUrl} alt="QR code to share BOOK BAT" />
                 <p class="splash_share_url">https://bat.junglestar.org</p>
             </div>
-        </button>
+        </SplashScreen>
     {:else if startupSplashPersistent}
-        <button type="button" class="splash splash_popover splash_help splash_startup" onclick={maybeCloseSplash} aria-label="Close start screen">
-            <div class="splash_help_scroll">
+        <SplashScreen onclick={maybeCloseSplash} ariaLabel="Close start screen">
+            <div class="splash_media_scroll">
                 <img class="splash_help_image" src={splashStartUrl} alt="BOOK BAT start screen" />
             </div>
-        </button>
+        </SplashScreen>
     {:else}
-        <div class="splash splash_startup splash_help">
-            <div class="splash_help_scroll">
+        <SplashScreen dismissible={false} layout="fill" animated={true}>
+            <div class="splash_media_scroll splash_media_scroll_fill">
                 <img class="splash_help_image" src={splashStartUrl} alt="BOOK BAT start screen" />
             </div>
-        </div>
+        </SplashScreen>
     {/if}
 {:else}
     <div class="app">
@@ -130,24 +132,20 @@
                     >
                 </span>
                 <div class="footer_actions">
-                    <button type="button" class="footer_action_btn" onclick={openHelpSplash}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                            <circle cx="12" cy="12" r="9" stroke-width="2" />
-                            <path d="M9.8 9a2.2 2.2 0 1 1 3.8 1.5c-.8.7-1.5 1.2-1.5 2.3" stroke-width="2" />
-                            <circle cx="12" cy="17.3" r="1" fill="currentColor" stroke="none" />
-                        </svg>
-                        <span>HELP</span>
-                    </button>
-                    <button type="button" class="footer_action_btn" onclick={openShareSplash}>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-                            <circle cx="18" cy="5.5" r="2" stroke-width="2" />
-                            <circle cx="6" cy="12" r="2" stroke-width="2" />
-                            <circle cx="18" cy="18.5" r="2" stroke-width="2" />
-                            <path d="M8 11l8-4" stroke-width="2" />
-                            <path d="M8 13l8 4" stroke-width="2" />
-                        </svg>
-                        <span>SHARE</span>
-                    </button>
+                    <ActionButton
+                        buttonClass="footer_action_btn"
+                        icon="help"
+                        labelLines={["Help"]}
+                        compact={true}
+                        onclick={openHelpSplash}
+                    />
+                    <ActionButton
+                        buttonClass="footer_action_btn"
+                        icon="share"
+                        labelLines={["Share", "This", "App"]}
+                        compact={true}
+                        onclick={openShareSplash}
+                    />
                 </div>
             </footer>
         </main>

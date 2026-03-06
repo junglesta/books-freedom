@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.8.7
+
+- Extracted reusable UI primitives for BOOKBAT action buttons and splash overlays, so footer, detail, export, and splash interactions now share single-source component structure
+- Refined footer and share-splash mobile behavior: clearer `Share This App` copy, stable icon/label composition, smaller QR URL treatment, and cleaner overflow handling
+- Unified help/share/start overlay behavior through a dedicated splash shell component, including consistent scrollable viewport behavior for modal splash content
+
 ## 0.8.6
 
 - Added native single-book share from Book Details via the Browser Share API, alongside the existing `Copy Book Info` action

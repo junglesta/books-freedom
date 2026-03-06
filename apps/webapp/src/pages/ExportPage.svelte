@@ -1,4 +1,5 @@
 <script lang="ts">
+    import ActionButton from "../components/ActionButton.svelte";
     import { getBooks, showToast, getLibraryName } from "../lib/stores.svelte";
     import { getRawCollection } from "../lib/storage";
     import {
@@ -279,24 +280,15 @@
                         <p>{fmt.desc}</p>
                     {/if}
                 </button>
-                <button
-                    class="help_btn"
+                <ActionButton
+                    buttonClass="help_btn"
+                    icon="help"
+                    labelLines={["Help"]}
+                    iconOnly={true}
+                    compact={true}
+                    ariaLabel={`Help for ${fmt.label}`}
                     onclick={() => toggleHelp(fmt.id)}
-                    aria-label="Help for {fmt.label}"
-                >
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <circle cx="12" cy="12" r="10" />
-                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                        <line x1="12" y1="17" x2="12.01" y2="17" />
-                    </svg>
-                </button>
+                />
             </div>
             {#if openHelp === fmt.id}
                 <div class="help_panel">
@@ -359,24 +351,15 @@
                     </details>
                 {/if}
             </div>
-            <button
-                class="help_btn"
+            <ActionButton
+                buttonClass="help_btn"
+                icon="help"
+                labelLines={["Help"]}
+                iconOnly={true}
+                compact={true}
+                ariaLabel="Help for Google Sheets"
                 onclick={() => toggleHelp("sheets")}
-                aria-label="Help for Google Sheets"
-            >
-                <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                    <line x1="12" y1="17" x2="12.01" y2="17" />
-                </svg>
-            </button>
+            />
         </div>
         {#if openHelp === "sheets"}
             <div class="help_panel">
