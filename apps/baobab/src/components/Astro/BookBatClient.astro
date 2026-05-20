@@ -34,6 +34,7 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
     data-config={encodedConfig}
 >
     <section class="bfc_body">
+        <aside class="bfc_sidebar">
         <header
             class="bfc_header"
             data-bfc-header
@@ -170,11 +171,14 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
             </button>
         </div>
 
-        <p class="bfc_count" data-bfc-count hidden>0 titles</p>
-        <div class="bfc_list" data-bfc-list></div>
-        <p class="bfc_empty" data-bfc-empty hidden>
-            No books match your filters.
-        </p>
+        </aside>
+        <div class="bfc_main">
+            <p class="bfc_count" data-bfc-count hidden>0 titles</p>
+            <div class="bfc_list" data-bfc-list></div>
+            <p class="bfc_empty" data-bfc-empty hidden>
+                No books match your filters.
+            </p>
+        </div>
     </section>
     <section class="bfc_export_wrap">
         <div class="bfc_export_slot" data-bfc-export-slot></div>
@@ -238,9 +242,9 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
             Licensed under
             <a
                 class="bfc_link"
-                href="https://creativecommons.org/licenses/by-sa/4.0/deed.en"
+                href="https://opensource.org/licenses/MIT"
                 target="_blank"
-                rel="noreferrer noopener">CC BY-SA 4.0</a
+                rel="noreferrer noopener">MIT</a
             >
         </span>
     </footer>
@@ -461,11 +465,11 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
 
     function statusChip(book) {
         const status = book.status || "to-read";
-        const rating = Number.isFinite(book.rating)
+        const stars = Number.isFinite(book.rating)
             ? " " + "★".repeat(Math.max(0, Number(book.rating)))
             : "";
-        const year = book.publishYear ? ` ${book.publishYear}` : "";
-        return `${statusLabel[status] || "To Read"}${rating}${year}`;
+        const year = book.publishYear ? `${book.publishYear} ` : "";
+        return `${year}${statusLabel[status] || "To Read"}${stars}`;
     }
 
     function generateBookText(book, { includeTitle = true } = {}) {
@@ -1002,20 +1006,24 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
                     referrerpolicy="no-referrer"
                   />
                 </div>
-                ${publisher ? `<p><strong>Publisher:</strong> ${publisher}</p>` : ""}
-                ${year ? `<p><strong>Year:</strong> ${year}</p>` : ""}
-                ${pages ? `<p><strong>Pages:</strong> ${pages}</p>` : ""}
-                ${language ? `<p><strong>Language:</strong> ${language}</p>` : ""}
-                ${notes ? `<p><strong>Notes:</strong> ${notes}</p>` : ""}
-                ${tags ? `<p><strong>Tags:</strong> ${tags}</p>` : ""}
-                <p><strong>ISBN-13:</strong> ${isbn13}</p>
-                ${synopsis ? `<p class="bfc_synopsis"><strong>Synopsis:</strong> ${synopsis}</p>` : ""}
-                <div class="bfc_actions" data-bfc-actions>
-                  <button type="button" class="bfc_action_btn" data-bfc-share="${bookId}" hidden>Share</button>
-                  <a class="bfc_action_btn" data-bfc-email="${bookId}" href="#" role="button">Email</a>
-                  <button type="button" class="bfc_action_btn" data-bfc-copy="${bookId}">
-                    <span data-bfc-copy-label>Copy book info</span>
-                  </button>
+                <div class="bfc_detail_body">
+                  <dl class="bfc_meta_grid">
+                    ${publisher ? `<dt>Publisher</dt><dd>${publisher}</dd>` : ""}
+                    ${year ? `<dt>Year</dt><dd>${year}</dd>` : ""}
+                    ${pages ? `<dt>Pages</dt><dd>${pages}</dd>` : ""}
+                    ${language ? `<dt>Language</dt><dd>${language}</dd>` : ""}
+                    ${tags ? `<dt>Tags</dt><dd>${tags}</dd>` : ""}
+                    ${notes ? `<dt>Notes</dt><dd>${notes}</dd>` : ""}
+                    <dt>ISBN-13</dt><dd>${isbn13}</dd>
+                  </dl>
+                  ${synopsis ? `<div class="bfc_synopsis"><h4 class="bfc_synopsis_label">Synopsis</h4><p>${synopsis}</p></div>` : ""}
+                  <div class="bfc_actions" data-bfc-actions>
+                    <button type="button" class="bfc_action_btn" data-bfc-share="${bookId}" hidden>Share</button>
+                    <a class="bfc_action_btn" data-bfc-email="${bookId}" href="#" role="button">Email</a>
+                    <button type="button" class="bfc_action_btn" data-bfc-copy="${bookId}">
+                      <span data-bfc-copy-label>Copy book info</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </details>
@@ -1418,6 +1426,10 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
     .bfc * {
         box-sizing: border-box;
     }
+    .bfc {
+        max-width: 1600px;
+        margin-inline: auto;
+    }
 
     .bfc_body {
         background: radial-gradient(
@@ -1429,11 +1441,74 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
         padding: var(--padding);
         border-radius: var(--radius);
     }
+    @media (min-width: 1100px) {
+        .bfc_body {
+            display: grid;
+            grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
+            column-gap: 24px;
+            align-items: start;
+        }
+        .bfc_sidebar {
+            position: sticky;
+            top: 16px;
+            align-self: start;
+            max-height: calc(100vh - 32px);
+            overflow-y: auto;
+            padding-inline-end: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .bfc_sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .bfc_sidebar::-webkit-scrollbar-thumb {
+            background: var(--border-card);
+            border-radius: 3px;
+        }
+        .bfc_main {
+            min-width: 0;
+        }
+
+        /* Sidebar: stack every control on its own line */
+        .bfc_sidebar .bfc_controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .bfc_sidebar .bfc_filter_row {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 12px;
+            margin-block: 0;
+        }
+        .bfc_sidebar .bfc_status_tabs {
+            flex: 0 0 auto;
+        }
+        .bfc_sidebar .bfc_lang_filter {
+            margin-left: 0;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+        }
+        .bfc_sidebar .bfc_lang_filter select {
+            min-block-size: 46px;
+            width: 100%;
+        }
+        .bfc_sidebar .bfc_view_switch,
+        .bfc_sidebar .bfc_expand_toggle {
+            align-self: flex-start;
+        }
+    }
 
     /* ── Header ──────────────────────────────────────────────────── */
     .bfc_header h1 {
         margin-block: 0;
-        font-size: var(--fs-hero);
+        font-size: clamp(48px, 9vw, 120px);
+        font-weight: 100;
+        letter-spacing: -0.02em;
+        line-height: 0.95;
         color: var(--accent);
         text-wrap: balance;
     }
@@ -1834,7 +1909,7 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
     .bfc_title {
         font-size: var(--fs-xl);
         font-weight: 600;
-        color: var(--text);
+        color: hsla(0, 0%, 100%, 0.7);
         overflow: hidden;
         display: -webkit-box;
         -webkit-line-clamp: 3;
@@ -1852,8 +1927,9 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
     }
 
     .bfc_authors {
-        font-size: var(--fs-xs);
-        color: var(--text-dim);
+        font-size: var(--fs-lg);
+        font-weight: 500;
+        color: var(--text);
     }
 
     .bfc_filter_row {
@@ -1981,9 +2057,8 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
     }
     .bfc_list--compact .bfc_detail_cover {
         display: block;
-        width: 140px;
-        max-width: 40%;
-        margin-block: 4px 10px;
+        width: 100%;
+        align-self: start;
         border-radius: var(--radius);
         overflow: hidden;
         background: var(--bg-card);
@@ -2043,45 +2118,105 @@ const encodedConfig = encodeURIComponent(JSON.stringify(resolvedConfig));
     .bfc_detail {
         border-block-start: 1px solid var(--border-sub);
         padding-inline: var(--padding);
-        padding-block: calc(var(--padding) - 4px) var(--padding);
+        padding-block: var(--padding);
         display: grid;
-        gap: 6px;
+        grid-template-columns: 1fr;
+        gap: 18px;
         font-size: var(--fs-sm);
         color: var(--text-dim);
     }
-    .bfc_detail p {
+    .bfc_list--compact .bfc_detail {
+        grid-template-columns: 160px minmax(0, 1fr);
+        column-gap: 22px;
+    }
+    /* Collapse to single column when the cover failed/was-missing,
+       so the metadata + synopsis get the full width back. */
+    .bfc_list--compact .bfc_detail:has(.bfc_detail_cover--failed) {
+        grid-template-columns: 1fr;
+    }
+    @media (max-width: 760px) {
+        .bfc_list--compact .bfc_detail {
+            grid-template-columns: 1fr;
+        }
+        .bfc_list--compact .bfc_detail_cover {
+            max-width: 160px;
+        }
+    }
+
+    .bfc_detail_body {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-width: 0;
+    }
+
+    /* Metadata as a tight definition-list grid */
+    .bfc_meta_grid {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        column-gap: 14px;
+        row-gap: 4px;
         margin: 0;
-        overflow-wrap: anywhere;
-        word-break: break-word;
-        white-space: normal;
+        font-size: var(--fs-sm);
     }
-    .bfc_detail strong {
+    .bfc_meta_grid dt {
+        color: var(--text-dim);
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        font-size: 0.78em;
+        align-self: baseline;
+        padding-block-start: 2px;
+    }
+    .bfc_meta_grid dd {
+        margin: 0;
         color: var(--text);
+        overflow-wrap: anywhere;
+        min-width: 0;
     }
+
+    /* Synopsis — narrow column for readable line length */
     .bfc_synopsis {
-        margin-block-start: 4px;
-        line-height: 1.5;
+        max-width: 65ch;
     }
+    .bfc_synopsis_label {
+        margin: 0 0 6px;
+        font-size: 0.78em;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+    }
+    .bfc_synopsis p {
+        margin: 0;
+        line-height: 1.55;
+        color: var(--text);
+        overflow-wrap: anywhere;
+    }
+
+    /* Actions — content-sized, right-aligned, lighter footprint */
     .bfc_actions {
         display: flex;
-        gap: 12px;
-        margin-block-start: 14px;
-        padding-block-start: 12px;
-        border-block-start: 1px solid var(--border-sub);
+        justify-content: flex-end;
         flex-wrap: wrap;
+        gap: 10px;
+        margin-block-start: 4px;
+        padding-block-start: 14px;
+        border-block-start: 1px solid var(--border-sub);
     }
     .bfc_action_btn {
-        flex: 1 1 140px;
-        min-height: 44px;
-        padding: 10px 16px;
+        min-height: 36px;
+        padding: 8px 16px;
         border: 1px solid var(--accent);
         border-radius: var(--radius);
         background: var(--bg-card);
         color: var(--accent);
         font: inherit;
+        font-size: var(--fs-sm);
         font-weight: 600;
         letter-spacing: 0.01em;
         cursor: pointer;
+        text-decoration: none;
         transition:
             background 0.15s ease,
             color 0.15s ease,

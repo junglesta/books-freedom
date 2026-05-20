@@ -2,6 +2,22 @@
 
 Changelog for the `@bookbat/baobab` Astro display component. The sibling BOOK BAT webapp has its own changelog at the repo root (`/CHANGELOG.md`).
 
+## 0.4.0 — 2026-05-20
+
+**Breaking — license change.** Relicensed from **CC BY-SA 4.0** (copyleft, share-alike) to **MIT** (permissive, no copyleft). Footer link updated. Downstream consumers who depended on the share-alike terms must review.
+
+- Expanded card detail panel redesigned as a 2-column grid (cover left, content right) with `<dl>`-based metadata, 65ch-capped synopsis, and right-aligned action row; collapses to single column on narrow viewports and when the cover is missing (via `:has(.bfc_detail_cover--failed)`)
+- Wide-screen layout: 40/60 sticky sidebar — controls (search, sort, status tabs, language, view toggle, expand toggle) move into a sticky left column above 1100px, with the book list scrolling independently on the right
+- Sidebar stacks every control on its own line; Search / Sort / Language each get label-on-its-own-line, input-on-the-next
+- Header reset: BAOBAB title now `clamp(48px, 9vw, 120px)`, `font-weight: 100`, tight tracking
+- Card summary: bumped author to `--fs-lg` and reordered the chip to `year · Read · ★★★★` (year first)
+- Title color set to `hsla(0, 0%, 100%, 0.7)`
+- Hardened cover loading: dropped `?default=false` from the Open Library URL so the SW no longer caches 404s as opaque entries; detect 1×1 placeholder via `naturalWidth`; added load/error handler to the detail-panel cover; bumped service-worker thumb cache to `v3` so old poisoned entries get evicted
+- Raised idle-time cover prewarm cap from 120 → 500 covers
+- `pnpm dev:baobab` now wipes `.astro`, `node_modules/.astro`, `node_modules/.vite`, and `dist` before starting (`pnpm clean` exposed for ad-hoc use)
+- `astro dev` now opens the browser automatically (`--open`)
+- Capped `.bfc` and `.preview-panel` to a centered max-width of 1600px / 1400px respectively
+
 ## 0.2.0 — 2026-05-20
 
 - Renamed package from `@bookbat/astro-site` to `@bookbat/baobab` and moved directory from `apps/astro-site` to `apps/baobab`. Updated workspace scripts (`pnpm dev:baobab`, `pnpm build:baobab`), Netlify configs, and ignore scripts accordingly

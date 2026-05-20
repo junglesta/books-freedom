@@ -2,6 +2,10 @@
 
 This is the BOOK BAT changelog. For the BAOBAB Astro display component, see [`apps/baobab/CHANGELOG.md`](apps/baobab/CHANGELOG.md).
 
+## 0.9.0 — 2026-05-20
+
+**Breaking — license change.** Project relicensed from **CC BY-SA 4.0** (copyleft, share-alike) to **MIT** (permissive, no copyleft). `LICENSE` rewritten; README license link updated. Downstream consumers who depended on the share-alike terms must review.
+
 ## 0.8.10 — 2026-05-20
 
 - Renamed app from `apps/webapp` → `apps/bookbat`; package `@bookbat/webapp` → `@bookbat/bookbat`. Workspace scripts moved to `pnpm dev:bookbat` / `pnpm build:bookbat` / `pnpm test`. Production build output is now `dist/bookbat`
